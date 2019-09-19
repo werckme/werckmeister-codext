@@ -4,20 +4,17 @@ import { basename } from 'path';
 
 import { getPlayer, Player } from '../com/Player';
 
-export class Play extends ACommand {
+export class Stop extends ACommand {
     async execute(): Promise<void> {
-        let editor = vscode.window.activeTextEditor;
-        if (!editor) {
-            return;
-        }
-        let sheetPath = editor.document.fileName;
-        let filename = basename(sheetPath);
         let player:Player = getPlayer();
-        player.play(sheetPath)
+        let currentFile = player.currentFile;
+        player.stop()
             .then(()=>{})
             .catch((ex)=>{
                 vscode.window.showErrorMessage(ex);
             });
-        vscode.window.showInformationMessage(`Playing: ${filename}`);
+        if (!!currentFile) {
+            vscode.window.showInformationMessage(`Stopped: ${basename(currentFile)}`);
+        }
     }
 }

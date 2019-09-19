@@ -12,8 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const ACommand_1 = require("./ACommand");
 const vscode = require("vscode");
 const path_1 = require("path");
-const Player_1 = require("../com/Player");
-class Play extends ACommand_1.ACommand {
+const WmPlayerPath = "/home/samba/workspace/werckmeister/build/sheetp";
+class PlayTerminal extends ACommand_1.ACommand {
     execute() {
         return __awaiter(this, void 0, void 0, function* () {
             let editor = vscode.window.activeTextEditor;
@@ -21,16 +21,17 @@ class Play extends ACommand_1.ACommand {
                 return;
             }
             let sheetPath = editor.document.fileName;
+            let cmd = `${WmPlayerPath} ${sheetPath}`;
             let filename = path_1.basename(sheetPath);
-            let player = Player_1.getPlayer();
-            player.play(sheetPath)
-                .then(() => { })
-                .catch((ex) => {
-                vscode.window.showErrorMessage(ex);
-            });
-            vscode.window.showInformationMessage(`Playing: ${filename}`);
+            let terminalName = `Werckmeister: ${filename}`;
+            let terminal = vscode.window.terminals.find(x => x.name === terminalName);
+            if (!terminal) {
+                terminal = vscode.window.createTerminal(terminalName);
+            }
+            terminal.show();
+            terminal.sendText(cmd);
         });
     }
 }
-exports.Play = Play;
-//# sourceMappingURL=Play.js.map
+exports.PlayTerminal = PlayTerminal;
+//# sourceMappingURL=PlayTerminal.js.map

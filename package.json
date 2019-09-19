@@ -10,44 +10,64 @@
         "Other"
     ],
     "activationEvents": [
-		"onCommand:extension.werckmeister.play"
+        "onCommand:extension.werckmeister.terminal.play",
+        "onCommand:extension.werckmeister.play",
+        "onCommand:extension.werckmeister.stop"
     ],
     "main": "./out/extension.js",
     "contributes": {
         "commands": [
-			{
-				"command": "extension.werckmeister.play",
-				"title": "Werckmeister: Play"
-			}
-		],
-        "languages": [{
-            "id": "werckmeister",
-            "aliases": ["Werckmeister", "werckmeister"],
-            "extensions": [".sheet",".template"],
-            "configuration": "./language-configuration.json"
-        }],
-        "grammars": [{
-            "language": "werckmeister",
-            "scopeName": "source.werckmeister",
-            "path": "./syntaxes/werckmeister.tmLanguage.json"
-        }]
+            {
+                "command": "extension.werckmeister.terminal.play",
+                "title": "Werckmeister: Play in Terminal"
+            },
+            {
+                "command": "extension.werckmeister.play",
+                "title": "Werckmeister: Play"
+            },
+            {
+                "command": "extension.werckmeister.stop",
+                "title": "Werckmeister: Stop"
+            }
+        ],
+        "languages": [
+            {
+                "id": "werckmeister",
+                "aliases": [
+                    "Werckmeister",
+                    "werckmeister"
+                ],
+                "extensions": [
+                    ".sheet",
+                    ".template"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "werckmeister",
+                "scopeName": "source.werckmeister",
+                "path": "./syntaxes/werckmeister.tmLanguage.json"
+            }
+        ]
     },
-	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"pretest": "npm run compile",
-		"test": "node ./out/test/runTest.js"
-	},
-	"devDependencies": {
-		"@types/glob": "^7.1.1",
-		"@types/mocha": "^5.2.6",
-		"@types/node": "^10.12.21",
-		"@types/vscode": "^1.38.0",
-		"glob": "^7.1.4",
-		"mocha": "^6.1.4",
-		"typescript": "^3.3.1",
-		"tslint": "^5.12.1",
-		"vscode-test": "^1.2.0"
-	}
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "pretest": "npm run compile",
+        "test": "node ./out/test/runTest.js"
+    },
+    "devDependencies": {
+        "@types/glob": "^7.1.1",
+        "@types/mocha": "^5.2.6",
+        "@types/node": "^10.12.21",
+        "@types/vscode": "^1.38.0",
+        "glob": "^7.1.4",
+        "mocha": "^6.1.4",
+        "typescript": "^3.3.1",
+        "tslint": "^5.12.1",
+        "vscode-test": "^1.2.0"
+    }
 }

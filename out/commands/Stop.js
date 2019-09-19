@@ -13,24 +13,21 @@ const ACommand_1 = require("./ACommand");
 const vscode = require("vscode");
 const path_1 = require("path");
 const Player_1 = require("../com/Player");
-class Play extends ACommand_1.ACommand {
+class Stop extends ACommand_1.ACommand {
     execute() {
         return __awaiter(this, void 0, void 0, function* () {
-            let editor = vscode.window.activeTextEditor;
-            if (!editor) {
-                return;
-            }
-            let sheetPath = editor.document.fileName;
-            let filename = path_1.basename(sheetPath);
             let player = Player_1.getPlayer();
-            player.play(sheetPath)
+            let currentFile = player.currentFile;
+            player.stop()
                 .then(() => { })
                 .catch((ex) => {
                 vscode.window.showErrorMessage(ex);
             });
-            vscode.window.showInformationMessage(`Playing: ${filename}`);
+            if (!!currentFile) {
+                vscode.window.showInformationMessage(`Stopped: ${path_1.basename(currentFile)}`);
+            }
         });
     }
 }
-exports.Play = Play;
-//# sourceMappingURL=Play.js.map
+exports.Stop = Stop;
+//# sourceMappingURL=Stop.js.map
