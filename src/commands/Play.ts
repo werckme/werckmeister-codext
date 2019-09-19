@@ -14,10 +14,10 @@ export class Play extends ACommand {
         let filename = basename(sheetPath);
         let player:Player = getPlayer();
         player.play(sheetPath)
-            .then(()=>{})
-            .catch((ex)=>{
-                vscode.window.showErrorMessage(ex);
-            });
+        .then(()=>{})
+        .catch((ex)=>{
+            vscode.window.showErrorMessage(`Werckmeister: ${ex}`);
+        });
         vscode.window.showInformationMessage(`Playing: ${filename}`);
     }
 }

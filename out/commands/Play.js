@@ -26,7 +26,7 @@ class Play extends ACommand_1.ACommand {
             player.play(sheetPath)
                 .then(() => { })
                 .catch((ex) => {
-                vscode.window.showErrorMessage(ex);
+                vscode.window.showErrorMessage(`Werckmeister: ${ex}`);
             });
             vscode.window.showInformationMessage(`Playing: ${filename}`);
         });
