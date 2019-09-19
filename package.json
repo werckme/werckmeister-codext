@@ -1,0 +1,25 @@
+{
+    "name": "werckmeister",
+    "displayName": "werckmeister",
+    "description": "Werckmeister for VS Code",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.38.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "werckmeister",
+            "aliases": ["Werckmeister", "werckmeister"],
+            "extensions": [".sheet",".template"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "werckmeister",
+            "scopeName": "source.werckmeister",
+            "path": "./syntaxes/werckmeister.tmLanguage.json"
+        }]
+    }
+}

@@ -1,0 +1,100 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Werckmeister",
+	"patterns": [
+		{"include": "#keywords"},
+		{"include": "#strings"},
+		{"include": "#comments"},
+		{"include": "#track"},
+		{"include": "#meta"}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.other.using.werckmeister",
+				"match": "@load"
+			}]
+		},
+		"strings": {
+			"name": "string.quoted.double.werckmeister",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.werckmeister",
+					"match": "\\\\."
+				}
+			]
+		},
+		"comments": {
+			"name": "comment.line.double-dash.werckmeister",
+			"begin": "--",
+			"end": "$"
+		},
+		"track": {
+			"name": "entity.name.track",
+			"begin": "\\[",
+			"end": "\\]",
+			"patterns": [
+				{ "include": "#comments" },
+				{ "include": "#voice" },
+				{ "include": "#meta" }
+			]
+		},
+		"voice": {
+			"name": "entity.name.voice",
+			"begin": "\\{",
+			"end": "\\}",
+			"patterns": [
+				{ "include": "#comments" },
+				{ "include": "#voicemeta" },
+				{
+					"name": "keyword.other.barline",
+					"match": "\\|"
+				}
+			]
+		},
+		"meta": {
+			"name": "entity.name.meta",
+			"begin": "(\\w+:)",
+			"beginCaptures": {
+				"1": {
+					"name": "entity.name.function.meta.werckmeister"
+				}
+			},
+			"end": ";",
+			"patterns": [
+				{
+					"name": "variable.parameter.meta.werckmeister",
+					"match": "[a-zA-Z0-9]+"
+				}
+			]
+		},
+		"voicemeta": {
+			"name": "entity.name.voicemeta",
+			"begin": "(/)",
+			"beginCaptures": {
+				"1": {
+					"name": "entity.name.function.voicemeta.werckmeister"
+				}
+			},
+			"end": "(/)",
+			"endCaptures": {
+				"1": {
+					"name": "entity.name.function.voicemeta.werckmeister"
+				}
+			},			
+			"patterns": [
+				{
+					"name": "entity.name.function.voicemeta.werckmeister",
+					"match": "\\w+:"
+				},
+				{
+					"name": "variable.parameter.voicemeta.werckmeister",
+					"match": "[a-zA-Z0-9]+"
+				}
+			]
+		}					
+	},
+	"scopeName": "source.werckmeister"
+}
