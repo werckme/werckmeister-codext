@@ -75,13 +75,13 @@
 			"begin": "(/)",
 			"beginCaptures": {
 				"1": {
-					"name": "entity.name.function.voicemeta.werckmeister"
+					"name": "entity.name.function.voicemeta.begin.werckmeister"
 				}
 			},
 			"end": "(/)",
 			"endCaptures": {
 				"1": {
-					"name": "entity.name.function.voicemeta.werckmeister"
+					"name": "entity.name.function.voicemeta.end.werckmeister"
 				}
 			},			
 			"patterns": [

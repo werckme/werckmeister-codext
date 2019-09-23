@@ -32,6 +32,8 @@ class Player {
             this.process = child_process_1.exec(cmd, (err, stdout, stderr) => {
                 if (!!err) {
                     reject(stderr);
+                    this.process = null;
+                    this.currentFile = null;
                     return;
                 }
                 resolve();

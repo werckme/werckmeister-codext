@@ -21,6 +21,8 @@ export class Player {
             this.process = exec(cmd, (err:any, stdout: any, stderr: any) => {
                 if (!!err) {
                     reject(stderr);
+                    this.process = null;
+                    this.currentFile = null;
                     return;
                 }
                 resolve();
