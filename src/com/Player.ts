@@ -16,6 +16,7 @@ export class Player {
             if (this.isPlaying) {
                 await this.stop();
             }
+            
             let cmd = `${WmPlayerPath} ${sheetPath} ${this.configToString()}`;
             this.currentFile = sheetPath;
             this.process = exec(cmd, (err:any, stdout: any, stderr: any) => {

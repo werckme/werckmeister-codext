@@ -6,22 +6,22 @@ const vscode = require("vscode");
 const Play_1 = require("./commands/Play");
 const PlayTerminal_1 = require("./commands/PlayTerminal");
 const Stop_1 = require("./commands/Stop");
-function excuteCommand(type) {
-    let cmd = new type();
+const SheetView_1 = require("./commands/SheetView");
+function excuteCommand(type, context) {
+    let cmd = new type(context);
     cmd.execute();
 }
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
     let ns = "extension.werckmeister";
-    // The command has been defined in the package.json file
-    // Now provide the implementation of the command with registerCommand
-    // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand(`${ns}.terminal.play`, excuteCommand.bind(null, PlayTerminal_1.PlayTerminal));
+    let disposable = vscode.commands.registerCommand(`${ns}.terminal.play`, excuteCommand.bind(null, PlayTerminal_1.PlayTerminal, context));
     context.subscriptions.push(disposable);
-    disposable = vscode.commands.registerCommand(`${ns}.play`, excuteCommand.bind(null, Play_1.Play));
+    disposable = vscode.commands.registerCommand(`${ns}.play`, excuteCommand.bind(null, Play_1.Play, context));
     context.subscriptions.push(disposable);
-    disposable = vscode.commands.registerCommand(`${ns}.stop`, excuteCommand.bind(null, Stop_1.Stop));
+    disposable = vscode.commands.registerCommand(`${ns}.stop`, excuteCommand.bind(null, Stop_1.Stop, context));
+    context.subscriptions.push(disposable);
+    disposable = vscode.commands.registerCommand(`${ns}.sheetview`, excuteCommand.bind(null, SheetView_1.SheetView, context));
     context.subscriptions.push(disposable);
 }
 exports.activate = activate;

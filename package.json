@@ -12,7 +12,8 @@
     "activationEvents": [
         "onCommand:extension.werckmeister.terminal.play",
         "onCommand:extension.werckmeister.play",
-        "onCommand:extension.werckmeister.stop"
+        "onCommand:extension.werckmeister.stop",
+        "onCommand:extension.werckmeister.sheetview"
     ],
     "main": "./out/extension.js",
     "contributes": {
@@ -28,6 +29,10 @@
             {
                 "command": "extension.werckmeister.stop",
                 "title": "Werckmeister: Stop"
+            },
+            {
+                "command": "extension.werckmeister.sheetview",
+                "title": "Werckmeister: Sheetview"
             }
         ],
         "languages": [
@@ -57,7 +62,8 @@
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
         "pretest": "npm run compile",
-        "test": "node ./out/test/runTest.js"
+        "test": "node ./out/test/runTest.js",
+        "echo": "echo hallo"
     },
     "devDependencies": {
         "@types/glob": "^7.1.1",
