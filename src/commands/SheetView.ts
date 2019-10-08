@@ -3,8 +3,15 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 
+
 export class SheetView extends ACommand {
 	
+
+	toWebViewUri(uri: vscode.Uri): string {
+		// panel.webview.asWebviewUri is not available at runtime for some reason
+		return `vscode-resource:${uri.path}`;
+	}
+
 	async execute(): Promise<void> {
 		const panel = vscode.window.createWebviewPanel(
 			'werckmeister.sheetview', // Identifies the type of the webview. Used internally
@@ -24,9 +31,8 @@ export class SheetView extends ACommand {
 			path.join(this.context.extensionPath, 'SheetView', 'SheetView.html')
 		);
 		
-		console.log(jsPath);
-		fs.readFile(htmlPath.path, 'utf8', function (err, data) {
-			data = data.replace("$mainSrc", `vscode-resource:${jsPath.path}`)
+		fs.readFile(htmlPath.path, 'utf8', (err, data) => {
+			data = data.replace("$mainSrc", this.toWebViewUri(jsPath))
 			panel.webview.html = data;
 		});
 	}

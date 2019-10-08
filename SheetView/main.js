@@ -1,4 +1,9 @@
-document.getElementById("text").innerText = "2";
+import React, { Component } from "react";
+
+console.log(React);
+
+// https://www.valentinog.com/blog/babel/
+document.getElementById("text").innerText = "HALLO";
 // var xhttp = new XMLHttpRequest();
 // xhttp.open("GET", "http://localhost:5000/api/app/version", true);
 // xhttp.onload = (data) => {
