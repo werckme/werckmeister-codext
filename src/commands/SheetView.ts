@@ -4,6 +4,9 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { Player, getPlayer, OnPlayerMessageEvent } from "../com/Player";
 
+
+let currentSheetView: any = null;
+
 export class SheetView extends ACommand {
 
 	currentPanel: vscode.WebviewPanel|null = null;
@@ -26,14 +29,18 @@ export class SheetView extends ACommand {
 	}
 
 	async execute(): Promise<void> {
+		if (currentSheetView !== null) {
+			return;
+		}
 		this.currentPanel = vscode.window.createWebviewPanel(
 			'werckmeister.sheetview', // Identifies the type of the webview. Used internally
 			'Sheet View', // Title of the panel displayed to the user
-			vscode.ViewColumn.One, // Editor column to show the new webview panel in.
+			vscode.ViewColumn.Two, // Editor column to show the new webview panel in.
 			{
 				enableScripts: true,
 			}
 		);
+		currentSheetView = this;
 		let jsPath = vscode.Uri.file(
 			path.join(this.context.extensionPath, 'SheetView', 'dist', 'sheetView.dist.js')
 		);
@@ -52,6 +59,7 @@ export class SheetView extends ACommand {
 
 		this.currentPanel.onDidDispose(()=>{
 			player.onPlayerMessage.removeListener(OnPlayerMessageEvent, this.onPlayerMessageBound);
+			currentSheetView = null;
 		});
 	}
 }

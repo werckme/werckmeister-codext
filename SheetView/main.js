@@ -1,10 +1,5 @@
-import React, { Component } from "react";
+import ReactDOM from 'react-dom';
+import React from 'react';
+import { MainComponent } from './components/main/main.component';
 
-// https://www.valentinog.com/blog/babel/
-document.getElementById("text").innerText = "HALLO";
-
-window.addEventListener('message', event => {
-
-    const message = event.data; // The JSON data our extension sent
-    document.getElementById("text").innerText = message.sheetTime;
-});
+ReactDOM.render(<MainComponent />, document.getElementById('main-component'));

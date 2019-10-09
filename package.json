@@ -66,10 +66,14 @@
         "compile-sheet-view": "webpack --config sheetView.webpack.config.js"
     },
     "devDependencies": {
+        "@babel/core": "^7.6.3",
+        "@babel/preset-env": "^7.6.3",
+        "@babel/preset-react": "^7.6.3",
         "@types/glob": "^7.1.1",
         "@types/mocha": "^5.2.6",
         "@types/node": "^10.12.21",
         "@types/vscode": "^1.38.0",
+        "babel-loader": "^8.0.6",
         "glob": "^7.1.4",
         "mocha": "^6.1.4",
         "tslint": "^5.12.1",
