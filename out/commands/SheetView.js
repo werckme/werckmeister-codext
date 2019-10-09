@@ -13,14 +13,26 @@ const ACommand_1 = require("./ACommand");
 const vscode = require("vscode");
 const path = require("path");
 const fs = require("fs");
+const Player_1 = require("../com/Player");
 class SheetView extends ACommand_1.ACommand {
+    constructor(context) {
+        super(context);
+        this.currentPanel = null;
+        this.onPlayerMessageBound = this.onPlayerMessage.bind(this);
+    }
     toWebViewUri(uri) {
         // panel.webview.asWebviewUri is not available at runtime for some reason
         return `vscode-resource:${uri.path}`;
     }
+    onPlayerMessage(sheetTime) {
+        if (!this.currentPanel) {
+            return;
+        }
+        this.currentPanel.webview.postMessage({ sheetTime: sheetTime });
+    }
     execute() {
         return __awaiter(this, void 0, void 0, function* () {
-            const panel = vscode.window.createWebviewPanel('werckmeister.sheetview', // Identifies the type of the webview. Used internally
+            this.currentPanel = vscode.window.createWebviewPanel('werckmeister.sheetview', // Identifies the type of the webview. Used internally
             'Sheet View', // Title of the panel displayed to the user
             vscode.ViewColumn.One, // Editor column to show the new webview panel in.
             {
@@ -30,7 +42,12 @@ class SheetView extends ACommand_1.ACommand {
             let htmlPath = vscode.Uri.file(path.join(this.context.extensionPath, 'SheetView', 'SheetView.html'));
             fs.readFile(htmlPath.path, 'utf8', (err, data) => {
                 data = data.replace("$mainSrc", this.toWebViewUri(jsPath));
-                panel.webview.html = data;
+                this.currentPanel.webview.html = data;
+            });
+            let player = Player_1.getPlayer();
+            player.onPlayerMessage.on(Player_1.OnPlayerMessageEvent, this.onPlayerMessageBound);
+            this.currentPanel.onDidDispose(() => {
+                player.onPlayerMessage.removeListener(Player_1.OnPlayerMessageEvent, this.onPlayerMessageBound);
             });
         });
     }

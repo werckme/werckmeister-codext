@@ -1,16 +1,43 @@
 const WmPlayerPath = "/home/samba/workspace/werckmeister/build/sheetp";
+const UDP_PORT = 8080;
 import { exec, ChildProcess } from 'child_process';
+import * as dgram from 'dgram';
+import * as EventEmitter from 'events';
 
 const Config = {
     watch: true
 };
 
+export const OnPlayerMessageEvent = 'OnPlayerMessageEvent';
+
 export class Player {
     currentFile: string|null = null;
+    socket: dgram.Socket|null = null;
+    onPlayerMessage: EventEmitter = new EventEmitter();
     private process: ChildProcess|null = null;
     get isPlaying(): boolean {
         return !!this.process;
     }
+    
+    startUdpListener() {
+		if (this.socket === null) {
+			this.socket = dgram.createSocket('udp4');
+        }
+        this.socket.on('message', (msg) => {
+            this.onPlayerMessage.emit(OnPlayerMessageEvent, Number.parseFloat(msg.toString()));
+        });
+        this.socket.bind(UDP_PORT);
+    }
+
+    stopUdpListener() {
+        if (this.socket === null) {
+            return;
+        }
+        this.socket.removeAllListeners();
+        this.socket.close();
+        this.socket = null;
+    }
+    
     play(sheetPath: string): Promise<void> {
         return new Promise(async (resolve, reject) => {
             if (this.isPlaying) {
@@ -30,6 +57,7 @@ export class Player {
                 this.process = null;
                 this.currentFile = null;
             });
+            this.startUdpListener();
         });
     }
     stop(): Promise<void> {
@@ -50,7 +78,10 @@ export class Player {
         });
     }
     private configToString() {
-        let options = [];
+        let options = [
+            `--funkfeuer=localhost:${UDP_PORT}`
+            ,'--nostdout'
+        ];
         if (Config.watch) {
             options.push("--watch");
         }

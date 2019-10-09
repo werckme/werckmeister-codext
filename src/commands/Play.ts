@@ -1,10 +1,10 @@
 import { ACommand } from "./ACommand";
 import * as vscode from 'vscode';
 import { basename } from 'path';
-
 import { getPlayer, Player } from '../com/Player';
 
 export class Play extends ACommand {
+
     async execute(): Promise<void> {
         let editor = vscode.window.activeTextEditor;
         if (!editor) {

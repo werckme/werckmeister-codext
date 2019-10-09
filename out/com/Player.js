@@ -10,17 +10,40 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const WmPlayerPath = "/home/samba/workspace/werckmeister/build/sheetp";
+const UDP_PORT = 8080;
 const child_process_1 = require("child_process");
+const dgram = require("dgram");
+const EventEmitter = require("events");
 const Config = {
     watch: true
 };
+exports.OnPlayerMessageEvent = 'OnPlayerMessageEvent';
 class Player {
     constructor() {
         this.currentFile = null;
+        this.socket = null;
+        this.onPlayerMessage = new EventEmitter();
         this.process = null;
     }
     get isPlaying() {
         return !!this.process;
+    }
+    startUdpListener() {
+        if (this.socket === null) {
+            this.socket = dgram.createSocket('udp4');
+        }
+        this.socket.on('message', (msg) => {
+            this.onPlayerMessage.emit(exports.OnPlayerMessageEvent, Number.parseFloat(msg.toString()));
+        });
+        this.socket.bind(UDP_PORT);
+    }
+    stopUdpListener() {
+        if (this.socket === null) {
+            return;
+        }
+        this.socket.removeAllListeners();
+        this.socket.close();
+        this.socket = null;
     }
     play(sheetPath) {
         return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
@@ -40,6 +63,7 @@ class Player {
                 this.process = null;
                 this.currentFile = null;
             });
+            this.startUdpListener();
         }));
     }
     stop() {
@@ -60,7 +84,10 @@ class Player {
         });
     }
     configToString() {
-        let options = [];
+        let options = [
+            `--funkfeuer=localhost:${UDP_PORT}`,
+            '--nostdout'
+        ];
         if (Config.watch) {
             options.push("--watch");
         }
