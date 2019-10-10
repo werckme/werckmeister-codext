@@ -25,11 +25,11 @@ class SheetView extends ACommand_1.ACommand {
         // panel.webview.asWebviewUri is not available at runtime for some reason
         return `vscode-resource:${uri.path}`;
     }
-    onPlayerMessage(sheetTime) {
+    onPlayerMessage(message) {
         if (!this.currentPanel) {
             return;
         }
-        this.currentPanel.webview.postMessage({ sheetTime: sheetTime });
+        this.currentPanel.webview.postMessage(message);
     }
     execute() {
         return __awaiter(this, void 0, void 0, function* () {

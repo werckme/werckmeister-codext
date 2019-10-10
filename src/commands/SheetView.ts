@@ -21,11 +21,11 @@ export class SheetView extends ACommand {
 		return `vscode-resource:${uri.path}`;
 	}
 
-	onPlayerMessage(sheetTime:Number) {
+	onPlayerMessage(message:any) {
 		if (!this.currentPanel) {
 			return;
 		}
-		this.currentPanel.webview.postMessage({sheetTime: sheetTime});
+		this.currentPanel.webview.postMessage(message);
 	}
 
 	async execute(): Promise<void> {

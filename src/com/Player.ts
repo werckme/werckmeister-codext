@@ -24,7 +24,8 @@ export class Player {
 			this.socket = dgram.createSocket('udp4');
         }
         this.socket.on('message', (msg) => {
-            this.onPlayerMessage.emit(OnPlayerMessageEvent, Number.parseFloat(msg.toString()));
+            let object = msg.toJSON();
+            this.onPlayerMessage.emit(OnPlayerMessageEvent, object);
         });
         this.socket.bind(UDP_PORT);
     }

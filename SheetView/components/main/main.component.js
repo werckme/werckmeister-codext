@@ -8,7 +8,6 @@ export class MainComponent extends React.Component {
         }
         window.addEventListener('message', event => { // get vscode message
             const message = event.data;
-            console.log(message);
             this.setState({sheetTime: message.sheetTime});
         });
     }

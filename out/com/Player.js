@@ -29,14 +29,12 @@ class Player {
         return !!this.process;
     }
     startUdpListener() {
-        if (this.socket !==null) {
-            return;
-        }
         if (this.socket === null) {
             this.socket = dgram.createSocket('udp4');
         }
         this.socket.on('message', (msg) => {
-            this.onPlayerMessage.emit(exports.OnPlayerMessageEvent, Number.parseFloat(msg.toString()));
+            let object = JSON.parse(msg.toString());
+            this.onPlayerMessage.emit(exports.OnPlayerMessageEvent, object);
         });
         this.socket.bind(UDP_PORT);
     }
