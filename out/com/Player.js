@@ -29,6 +29,9 @@ class Player {
         return !!this.process;
     }
     startUdpListener() {
+        if (this.socket !== null) {
+            return;
+        }
         if (this.socket === null) {
             this.socket = dgram.createSocket('udp4');
         }
