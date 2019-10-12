@@ -84,6 +84,7 @@
     },
     "dependencies": {
         "react": "^16.10.2",
-        "react-dom": "^16.10.2"
+        "react-dom": "^16.10.2",
+        "udp-free-port": "^1.0.0"
     }
 }
