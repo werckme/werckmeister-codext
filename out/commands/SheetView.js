@@ -20,16 +20,62 @@ class SheetView extends ACommand_1.ACommand {
         super(context);
         this.currentPanel = null;
         this.onPlayerMessageBound = this.onPlayerMessage.bind(this);
+        this.onSheetFileChangedeBound = this.onSheetFileChanged.bind(this);
     }
     toWebViewUri(uri) {
         // panel.webview.asWebviewUri is not available at runtime for some reason
         return `vscode-resource:${uri.path}`;
+    }
+    onSheetFileChanged(state) {
+        if (state === Player_1.PlayerState.Playing) {
+            this.updateSheetSourceMap();
+        }
+    }
+    readFile(path) {
+        return new Promise((resolve, reject) => {
+            fs.readFile(path, "utf8", (err, data) => {
+                if (!!err) {
+                    reject(err);
+                    return;
+                }
+                resolve(data);
+            });
+        });
+    }
+    updateSheetSourceMap() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.currentPanel) {
+                return;
+            }
+            let player = Player_1.getPlayer();
+            let sourceMap = player.sourceMap;
+            let fileInfos = sourceMap.sources.map((source) => __awaiter(this, void 0, void 0, function* () {
+                const fileInfo = {};
+                Object.assign(fileInfo, source);
+                fileInfo.extension = path.extname(source.path);
+                fileInfo.basename = path.basename(source.path);
+                fileInfo.text = yield this.readFile(sourceMap.mainDocument);
+                return fileInfo;
+            }));
+            fileInfos = yield Promise.all(fileInfos);
+            this.currentPanel.webview.postMessage({ fileInfos });
+        });
     }
     onPlayerMessage(message) {
         if (!this.currentPanel) {
             return;
         }
         this.currentPanel.webview.postMessage(message);
+    }
+    registerListener() {
+        let player = Player_1.getPlayer();
+        player.playerMessage.on(Player_1.OnPlayerMessageEvent, this.onPlayerMessageBound);
+        player.playerMessage.on(Player_1.OnPlayerStateChanged, this.onSheetFileChangedeBound);
+    }
+    removeListener() {
+        let player = Player_1.getPlayer();
+        player.playerMessage.removeListener(Player_1.OnPlayerMessageEvent, this.onPlayerMessageBound);
+        player.playerMessage.removeListener(Player_1.OnPlayerStateChanged, this.onSheetFileChangedeBound);
     }
     execute() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -49,10 +95,9 @@ class SheetView extends ACommand_1.ACommand {
                 data = data.replace("$mainSrc", this.toWebViewUri(jsPath));
                 this.currentPanel.webview.html = data;
             });
-            let player = Player_1.getPlayer();
-            player.onPlayerMessage.on(Player_1.OnPlayerMessageEvent, this.onPlayerMessageBound);
+            this.registerListener();
             this.currentPanel.onDidDispose(() => {
-                player.onPlayerMessage.removeListener(Player_1.OnPlayerMessageEvent, this.onPlayerMessageBound);
+                this.removeListener();
                 currentSheetView = null;
             });
         });

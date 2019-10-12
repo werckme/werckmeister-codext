@@ -3,8 +3,9 @@ const UDP_PORT = 8080;
 import { exec, ChildProcess } from 'child_process';
 import * as dgram from 'dgram';
 import * as EventEmitter from 'events';
-import { resolve } from 'dns';
-import { ISourceMap, EmptySourceMap } from './SourceMap';
+import { ISourceMap } from './SourceMap';
+import { throws } from 'assert';
+
 
 const freeUdpPort = require('udp-free-port');
 
@@ -29,13 +30,21 @@ function getFreeUdpPort(): Promise<number> {
 }
 
 export const OnPlayerMessageEvent = 'OnPlayerMessageEvent';
+export const OnPlayerStateChanged = 'OnPlayerStateChanged';
+
+export enum PlayerState {
+    Undefined,
+    Playing,
+    Stopped
+}
 
 export class Player {
-    currentFile: string|null = null;
     socket: dgram.Socket|null = null;
-    onPlayerMessage: EventEmitter = new EventEmitter();
+    playerMessage: EventEmitter = new EventEmitter();
     private process: ChildProcess|null = null;
-    sourceMap: ISourceMap = EmptySourceMap;
+    sourceMap: ISourceMap|null = null;
+    currentFile: string|null = null;
+
     get isPlaying(): boolean {
         return !!this.process;
     }
@@ -48,7 +57,7 @@ export class Player {
         }
         this.socket.on('message', (msg) => {
             let object = JSON.parse(msg.toString());
-            this.onPlayerMessage.emit(exports.OnPlayerMessageEvent, object);
+            this.playerMessage.emit(exports.OnPlayerMessageEvent, object);
         });
         this.socket.bind(port);
         console.log(`listen udp messages on port ${port}`);
@@ -69,11 +78,11 @@ export class Player {
         return exec(cmd, callback);
     }
 
-    protected getSourceMap(sheetPath: string): Promise<object> {
+    private updateSourceMap(): Promise<ISourceMap> {
         return new Promise((resolve, reject) => {
             const config = new Config();
             config.sourceMap = true;
-            config.sheetPath = sheetPath;
+            config.sheetPath = this.currentFile as string;
             let cmd = `${WmPlayerPath} ${this.configToString(config)}`;
             this._execute(cmd, (err:any, stdout: any, stderr: any) => {
                 if (!!err) {
@@ -87,11 +96,16 @@ export class Player {
                     reject(ex);
                 }
             });
+        }).then((sourceMap)=>{
+            this.sourceMap = sourceMap as ISourceMap;
+            this.sourceMap.mainDocument = this.currentFile as string;
+            return this.sourceMap;
         });
     }
 
     async play(sheetPath: string): Promise<void> {
-        this.sourceMap = await this.getSourceMap(sheetPath) as ISourceMap;
+        this.currentFile = sheetPath;
+        await this.updateSourceMap();
         return this._startPlayer(sheetPath);
     }
 
@@ -107,7 +121,7 @@ export class Player {
             config.port = nextFreePort;
             config.sheetPath = sheetPath;
             let cmd = `${WmPlayerPath} ${this.configToString(config)}`;
-            this.currentFile = sheetPath;
+            setTimeout(this.playerMessage.emit.bind(this.playerMessage, OnPlayerStateChanged, PlayerState.Playing), 10);
             this.process = this._execute(cmd, (err:any, stdout: any, stderr: any) => {
                 if (!!err) {
                     reject(stderr);
@@ -134,6 +148,7 @@ export class Player {
             let waitUntilEnd = () => {
                 if (!this.isPlaying) {
                     resolve();
+                    this.playerMessage.emit(OnPlayerStateChanged, PlayerState.Stopped);
                     return;
                 }
                 setTimeout(waitUntilEnd, 100);

@@ -83,6 +83,7 @@
         "webpack-cli": "^3.3.9"
     },
     "dependencies": {
+        "lodash": "^4.17.15",
         "react": "^16.10.2",
         "react-dom": "^16.10.2",
         "udp-free-port": "^1.0.0"

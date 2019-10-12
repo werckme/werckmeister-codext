@@ -1,9 +1,8 @@
-export interface SourceInfo {
+export interface ISourceInfo {
     sourceId: number;
     path: string;
 }
 export interface ISourceMap {
-    sources: Array<SourceInfo>;
+    mainDocument: string;
+    sources: Array<ISourceInfo>;
 }
-
-export const EmptySourceMap = {sources:[]};

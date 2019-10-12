@@ -14,7 +14,6 @@ const UDP_PORT = 8080;
 const child_process_1 = require("child_process");
 const dgram = require("dgram");
 const EventEmitter = require("events");
-const SourceMap_1 = require("./SourceMap");
 const freeUdpPort = require('udp-free-port');
 class Config {
     constructor() {
@@ -38,13 +37,20 @@ function getFreeUdpPort() {
     });
 }
 exports.OnPlayerMessageEvent = 'OnPlayerMessageEvent';
+exports.OnPlayerStateChanged = 'OnPlayerStateChanged';
+var PlayerState;
+(function (PlayerState) {
+    PlayerState[PlayerState["Undefined"] = 0] = "Undefined";
+    PlayerState[PlayerState["Playing"] = 1] = "Playing";
+    PlayerState[PlayerState["Stopped"] = 2] = "Stopped";
+})(PlayerState = exports.PlayerState || (exports.PlayerState = {}));
 class Player {
     constructor() {
-        this.currentFile = null;
         this.socket = null;
-        this.onPlayerMessage = new EventEmitter();
+        this.playerMessage = new EventEmitter();
         this.process = null;
-        this.sourceMap = SourceMap_1.EmptySourceMap;
+        this.sourceMap = null;
+        this.currentFile = null;
     }
     get isPlaying() {
         return !!this.process;
@@ -58,7 +64,7 @@ class Player {
         }
         this.socket.on('message', (msg) => {
             let object = JSON.parse(msg.toString());
-            this.onPlayerMessage.emit(exports.OnPlayerMessageEvent, object);
+            this.playerMessage.emit(exports.OnPlayerMessageEvent, object);
         });
         this.socket.bind(port);
         console.log(`listen udp messages on port ${port}`);
@@ -76,11 +82,11 @@ class Player {
         console.log(cmd);
         return child_process_1.exec(cmd, callback);
     }
-    getSourceMap(sheetPath) {
+    updateSourceMap() {
         return new Promise((resolve, reject) => {
             const config = new Config();
             config.sourceMap = true;
-            config.sheetPath = sheetPath;
+            config.sheetPath = this.currentFile;
             let cmd = `${WmPlayerPath} ${this.configToString(config)}`;
             this._execute(cmd, (err, stdout, stderr) => {
                 if (!!err) {
@@ -95,11 +101,16 @@ class Player {
                     reject(ex);
                 }
             });
+        }).then((sourceMap) => {
+            this.sourceMap = sourceMap;
+            this.sourceMap.mainDocument = this.currentFile;
+            return this.sourceMap;
         });
     }
     play(sheetPath) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.sourceMap = (yield this.getSourceMap(sheetPath));
+            this.currentFile = sheetPath;
+            yield this.updateSourceMap();
             return this._startPlayer(sheetPath);
         });
     }
@@ -116,7 +127,7 @@ class Player {
                 config.port = nextFreePort;
                 config.sheetPath = sheetPath;
                 let cmd = `${WmPlayerPath} ${this.configToString(config)}`;
-                this.currentFile = sheetPath;
+                setTimeout(this.playerMessage.emit.bind(this.playerMessage, exports.OnPlayerStateChanged, PlayerState.Playing), 10);
                 this.process = this._execute(cmd, (err, stdout, stderr) => {
                     if (!!err) {
                         reject(stderr);
@@ -143,6 +154,7 @@ class Player {
             let waitUntilEnd = () => {
                 if (!this.isPlaying) {
                     resolve();
+                    this.playerMessage.emit(exports.OnPlayerStateChanged, PlayerState.Stopped);
                     return;
                 }
                 setTimeout(waitUntilEnd, 100);
