@@ -1,13 +1,21 @@
 import React from "react";
 import * as _ from 'lodash';
+import { SourceViewComponent } from "../sourceView/sourceView.component";
+
+function getSourceKey(sourceId) {
+    return Number(sourceId).toString();
+}
 
 export class MainComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             sheetTime: 0,
-            sheetfile: {}
+            sheetfiles: {},
+            mainSheet: null,
+            text: ""
         }
+       
         window.addEventListener('message', event => { // get vscode message
             const message = event.data;
             this.handleMessage(message);
@@ -21,6 +29,9 @@ export class MainComponent extends React.Component {
         if (message.fileInfos) {
             this.updateFileInfos(message.fileInfos);
         }
+        if(message.sheetEventInfos) {
+            this.updateSheetEventInfos(message.sheetEventInfos);
+        }
     }
 
     updateSheetTime(sheetTime) {
@@ -28,21 +39,50 @@ export class MainComponent extends React.Component {
     }
 
     updateFileInfos(infos) {
-        console.log(infos);
-        const sheetfile = _(infos).find(x=>x.extension==='.sheet');
-        console.log(sheetfile);
-        this.setState({sheetfile: sheetfile});
+        const sheetfiles = _(infos)
+            .map(x=> Object.assign(x, {eventInfos:[]}))
+            .mapKeys(x=>getSourceKey(x.sourceId))
+            .value()
+        ;
+        const mainSheet = _(sheetfiles).find(x=>x.extension==='.sheet');
+        console.log(sheetfiles);
+        this.setState({sheetfiles, mainSheet});
+    }
+
+    updateSheetEventInfos(sheetEventInfos) {
+        for(let sheetEventInfo of sheetEventInfos) {
+            let source = this.state.sheetfiles[getSourceKey(sheetEventInfo.sourceId)];
+            if (!source) {
+                console.log("?", sheetEventInfo.sourceId);
+                continue;
+            }
+            console.log("!", sheetEventInfo.sourceId);
+            source.eventInfos.push(sheetEventInfo);
+        }
+        this.setState({sheetfiles: this.state.sheetfiles});
     }
 
     render() {
+        let keys = _.keys(this.state.sheetfiles);
+        keys = keys.sort((a, b) => {
+            if (a === this.state.mainSheet.sourceId) {
+                return -1;
+            }
+            if (b === this.state.mainSheet.sourceId) {
+                return 1;
+            }
+            return a > b;
+        });
+        
         return (
             <div>
-                <h4>Sheet: {this.state.sheetfile ? this.state.sheetfile.basename : 'no sheet'}</h4>
-                { this.state.sheetTime }
-                <br></br>
-                <code>
-                    { this.state.sheetfile.text }
-                </code>
+                <h4>-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=</h4>
+                <h5> { this.state.sheetTime } </h5>  
+                {
+                    _(keys)
+                    .map(x=> <SourceViewComponent key={getSourceKey(this.state.sheetfiles[x].sourceId)} fileInfo={this.state.sheetfiles[x]}></SourceViewComponent> )
+                    .value()
+                }
             </div>
         );
     }

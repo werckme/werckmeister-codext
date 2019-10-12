@@ -54,7 +54,7 @@ class SheetView extends ACommand_1.ACommand {
                 Object.assign(fileInfo, source);
                 fileInfo.extension = path.extname(source.path);
                 fileInfo.basename = path.basename(source.path);
-                fileInfo.text = yield this.readFile(sourceMap.mainDocument);
+                fileInfo.text = yield this.readFile(source.path);
                 return fileInfo;
             }));
             fileInfos = yield Promise.all(fileInfos);

@@ -13,7 +13,7 @@ export class Play extends ACommand {
         let sheetPath = editor.document.fileName;
         let filename = basename(sheetPath);
         let player:Player = getPlayer();
-        player.play(sheetPath)
+        player.play(sheetPath) 
         .then(()=>{})
         .catch((ex)=>{
             vscode.window.showErrorMessage(`Werckmeister: ${ex}`);

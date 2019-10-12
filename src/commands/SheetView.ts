@@ -52,9 +52,11 @@ export class SheetView extends ACommand {
 			Object.assign(fileInfo, source);
 			fileInfo.extension = path.extname(source.path);
 			fileInfo.basename = path.basename(source.path);
-			fileInfo.text = await this.readFile(sourceMap!.mainDocument);
+			fileInfo.text = await this.readFile(source.path);
 			return fileInfo;
 		});
+
+		
 		fileInfos = await Promise.all(fileInfos);
 		this.currentPanel.webview.postMessage({fileInfos});
 	}
