@@ -14,7 +14,10 @@ export class SourceViewComponent extends React.Component {
         const sourceText = this.state.fileInfo.text;
         let text = "";
         for (let eventInfo of this.state.fileInfo.eventInfos) {
-            let chars = sourceText[eventInfo.position] + sourceText[eventInfo.position+1]+ sourceText[eventInfo.position+2];
+            if (!eventInfo.beginPosition || !eventInfo.endPosition) {
+                continue;
+            }
+            let chars = sourceText.substr(eventInfo.beginPosition, eventInfo.endPosition - eventInfo.beginPosition);
             text += `${chars} `;
         }
         return (
