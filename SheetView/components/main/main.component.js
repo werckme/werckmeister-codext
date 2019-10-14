@@ -50,6 +50,10 @@ export class MainComponent extends React.Component {
     }
 
     updateSheetEventInfos(sheetEventInfos) {
+        for (let sourceKey in this.state.sheetfiles) {
+            let source = this.state.sheetfiles[sourceKey];
+            source.eventInfos.splice(0, source.eventInfos.length);
+        }
         for(let sheetEventInfo of sheetEventInfos) {
             let source = this.state.sheetfiles[getSourceKey(sheetEventInfo.sourceId)];
             if (!source) {
