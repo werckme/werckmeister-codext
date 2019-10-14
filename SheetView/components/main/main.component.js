@@ -53,10 +53,10 @@ export class MainComponent extends React.Component {
         for(let sheetEventInfo of sheetEventInfos) {
             let source = this.state.sheetfiles[getSourceKey(sheetEventInfo.sourceId)];
             if (!source) {
-                console.log("?", sheetEventInfo.sourceId);
+                //console.log("?", sheetEventInfo.sourceId);
                 continue;
             }
-            console.log("!", sheetEventInfo.sourceId);
+            //console.log("!", sheetEventInfo.sourceId);
             source.eventInfos.push(sheetEventInfo);
         }
         this.setState({sheetfiles: this.state.sheetfiles});

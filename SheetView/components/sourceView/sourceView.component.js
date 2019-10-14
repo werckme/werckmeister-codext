@@ -8,6 +8,37 @@ const EditorStyle = {
     position: 'absolute'
 }
 
+const MarkerClass = "sheet-marker";
+
+function getRowAndColumn(text, position) {
+    let row = 0;
+    let col = 0;
+    if (position >= text.length) {
+        return null;
+    }
+    const _isNewline = (char, nextchar) => { 
+        if (char === '\n') {
+            return 1;
+        }
+        if (char === '\r' && nextchar === '\n') {
+            return 2;
+        }
+    }
+    for(let idx=0; idx < position; ++idx) {
+        let char = text[idx];
+        let skipChars = _isNewline(char, text[idx+1]);
+        let isNewline = !!skipChars;
+        if (isNewline) {
+            ++row;
+            col = 0;
+            idx += skipChars - 1;
+            continue;
+        }
+        ++col;
+    }
+    return {row, col};
+}
+
 export class SourceViewComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -26,6 +57,10 @@ export class SourceViewComponent extends React.Component {
             readOnly: true
         });
         this.editor.session.setMode("ace/mode/sheet");
+        setTimeout(()=>{
+            let aceRange = new ace.Range(1,1, 1,10);
+            this.editor.session.addMarker(aceRange, MarkerClass, null, true);
+        },100);
 
     }
 
@@ -33,16 +68,22 @@ export class SourceViewComponent extends React.Component {
         this.refEditor = item;
     }
 
+    updateEventMarkers() {
+        const sourceText = this.state.fileInfo.text;
+        for (let eventInfo of this.state.fileInfo.eventInfos) {
+            if (!eventInfo.beginPosition || !eventInfo.endPosition) {
+                continue;
+            }
+            let from = getRowAndColumn(sourceText, eventInfo.beginPosition);
+            let to = getRowAndColumn(sourceText, eventInfo.endPosition);
+            let aceRange = new ace.Range(from.row, from.col, to.row, to.col);
+            this.editor.session.addMarker(aceRange, MarkerClass, null, true);
+        }
+    }
+
     render() {
         const sourceText = this.state.fileInfo.text;
-        // let text = "";
-        // for (let eventInfo of this.state.fileInfo.eventInfos) {
-        //     if (!eventInfo.beginPosition || !eventInfo.endPosition) {
-        //         continue;
-        //     }
-        //     let chars = sourceText.substr(eventInfo.beginPosition, eventInfo.endPosition - eventInfo.beginPosition);
-        //     text += `${chars} `;
-        // }
+        this.updateEventMarkers();
         return (
             <div>
                 <hr></hr>
