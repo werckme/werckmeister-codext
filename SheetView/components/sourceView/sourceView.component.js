@@ -1,5 +1,6 @@
 import React from "react";
-import * as ace from 'ace-builds';
+import * as ace from 'werckmeister-ace-build';
+import 'werckmeister-ace-build/src-noconflict/mode-sheet';
 
 const EditorStyle = {
     width: '100%',
@@ -24,7 +25,8 @@ export class SourceViewComponent extends React.Component {
             printMargin: false,
             readOnly: true
         });
-        
+        this.editor.session.setMode("ace/mode/sheet");
+
     }
 
     updateRef(item) {
