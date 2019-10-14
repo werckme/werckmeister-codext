@@ -1,6 +1,7 @@
 import React from "react";
 import * as ace from 'werckmeister-ace-build';
 import 'werckmeister-ace-build/src-noconflict/mode-sheet';
+import 'werckmeister-ace-build/src-noconflict/theme-dracula';
 
 const ContainerStyle = {
     position: 'relative',
@@ -65,6 +66,7 @@ export class SourceViewComponent extends React.Component {
             readOnly: true
         });
         this.editor.session.setMode("ace/mode/sheet");
+        this.editor.setTheme("ace/theme/dracula");
     }
 
     updateRef(item) {
