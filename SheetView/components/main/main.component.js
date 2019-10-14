@@ -80,6 +80,7 @@ export class MainComponent extends React.Component {
                 <h5> { this.state.sheetTime } </h5>  
                 {
                     _(keys)
+                    .filter(x=> x == this.state.mainSheet.sourceId)
                     .map(x=> <SourceViewComponent key={getSourceKey(this.state.sheetfiles[x].sourceId)} fileInfo={this.state.sheetfiles[x]}></SourceViewComponent> )
                     .value()
                 }
