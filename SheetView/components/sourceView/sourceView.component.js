@@ -57,11 +57,6 @@ export class SourceViewComponent extends React.Component {
             readOnly: true
         });
         this.editor.session.setMode("ace/mode/sheet");
-        setTimeout(()=>{
-            let aceRange = new ace.Range(1,1, 1,10);
-            this.editor.session.addMarker(aceRange, MarkerClass, null, true);
-        },100);
-
     }
 
     updateRef(item) {
