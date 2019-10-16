@@ -23,7 +23,16 @@ const EditorStyle = {
 
 const MarkerClass = "sheet-marker";
 
-function getRowAndColumn(text, position) {
+function getRowAndColumn(text, position, fixTrailingWhitespaces) {
+    while(position > 0 && fixTrailingWhitespaces) {
+        // remove trailing whitespaces
+        let char = text[position-1];
+        let charIsWhiteSpace = /\s/.test(char);
+        if (!charIsWhiteSpace) {
+            break;
+        }
+        --position;
+    }
     let row = 0;
     let col = 0;
     if (position >= text.length) {
@@ -98,7 +107,7 @@ export class SourceViewComponent extends React.Component {
                 continue;
             }
             let from = getRowAndColumn(sourceText, eventInfo.beginPosition);
-            let to = getRowAndColumn(sourceText, eventInfo.endPosition);
+            let to = getRowAndColumn(sourceText, eventInfo.endPosition, true);
             let aceRange = new ace.Range(from.row, from.col, to.row, to.col);
             let marker = this.editor.session.addMarker(aceRange, MarkerClass, null, true);
             this.positionMarkerMap[keyPosition] = marker;
