@@ -4,8 +4,13 @@ import 'werckmeister-ace-build/src-noconflict/mode-sheet';
 import 'werckmeister-ace-build/src-noconflict/theme-dracula';
 
 const ContainerStyle = {
+    position: 'static',
+    width: '100%'
+}
+
+const EditorWrapperStyle = {
     position: 'relative',
-    height: '800px'
+    height: '500px'
 }
 
 const EditorStyle = {
@@ -106,10 +111,11 @@ export class SourceViewComponent extends React.Component {
         return (
             <div style={ContainerStyle}>
                 <hr></hr>
-                {this.state.fileInfo.eventInfos.length}
                 <h5>{this.state.fileInfo.basename}</h5>
-                <div ref={this.updateRef.bind(this)} style={EditorStyle}>
-                    {sourceText}
+                <div style={EditorWrapperStyle}>
+                    <div ref={this.updateRef.bind(this)} style={EditorStyle}>
+                        {sourceText}
+                    </div>
                 </div>
             </div>
         );

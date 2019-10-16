@@ -6,6 +6,11 @@ function getSourceKey(sourceId) {
     return Number(sourceId).toString();
 }
 
+function isSheetFile(fileInfo) {
+    return fileInfo.extension === '.sheet'
+        || fileInfo.extension === '.template'
+}
+
 export class MainComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -84,6 +89,7 @@ export class MainComponent extends React.Component {
                 <h5> { this.state.sheetTime } </h5>  
                 {
                     _(keys)
+                    .filter(x=> isSheetFile(this.state.sheetfiles[x]))
                     //.filter(x=> x == this.state.mainSheet.sourceId)
                     .map(x=> <SourceViewComponent key={getSourceKey(this.state.sheetfiles[x].sourceId)} fileInfo={this.state.sheetfiles[x]}></SourceViewComponent> )
                     .value()
