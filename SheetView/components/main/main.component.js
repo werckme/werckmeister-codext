@@ -73,15 +73,15 @@ export class MainComponent extends React.Component {
 
     render() {
         let keys = _.keys(this.state.sheetfiles);
-        keys = keys.sort((a, b) => {
-            if (a === this.state.mainSheet.sourceId) {
+        let sortValues = (a, b) => {
+            if (a == this.state.mainSheet.sourceId) {
                 return -1;
             }
-            if (b === this.state.mainSheet.sourceId) {
+            if (b == this.state.mainSheet.sourceId) {
                 return 1;
             }
             return a > b;
-        });
+        };
         
         return (
             <div>
@@ -91,6 +91,7 @@ export class MainComponent extends React.Component {
                     _(keys)
                     .filter(x=> isSheetFile(this.state.sheetfiles[x]))
                     //.filter(x=> x == this.state.mainSheet.sourceId)
+                    .sort(sortValues)
                     .map(x=> <SourceViewComponent key={getSourceKey(this.state.sheetfiles[x].sourceId)} fileInfo={this.state.sheetfiles[x]}></SourceViewComponent> )
                     .value()
                 }
