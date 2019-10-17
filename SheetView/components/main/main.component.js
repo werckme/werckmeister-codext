@@ -74,10 +74,10 @@ export class MainComponent extends React.Component {
     render() {
         let keys = _.keys(this.state.sheetfiles);
         let sortValues = (a, b) => {
-            if (a == this.state.mainSheet.sourceId) {
+            if (a === this.state.mainSheet.sourceId) {
                 return -1;
             }
-            if (b == this.state.mainSheet.sourceId) {
+            if (b === this.state.mainSheet.sourceId) {
                 return 1;
             }
             return a > b;
