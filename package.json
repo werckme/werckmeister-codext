@@ -84,9 +84,11 @@
         "webpack-cli": "^3.3.9"
     },
     "dependencies": {
+        "ace-builds": "^1.4.6",
         "lodash": "^4.17.15",
         "react": "^16.10.2",
         "react-dom": "^16.10.2",
-        "udp-free-port": "^1.0.0"
+        "udp-free-port": "^1.0.0",
+        "werckmeister-ace-build": "^1.4.6"
     }
 }
