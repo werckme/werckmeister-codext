@@ -10,95 +10,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const ACommand_1 = require("./ACommand");
-const vscode = require("vscode");
-const path = require("path");
-const fs = require("fs");
-const Player_1 = require("../com/Player");
-let currentSheetView = null;
+const SheetView_1 = require("../com/SheetView");
+const AWebView_1 = require("../com/AWebView");
+let currentView = null;
 class SheetView extends ACommand_1.ACommand {
-    constructor(context) {
-        super(context);
-        this.currentPanel = null;
-        this.onPlayerMessageBound = this.onPlayerMessage.bind(this);
-        this.onSheetFileChangedeBound = this.onSheetFileChanged.bind(this);
-    }
-    toWebViewUri(uri) {
-        // panel.webview.asWebviewUri is not available at runtime for some reason
-        return `vscode-resource:${uri.path}`;
-    }
-    onSheetFileChanged(state) {
-        if (state === Player_1.PlayerState.Playing) {
-            this.updateSheetSourceMap();
-        }
-    }
-    readFile(path) {
-        return new Promise((resolve, reject) => {
-            fs.readFile(path, "utf8", (err, data) => {
-                if (!!err) {
-                    reject(err);
-                    return;
-                }
-                resolve(data);
-            });
-        });
-    }
-    updateSheetSourceMap() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.currentPanel) {
-                return;
-            }
-            let player = Player_1.getPlayer();
-            let sourceMap = player.sourceMap;
-            let fileInfos = sourceMap.sources.map((source) => __awaiter(this, void 0, void 0, function* () {
-                const fileInfo = {};
-                Object.assign(fileInfo, source);
-                fileInfo.extension = path.extname(source.path);
-                fileInfo.basename = path.basename(source.path);
-                fileInfo.text = yield this.readFile(source.path);
-                return fileInfo;
-            }));
-            fileInfos = yield Promise.all(fileInfos);
-            this.currentPanel.webview.postMessage({ fileInfos });
-        });
-    }
-    onPlayerMessage(message) {
-        if (!this.currentPanel) {
-            return;
-        }
-        this.currentPanel.webview.postMessage(message);
-    }
-    registerListener() {
-        let player = Player_1.getPlayer();
-        player.playerMessage.on(Player_1.OnPlayerMessageEvent, this.onPlayerMessageBound);
-        player.playerMessage.on(Player_1.OnPlayerStateChanged, this.onSheetFileChangedeBound);
-    }
-    removeListener() {
-        let player = Player_1.getPlayer();
-        player.playerMessage.removeListener(Player_1.OnPlayerMessageEvent, this.onPlayerMessageBound);
-        player.playerMessage.removeListener(Player_1.OnPlayerStateChanged, this.onSheetFileChangedeBound);
-    }
     execute() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (currentSheetView !== null) {
+            if (currentView !== null) {
                 return;
             }
-            this.currentPanel = vscode.window.createWebviewPanel('werckmeister.sheetview', // Identifies the type of the webview. Used internally
-            'Sheet View', // Title of the panel displayed to the user
-            vscode.ViewColumn.Two, // Editor column to show the new webview panel in.
-            {
-                enableScripts: true,
-            });
-            currentSheetView = this;
-            let jsPath = vscode.Uri.file(path.join(this.context.extensionPath, 'SheetView', 'dist', 'sheetView.dist.js'));
-            let htmlPath = vscode.Uri.file(path.join(this.context.extensionPath, 'SheetView', 'SheetView.html'));
-            fs.readFile(htmlPath.path, 'utf8', (err, data) => {
-                data = data.replace("$mainSrc", this.toWebViewUri(jsPath));
-                this.currentPanel.webview.html = data;
-            });
-            this.registerListener();
-            this.currentPanel.onDidDispose(() => {
-                this.removeListener();
-                currentSheetView = null;
+            currentView = new SheetView_1.SheetView(this.context);
+            yield currentView.createPanel();
+            currentView.onLifecycleEvent.on(AWebView_1.OnDispose, () => {
+                currentView = null;
             });
         });
     }
