@@ -16,7 +16,6 @@ class Stop extends ACommand_1.ACommand {
     execute() {
         return __awaiter(this, void 0, void 0, function* () {
             let player = Player_1.getPlayer();
-            let currentFile = player.currentFile;
             player.stop()
                 .then(() => { })
                 .catch((ex) => {

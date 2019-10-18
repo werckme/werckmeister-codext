@@ -7,7 +7,6 @@ import { getPlayer, Player } from '../com/Player';
 export class Stop extends ACommand {
     async execute(): Promise<void> {
         let player:Player = getPlayer();
-        let currentFile = player.currentFile;
         player.stop()
             .then(()=>{})
             .catch((ex)=>{
