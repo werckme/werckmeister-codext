@@ -83,7 +83,6 @@ export class MainComponent extends React.Component {
         
         return (
             <div>
-                <h4>-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=</h4>
                 <h5> { this.state.sheetTime } </h5>  
                 {
                     _(keys)
