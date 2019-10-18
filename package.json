@@ -60,7 +60,17 @@
                 "scopeName": "source.werckmeister",
                 "path": "./syntaxes/werckmeister.tmLanguage.json"
             }
-        ]
+        ],
+        "configuration": {
+            "title": "Werckmeister",
+            "properties": {
+              "werckmeister.werckmeisterBinaryDirectory": {
+                "type": "string",
+                "default": null,
+                "description": "Specifies the folder path containing the executables \"sheetp\" and \"sheetc\"."
+              }
+            }
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",

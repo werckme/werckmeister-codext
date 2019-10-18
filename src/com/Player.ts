@@ -1,13 +1,12 @@
-const WmPlayerPath = "/home/samba/workspace/werckmeister/build/sheetp";
-const UDP_PORT = 8080;
 import { exec, ChildProcess } from 'child_process';
 import * as dgram from 'dgram';
 import * as EventEmitter from 'events';
 import { ISourceMap } from './SourceMap';
-import { throws } from 'assert';
-
-
+import * as vscode from 'vscode';
+import * as path from 'path';
 const freeUdpPort = require('udp-free-port');
+
+const PlayerExecutable = process.platform === 'win32' ? 'sheetp.exe' : 'sheetp';
 
 class Config {
     watch: Boolean = false;
@@ -44,6 +43,15 @@ export class Player {
     private process: ChildProcess|null = null;
     sourceMap: ISourceMap|null = null;
     currentFile: string|null = null;
+
+    get wmPlayerPath(): string {
+        const settings = vscode.workspace.getConfiguration('werckmeister');
+        const strPath = settings.werckmeisterBinaryDirectory as string;
+        if (!strPath) {
+            throw new Error(`missing \"Werckmeister BinaryDirectory\" configuration. (Settings->Extensions->Werckmeister)`);
+        }
+        return path.join(strPath, PlayerExecutable);
+    }
 
     get isPlaying(): boolean {
         return !!this.process;
@@ -83,7 +91,7 @@ export class Player {
             const config = new Config();
             config.sourceMap = true;
             config.sheetPath = this.currentFile as string;
-            let cmd = `${WmPlayerPath} ${this.configToString(config)}`;
+            let cmd = `${this.wmPlayerPath} ${this.configToString(config)}`;
             this._execute(cmd, (err:any, stdout: any, stderr: any) => {
                 if (!!err) {
                     reject(err);
@@ -120,7 +128,7 @@ export class Player {
             config.watch = true;
             config.port = nextFreePort;
             config.sheetPath = sheetPath;
-            let cmd = `${WmPlayerPath} ${this.configToString(config)}`;
+            let cmd = `${this.wmPlayerPath} ${this.configToString(config)}`;
             setTimeout(this.playerMessage.emit.bind(this.playerMessage, OnPlayerStateChanged, PlayerState.Playing), 10);
             this.process = this._execute(cmd, (err:any, stdout: any, stderr: any) => {
                 if (!!err) {
@@ -130,6 +138,7 @@ export class Player {
                     return;
                 }
                 resolve();
+                this.stopUdpListener();
                 this.process = null;
                 this.currentFile = null;
             });

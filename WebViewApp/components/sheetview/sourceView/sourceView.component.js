@@ -19,7 +19,13 @@ const EditorStyle = {
     position: 'absolute'
 }
 
-
+const EditorOptions = {
+    showGutter: false,
+    printMargin: false,
+    readOnly: true,
+    highlightActiveLine: false,
+    highlightSelectedWord: false,
+};
 
 const MarkerClass = "sheet-marker";
 
@@ -74,11 +80,7 @@ export class SourceViewComponent extends React.Component {
 
     componentDidMount() {
         this.editor = ace.edit(this.refEditor);
-        this.editor.setOptions({
-            showGutter: false,
-            printMargin: false,
-            readOnly: true
-        });
+        this.editor.setOptions(EditorOptions);
         this.editor.session.setMode("ace/mode/sheet");
         this.editor.setTheme("ace/theme/dracula");
     }
