@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const ACommand_1 = require("./ACommand");
 const vscode = require("vscode");
-const path_1 = require("path");
 const Player_1 = require("../com/Player");
 class Stop extends ACommand_1.ACommand {
     execute() {
@@ -23,9 +22,6 @@ class Stop extends ACommand_1.ACommand {
                 .catch((ex) => {
                 vscode.window.showErrorMessage(ex);
             });
-            if (!!currentFile) {
-                vscode.window.showInformationMessage(`Stopped: ${path_1.basename(currentFile)}`);
-            }
         });
     }
 }

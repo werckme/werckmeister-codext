@@ -50,7 +50,7 @@ export class MainComponent extends React.Component {
             .value()
         ;
         const mainSheet = _(sheetfiles).find(x=>x.extension==='.sheet');
-        console.log(sheetfiles);
+        this.setState({sheetfiles: {}, mainSheet: {}}); // force hard reset
         this.setState({sheetfiles, mainSheet});
     }
 
@@ -62,10 +62,8 @@ export class MainComponent extends React.Component {
         for(let sheetEventInfo of sheetEventInfos) {
             let source = this.state.sheetfiles[getSourceKey(sheetEventInfo.sourceId)];
             if (!source) {
-                //console.log("?", sheetEventInfo.sourceId);
                 continue;
             }
-            //console.log("!", sheetEventInfo.sourceId);
             source.eventInfos.push(sheetEventInfo);
         }
         this.setState({sheetfiles: this.state.sheetfiles});
@@ -90,7 +88,6 @@ export class MainComponent extends React.Component {
                 {
                     _(keys)
                     .filter(x=> isSheetFile(this.state.sheetfiles[x]))
-                    //.filter(x=> x == this.state.mainSheet.sourceId)
                     .sort(sortValues)
                     .map(x=> <SourceViewComponent key={getSourceKey(this.state.sheetfiles[x].sourceId)} fileInfo={this.state.sheetfiles[x]}></SourceViewComponent> )
                     .value()

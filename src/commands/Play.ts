@@ -18,7 +18,6 @@ export class Play extends ACommand {
         .catch((ex)=>{
             vscode.window.showErrorMessage(`Werckmeister: ${ex}`);
         });
-        vscode.window.showInformationMessage(`Playing: ${filename}`);
         vscode.commands.executeCommand('extension.werckmeister.sheetview');
     }
 }

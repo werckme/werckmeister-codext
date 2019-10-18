@@ -8,11 +8,11 @@ export class SheetView extends AWebView {
 
 	currentPanel: vscode.WebviewPanel|null = null;
 	onPlayerMessageBound: any;
-    onSheetFileChangedeBound: any;
+    onPlayerStateChangedBound: any;
 	constructor(context: vscode.ExtensionContext) {
 		super(context);
 		this.onPlayerMessageBound = this.onPlayerMessage.bind(this);
-		this.onSheetFileChangedeBound = this.onSheetFileChanged.bind(this);
+		this.onPlayerStateChangedBound = this.onPlayerStateChanged.bind(this);
 	}
 
 	toWebViewUri(uri: vscode.Uri): string {
@@ -20,7 +20,7 @@ export class SheetView extends AWebView {
 		return `vscode-resource:${uri.path}`;
 	}
 
-	onSheetFileChanged(state: PlayerState) {
+	onPlayerStateChanged(state: PlayerState) {
 		if (state===PlayerState.Playing) {
 			this.updateSheetSourceMap();
 		}
@@ -41,7 +41,7 @@ export class SheetView extends AWebView {
 	async updateSheetSourceMap() {
 		if (!this.currentPanel) {
 			return;
-		}	
+		}
 		let player:Player = getPlayer();
 		let sourceMap = player.sourceMap;
 		let fileInfos = sourceMap!.sources.map(async (source)=>{
@@ -68,13 +68,13 @@ export class SheetView extends AWebView {
 	registerListener() {
 		let player:Player = getPlayer();
 		player.playerMessage.on(OnPlayerMessageEvent, this.onPlayerMessageBound);
-		player.playerMessage.on(OnPlayerStateChanged, this.onSheetFileChangedeBound);
+		player.playerMessage.on(OnPlayerStateChanged, this.onPlayerStateChangedBound);
 	}
 
 	removeListener() {
 		let player:Player = getPlayer();
 		player.playerMessage.removeListener(OnPlayerMessageEvent, this.onPlayerMessageBound);
-		player.playerMessage.removeListener(OnPlayerStateChanged, this.onSheetFileChangedeBound);
+		player.playerMessage.removeListener(OnPlayerStateChanged, this.onPlayerStateChangedBound);
 	}
 
 

@@ -12,9 +12,6 @@ export class Stop extends ACommand {
             .then(()=>{})
             .catch((ex)=>{
                 vscode.window.showErrorMessage(ex);
-            });
-        if (!!currentFile) {
-            vscode.window.showInformationMessage(`Stopped: ${basename(currentFile)}`);
-        }
+        });
     }
 }
