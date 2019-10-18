@@ -6,7 +6,8 @@ const vscode = require("vscode");
 const Play_1 = require("./commands/Play");
 const PlayTerminal_1 = require("./commands/PlayTerminal");
 const Stop_1 = require("./commands/Stop");
-const SheetView_1 = require("./commands/SheetView");
+const ShowSheetView_1 = require("./commands/ShowSheetView");
+const ShowPianoView_1 = require("./commands/ShowPianoView");
 function excuteCommand(type, context) {
     let cmd = new type(context);
     cmd.execute();
@@ -21,7 +22,9 @@ function activate(context) {
     context.subscriptions.push(disposable);
     disposable = vscode.commands.registerCommand(`${ns}.stop`, excuteCommand.bind(null, Stop_1.Stop, context));
     context.subscriptions.push(disposable);
-    disposable = vscode.commands.registerCommand(`${ns}.sheetview`, excuteCommand.bind(null, SheetView_1.SheetView, context));
+    disposable = vscode.commands.registerCommand(`${ns}.sheetview`, excuteCommand.bind(null, ShowSheetView_1.ShowSheetView, context));
+    context.subscriptions.push(disposable);
+    disposable = vscode.commands.registerCommand(`${ns}.pianoview`, excuteCommand.bind(null, ShowPianoView_1.ShowPianoView, context));
     context.subscriptions.push(disposable);
 }
 exports.activate = activate;

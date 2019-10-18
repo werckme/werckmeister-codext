@@ -21,10 +21,6 @@ class SheetView extends AWebView_1.AWebView {
         this.onPlayerMessageBound = this.onPlayerMessage.bind(this);
         this.onPlayerStateChangedBound = this.onPlayerStateChanged.bind(this);
     }
-    toWebViewUri(uri) {
-        // panel.webview.asWebviewUri is not available at runtime for some reason
-        return `vscode-resource:${uri.path}`;
-    }
     onPlayerStateChanged(state) {
         if (state === Player_1.PlayerState.Playing) {
             this.updateSheetSourceMap();
@@ -78,8 +74,8 @@ class SheetView extends AWebView_1.AWebView {
     }
     createPanelImpl() {
         return new Promise((resolve, reject) => {
-            this.currentPanel = vscode.window.createWebviewPanel('werckmeister.WebViewApp', // Identifies the type of the webview. Used internally
-            'Sheet View', // Title of the panel displayed to the user
+            this.currentPanel = vscode.window.createWebviewPanel('werckmeister.SheetView', // Identifies the type of the webview. Used internally
+            'Sheet', // Title of the panel displayed to the user
             vscode.ViewColumn.Two, // Editor column to show the new webview panel in.
             {
                 enableScripts: true,

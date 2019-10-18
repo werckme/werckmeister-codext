@@ -13,7 +13,8 @@
         "onCommand:extension.werckmeister.terminal.play",
         "onCommand:extension.werckmeister.play",
         "onCommand:extension.werckmeister.stop",
-        "onCommand:extension.werckmeister.sheetview"
+        "onCommand:extension.werckmeister.sheetview",
+        "onCommand:extension.werckmeister.pianoview"
     ],
     "main": "./out/extension.js",
     "contributes": {
@@ -33,6 +34,10 @@
             {
                 "command": "extension.werckmeister.sheetview",
                 "title": "Werckmeister: Sheetview"
+            },
+            {
+                "command": "extension.werckmeister.pianoview",
+                "title": "Werckmeister: PianoView"
             }
         ],
         "languages": [

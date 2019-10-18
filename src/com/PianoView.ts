@@ -1,10 +1,9 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import * as fs from 'fs';
 import { Player, getPlayer, OnPlayerMessageEvent, OnPlayerStateChanged, PlayerState } from "../com/Player";
 import { AWebView } from './AWebView';
 
-export class SheetView extends AWebView {
+export class PianoView extends AWebView {
 
 	currentPanel: vscode.WebviewPanel|null = null;
 	onPlayerMessageBound: any;
@@ -17,7 +16,6 @@ export class SheetView extends AWebView {
 
 	onPlayerStateChanged(state: PlayerState) {
 		if (state===PlayerState.Playing) {
-			this.updateSheetSourceMap();
 		}
 	}
 
@@ -33,31 +31,8 @@ export class SheetView extends AWebView {
 		});
 	}
 
-	async updateSheetSourceMap() {
-		if (!this.currentPanel) {
-			return;
-		}
-		let player:Player = getPlayer();
-		let sourceMap = player.sourceMap;
-		let fileInfos = sourceMap!.sources.map(async (source)=>{
-			const fileInfo:any = {};
-			Object.assign(fileInfo, source);
-			fileInfo.extension = path.extname(source.path);
-			fileInfo.basename = path.basename(source.path);
-			fileInfo.text = await this.readFile(source.path);
-			return fileInfo;
-		});
-
-		
-		fileInfos = await Promise.all(fileInfos);
-		this.currentPanel.webview.postMessage({fileInfos});
-	}
 
 	onPlayerMessage(message:any) {
-		if (!this.currentPanel) {
-			return;
-		}
-		this.currentPanel.webview.postMessage(message);
 	}
 
 	registerListener() {
@@ -76,15 +51,15 @@ export class SheetView extends AWebView {
     protected createPanelImpl(): Promise<vscode.WebviewPanel> {
         return new Promise<vscode.WebviewPanel>((resolve, reject) => {
             this.currentPanel = vscode.window.createWebviewPanel(
-                'werckmeister.SheetView', // Identifies the type of the webview. Used internally
-                'Sheet', // Title of the panel displayed to the user
-                vscode.ViewColumn.Two, // Editor column to show the new webview panel in.
+                'werckmeister.PianoView', // Identifies the type of the webview. Used internally
+                'Piano', // Title of the panel displayed to the user
+                vscode.ViewColumn.One, // Editor column to show the new webview panel in.
                 {
                     enableScripts: true,
                 }
             );
             let jsPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'dist', 'WebViewApp.dist.js'));
-            let htmlPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'sheetView.html'));
+            let htmlPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'pianoView.html'));
             
             fs.readFile(htmlPath.path, 'utf8', (err, data) => {
                 data = data.replace("$mainSrc", this.toWebViewUri(jsPath))
