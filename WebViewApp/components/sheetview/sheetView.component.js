@@ -1,6 +1,6 @@
 import React from "react";
 import * as _ from 'lodash';
-import { SourceViewComponent } from "../sourceView/sourceView.component";
+import { SourceViewComponent } from "./sourceView/sourceView.component";
 
 function getSourceKey(sourceId) {
     return Number(sourceId).toString();
@@ -11,7 +11,7 @@ function isSheetFile(fileInfo) {
         || fileInfo.extension === '.template'
 }
 
-export class MainComponent extends React.Component {
+export class SheetViewComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {

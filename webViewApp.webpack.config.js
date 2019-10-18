@@ -1,11 +1,11 @@
 const path = require('path');
 
 module.exports = {
-  entry: './SheetView/main.js',
+  entry: './WebViewApp/main.js',
   mode: 'development',
   output: {
-    path: path.resolve('./SheetView/', 'dist'),
-    filename: 'sheetView.dist.js'
+    path: path.resolve('./WebViewApp/', 'dist'),
+    filename: 'WebViewApp.dist.js'
   },
   module: {
     rules: [

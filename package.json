@@ -63,8 +63,8 @@
         "watch": "tsc -watch -p ./;",
         "pretest": "npm run compile",
         "test": "node ./out/test/runTest.js",
-        "build-sheetview": "webpack --config sheetView.webpack.config.js",
-        "dev-sheetview": "webpack --config sheetView.webpack.config.js --watch"
+        "build-webviewapp": "webpack --config webViewApp.webpack.config.js",
+        "dev-webviewapp": "webpack --config webViewApp.webpack.config.js --watch"
     },
     "devDependencies": {
         "@babel/core": "^7.6.3",

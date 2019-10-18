@@ -81,15 +81,15 @@ export class SheetView extends AWebView {
     protected createPanelImpl(): Promise<vscode.WebviewPanel> {
         return new Promise<vscode.WebviewPanel>((resolve, reject) => {
             this.currentPanel = vscode.window.createWebviewPanel(
-                'werckmeister.sheetview', // Identifies the type of the webview. Used internally
+                'werckmeister.WebViewApp', // Identifies the type of the webview. Used internally
                 'Sheet View', // Title of the panel displayed to the user
                 vscode.ViewColumn.Two, // Editor column to show the new webview panel in.
                 {
                     enableScripts: true,
                 }
             );
-            let jsPath = vscode.Uri.file(this.getExtensionPath('SheetView', 'dist', 'sheetView.dist.js'));
-            let htmlPath = vscode.Uri.file(this.getExtensionPath('SheetView', 'SheetView.html'));
+            let jsPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'dist', 'WebViewApp.dist.js'));
+            let htmlPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'sheetView.html'));
             
             fs.readFile(htmlPath.path, 'utf8', (err, data) => {
                 data = data.replace("$mainSrc", this.toWebViewUri(jsPath))
