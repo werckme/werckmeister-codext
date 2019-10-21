@@ -19,7 +19,7 @@ class AWebView {
     }
     toWebViewUri(uri) {
         // panel.webview.asWebviewUri is not available at runtime for some reason
-        return `vscode-resource:${uri.path}`;
+        return `vscode-resource:${uri.fsPath}`;
     }
     getExtensionPath(...pathComponents) {
         return path.join(this.context.extensionPath, ...pathComponents);

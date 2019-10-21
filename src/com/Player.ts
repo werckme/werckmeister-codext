@@ -4,16 +4,42 @@ import * as EventEmitter from 'events';
 import { ISourceMap } from './SourceMap';
 import * as vscode from 'vscode';
 import * as path from 'path';
-const freeUdpPort = require('udp-free-port');
+import * as fs from 'fs';
 
-const PlayerExecutable = process.platform === 'win32' ? 'sheetp.exe' : 'sheetp';
+const freeUdpPort = require('udp-free-port');
+const Win32SigintWorkaroundFile = "keepalive";
+const IsWindows:boolean = process.platform === 'win32';
+
+function playerWorkingDirectory() {
+    const settings = vscode.workspace.getConfiguration('werckmeister');
+    const strPath = settings.werckmeisterBinaryDirectory as string;
+    if (!strPath) {
+        throw new Error(`missing \"Werckmeister BinaryDirectory\" configuration. (Settings->Extensions->Werckmeister)`);
+    }
+    return strPath;
+}
+
+function toWMBINPath(executable: string) {
+    return path.join(playerWorkingDirectory(), executable);
+}
+
+function killProcess(childProcess:ChildProcess) {
+    if (IsWindows) {
+        fs.unlinkSync(toWMBINPath(Win32SigintWorkaroundFile));
+        return;
+    }
+    childProcess!.kill("SIGINT");
+}
+
+const PlayerExecutable = IsWindows ? 'sheetp.exe' : 'sheetp';
 
 class Config {
-    watch: Boolean = false;
-    funkfeuer: Boolean = false;
-    sourceMap: Boolean = false;
+    watch: boolean = false;
+    funkfeuer: boolean = false;
+    sourceMap: boolean = false;
     port: number = 8080;
     sheetPath: string = "";
+    sigintWorkaround:boolean = IsWindows ? true : false;
 };
 
 function getFreeUdpPort(): Promise<number> {
@@ -45,12 +71,7 @@ export class Player {
     currentFile: string|null = null;
 
     get wmPlayerPath(): string {
-        const settings = vscode.workspace.getConfiguration('werckmeister');
-        const strPath = settings.werckmeisterBinaryDirectory as string;
-        if (!strPath) {
-            throw new Error(`missing \"Werckmeister BinaryDirectory\" configuration. (Settings->Extensions->Werckmeister)`);
-        }
-        return path.join(strPath, PlayerExecutable);
+        return toWMBINPath(PlayerExecutable);
     }
 
     get isPlaying(): boolean {
@@ -83,7 +104,7 @@ export class Player {
     
     private _execute(cmd:string, callback: (err:any, stdout: any, stderr: any)=>void): ChildProcess {
         console.log(cmd);
-        return exec(cmd, callback);
+        return exec(cmd, {cwd: playerWorkingDirectory()}, callback);
     }
 
     private updateSourceMap(): Promise<ISourceMap> {
@@ -91,7 +112,7 @@ export class Player {
             const config = new Config();
             config.sourceMap = true;
             config.sheetPath = this.currentFile as string;
-            let cmd = `${this.wmPlayerPath} ${this.configToString(config)}`;
+            let cmd = `${this.wmPlayerPath} ${this.configToString(config)}"`;
             this._execute(cmd, (err:any, stdout: any, stderr: any) => {
                 if (!!err) {
                     reject(err);
@@ -153,7 +174,7 @@ export class Player {
                 return;
             }
             this.stopUdpListener();
-            this.process!.kill("SIGINT");
+            killProcess(this.process as ChildProcess);
             let waitUntilEnd = () => {
                 if (!this.isPlaying) {
                     resolve();
@@ -181,6 +202,9 @@ export class Player {
         }
         if (config.sourceMap) {
             options.push('--sources');
+        }
+        if (config.sigintWorkaround) {
+            options.push('--win32-sigint-workaround');
         }
         return options.join(" ");
     }

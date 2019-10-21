@@ -64,18 +64,18 @@
         "configuration": {
             "title": "Werckmeister",
             "properties": {
-              "werckmeister.werckmeisterBinaryDirectory": {
-                "type": "string",
-                "default": null,
-                "description": "Specifies the folder path containing the executables \"sheetp\" and \"sheetc\"."
-              }
+                "werckmeister.werckmeisterBinaryDirectory": {
+                    "type": "string",
+                    "default": null,
+                    "description": "Specifies the folder path containing the executables \"sheetp\" and \"sheetc\"."
+                }
             }
         }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./;",
+        "watch": "tsc -watch -p ./",
         "pretest": "npm run compile",
         "test": "node ./out/test/runTest.js",
         "build-webviewapp": "webpack --config webViewApp.webpack.config.js",
@@ -103,7 +103,9 @@
         "lodash": "^4.17.15",
         "react": "^16.10.2",
         "react-dom": "^16.10.2",
+        "taskkill": "^3.0.0",
         "udp-free-port": "^1.0.0",
-        "werckmeister-ace-build": "^1.4.6"
+        "werckmeister-ace-build": "^1.4.6",
+        "windows-kill": "^0.3.3"
     }
 }

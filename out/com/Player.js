@@ -14,8 +14,29 @@ const dgram = require("dgram");
 const EventEmitter = require("events");
 const vscode = require("vscode");
 const path = require("path");
+const fs = require("fs");
 const freeUdpPort = require('udp-free-port');
-const PlayerExecutable = process.platform === 'win32' ? 'sheetp.exe' : 'sheetp';
+const Win32SigintWorkaroundFile = "keepalive";
+const IsWindows = process.platform === 'win32';
+function playerWorkingDirectory() {
+    const settings = vscode.workspace.getConfiguration('werckmeister');
+    const strPath = settings.werckmeisterBinaryDirectory;
+    if (!strPath) {
+        throw new Error(`missing \"Werckmeister BinaryDirectory\" configuration. (Settings->Extensions->Werckmeister)`);
+    }
+    return strPath;
+}
+function toWMBINPath(executable) {
+    return path.join(playerWorkingDirectory(), executable);
+}
+function killProcess(childProcess) {
+    if (IsWindows) {
+        fs.unlinkSync(toWMBINPath(Win32SigintWorkaroundFile));
+        return;
+    }
+    childProcess.kill("SIGINT");
+}
+const PlayerExecutable = IsWindows ? 'sheetp.exe' : 'sheetp';
 class Config {
     constructor() {
         this.watch = false;
@@ -23,6 +44,7 @@ class Config {
         this.sourceMap = false;
         this.port = 8080;
         this.sheetPath = "";
+        this.sigintWorkaround = IsWindows ? true : false;
     }
 }
 ;
@@ -54,12 +76,7 @@ class Player {
         this.currentFile = null;
     }
     get wmPlayerPath() {
-        const settings = vscode.workspace.getConfiguration('werckmeister');
-        const strPath = settings.werckmeisterBinaryDirectory;
-        if (!strPath) {
-            throw new Error(`missing \"Werckmeister BinaryDirectory\" configuration. (Settings->Extensions->Werckmeister)`);
-        }
-        return path.join(strPath, PlayerExecutable);
+        return toWMBINPath(PlayerExecutable);
     }
     get isPlaying() {
         return !!this.process;
@@ -89,14 +106,14 @@ class Player {
     }
     _execute(cmd, callback) {
         console.log(cmd);
-        return child_process_1.exec(cmd, callback);
+        return child_process_1.exec(cmd, { cwd: playerWorkingDirectory() }, callback);
     }
     updateSourceMap() {
         return new Promise((resolve, reject) => {
             const config = new Config();
             config.sourceMap = true;
             config.sheetPath = this.currentFile;
-            let cmd = `${this.wmPlayerPath} ${this.configToString(config)}`;
+            let cmd = `${this.wmPlayerPath} ${this.configToString(config)}"`;
             this._execute(cmd, (err, stdout, stderr) => {
                 if (!!err) {
                     reject(err);
@@ -160,7 +177,7 @@ class Player {
                 return;
             }
             this.stopUdpListener();
-            this.process.kill("SIGINT");
+            killProcess(this.process);
             let waitUntilEnd = () => {
                 if (!this.isPlaying) {
                     resolve();
@@ -188,6 +205,9 @@ class Player {
         }
         if (config.sourceMap) {
             options.push('--sources');
+        }
+        if (config.sigintWorkaround) {
+            options.push('--win32-sigint-workaround');
         }
         return options.join(" ");
     }

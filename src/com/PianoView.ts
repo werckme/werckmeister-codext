@@ -61,7 +61,7 @@ export class PianoView extends AWebView {
             let jsPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'dist', 'WebViewApp.dist.js'));
             let htmlPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'pianoView.html'));
             
-            fs.readFile(htmlPath.path, 'utf8', (err, data) => {
+            fs.readFile(htmlPath.fsPath, 'utf8', (err, data) => {
                 data = data.replace("$mainSrc", this.toWebViewUri(jsPath))
                 this.currentPanel!.webview.html = data;
                 resolve(this.currentPanel as vscode.WebviewPanel);
