@@ -76,7 +76,7 @@ class SheetView extends AWebView_1.AWebView {
         return new Promise((resolve, reject) => {
             this.currentPanel = vscode.window.createWebviewPanel('werckmeister.SheetView', // Identifies the type of the webview. Used internally
             'Sheet', // Title of the panel displayed to the user
-            vscode.ViewColumn.Two, // Editor column to show the new webview panel in.
+            vscode.ViewColumn.Beside, // Editor column to show the new webview panel in.
             {
                 enableScripts: true,
             });

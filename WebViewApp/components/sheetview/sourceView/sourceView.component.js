@@ -16,7 +16,7 @@ const EditorWrapperStyle = {
 const EditorStyle = {
     width: '100%',
     height: '100%',
-    position: 'absolute'
+    position: 'absolute',
 }
 
 const EditorOptions = {
@@ -25,6 +25,7 @@ const EditorOptions = {
     readOnly: true,
     highlightActiveLine: false,
     highlightSelectedWord: false,
+    newLineMode: 'unix'
 };
 
 const MarkerClass = "sheet-marker";
@@ -44,22 +45,18 @@ function getRowAndColumn(text, position, fixTrailingWhitespaces) {
     if (position >= text.length) {
         return null;
     }
-    const _isNewline = (char, nextchar) => { 
+    const _isNewline = (char) => { 
+        // assuming text is unixstyle LF
         if (char === '\n') {
-            return 1;
+            return true;
         }
-        if (char === '\r' && nextchar === '\n') {
-            return 2;
-        }
+        return false;
     }
     for(let idx=0; idx < position; ++idx) {
         let char = text[idx];
-        let skipChars = _isNewline(char, text[idx+1]);
-        let isNewline = !!skipChars;
-        if (isNewline) {
+        if (_isNewline(char)) {
             ++row;
             col = 0;
-            idx += skipChars - 1;
             continue;
         }
         ++col;
@@ -90,7 +87,10 @@ export class SourceViewComponent extends React.Component {
     }
 
     updateEventMarkers() {
-        const sourceText = this.state.fileInfo.text;
+        if (!this.editor && !this.text) {
+            return;
+        }
+        const sourceText = this.editor.session.doc.getValue();
         const toRemove = _(this.positionMarkerMap)
             .keys()
             .without( ..._(this.state.fileInfo.eventInfos).map(x=>x.beginPosition).value() )
