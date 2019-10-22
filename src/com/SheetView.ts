@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { Player, getPlayer, OnPlayerMessageEvent, OnPlayerStateChanged, PlayerState } from "../com/Player";
 import { AWebView } from './AWebView';
+import { WMCommandStop, WMCommandPlay } from '../extension';
 
 export class SheetView extends AWebView {
 
@@ -72,6 +73,20 @@ export class SheetView extends AWebView {
 		player.playerMessage.removeListener(OnPlayerStateChanged, this.onPlayerStateChangedBound);
 	}
 
+	onStopReceived() {
+		vscode.commands.executeCommand(WMCommandStop);
+	}
+
+	onPlayReceived() {
+		vscode.commands.executeCommand(WMCommandPlay);
+	}
+
+	onWebViewMessage(message: any) {
+		switch(message.command) {
+			case "player-stop": return this.onStopReceived();
+			case "player-play": return this.onPlayReceived();
+		}
+	}
 
     protected createPanelImpl(): Promise<vscode.WebviewPanel> {
         return new Promise<vscode.WebviewPanel>((resolve, reject) => {
@@ -85,7 +100,9 @@ export class SheetView extends AWebView {
             );
             let jsPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'dist', 'WebViewApp.dist.js'));
             let htmlPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'sheetView.html'));
-            
+			
+			this.currentPanel.webview.onDidReceiveMessage(this.onWebViewMessage.bind(this), undefined, this.context.subscriptions);
+			
             fs.readFile(htmlPath.fsPath, 'utf8', (err, data) => {
                 data = data.replace("$mainSrc", this.toWebViewUri(jsPath))
                 this.currentPanel!.webview.html = data;

@@ -60,16 +60,19 @@ export const OnPlayerStateChanged = 'OnPlayerStateChanged';
 export enum PlayerState {
     Undefined,
     Playing,
-    Stopped
+    Stopped,
+    Stopping,
+    Paused
 }
 
 export class Player {
+    private _state: PlayerState = PlayerState.Stopped;
     socket: dgram.Socket|null = null;
     playerMessage: EventEmitter = new EventEmitter();
     private process: ChildProcess|null = null;
     sourceMap: ISourceMap|null = null;
     currentFile: string|null = null;
-
+    private _sheetTime: number = 0;
     get wmPlayerPath(): string {
         return toWMBINPath(PlayerExecutable);
     }
@@ -77,6 +80,33 @@ export class Player {
     get isPlaying(): boolean {
         return !!this.process;
     }
+
+    get sheetTime(): number {
+        return this._sheetTime;
+    }
+
+    set sheetTime(val: number) {
+        this._sheetTime = val;
+        if (val === 0) {
+            this.playerMessage.emit(exports.OnPlayerMessageEvent, {sheetTime: 0});
+        }
+    }
+   
+    get state(): PlayerState {
+        return this._state;
+    }
+
+    set state(val: PlayerState) {
+        this._state = val;
+        this.playerMessage.emit.bind(this.playerMessage, OnPlayerStateChanged, this._state);
+    }
+
+    updateSheetTime(udpMessage:any) {
+        if (udpMessage.sheetTime) {
+            this.sheetTime = udpMessage.sheetTime;
+        }
+    }
+
     startUdpListener(port: number) {
         if (this.socket !== null) {
             return;
@@ -86,6 +116,7 @@ export class Player {
         }
         this.socket.on('message', (msg) => {
             let object = JSON.parse(msg.toString());
+            this.updateSheetTime(object);
             this.playerMessage.emit(exports.OnPlayerMessageEvent, object);
         });
         this.socket.bind(port);
@@ -138,6 +169,10 @@ export class Player {
         return this._startPlayer(sheetPath);
     }
 
+    pause(): Promise<void> {
+        return this.stop();
+    }
+
     private async _startPlayer(sheetPath: string): Promise<void> {
         return new Promise(async (resolve, reject) => {
             if (this.isPlaying) {
@@ -150,7 +185,7 @@ export class Player {
             config.port = nextFreePort;
             config.sheetPath = sheetPath;
             let cmd = `${this.wmPlayerPath} ${this.configToString(config)}`;
-            setTimeout(this.playerMessage.emit.bind(this.playerMessage, OnPlayerStateChanged, PlayerState.Playing), 10);
+            setTimeout(()=>{this.state = PlayerState.Playing}, 10);
             this.process = this._execute(cmd, (err:any, stdout: any, stderr: any) => {
                 if (!!err) {
                     reject(stderr);
@@ -161,7 +196,10 @@ export class Player {
                 resolve();
                 this.stopUdpListener();
                 this.process = null;
-                this.currentFile = null;
+                if (this.state === PlayerState.Stopped || this.state === PlayerState.Stopping) {
+                    this.currentFile = null;
+                    this.sheetTime = 0;
+                }
             });
             this.startUdpListener(config.port);
         });
@@ -174,11 +212,12 @@ export class Player {
                 return;
             }
             this.stopUdpListener();
+            this._state = PlayerState.Stopping;
             killProcess(this.process as ChildProcess);
             let waitUntilEnd = () => {
                 if (!this.isPlaying) {
                     resolve();
-                    this.playerMessage.emit(OnPlayerStateChanged, PlayerState.Stopped);
+                    this._state = PlayerState.Stopped;
                     return;
                 }
                 setTimeout(waitUntilEnd, 100);
@@ -186,6 +225,7 @@ export class Player {
             waitUntilEnd();
         });
     }
+
     private configToString(config: Config) {
         if (!config.sheetPath) {
             throw new Error('missing sheet path');

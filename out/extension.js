@@ -8,23 +8,32 @@ const PlayTerminal_1 = require("./commands/PlayTerminal");
 const Stop_1 = require("./commands/Stop");
 const ShowSheetView_1 = require("./commands/ShowSheetView");
 const ShowPianoView_1 = require("./commands/ShowPianoView");
+const Pause_1 = require("./commands/Pause");
 function excuteCommand(type, context) {
     let cmd = new type(context);
     cmd.execute();
 }
+const _ns = "extension.werckmeister";
+exports.WMCommandPlay = `${_ns}.play`;
+exports.WMCommandPlayTerminal = `${_ns}.terminal.play`;
+exports.WMCommandStop = `${_ns}.stop`;
+exports.WMCommandPause = `${_ns}.pause`;
+exports.WMCommandOpenSheeView = `${_ns}.sheetview`;
+exports.WMCommandOpenPianoView = `${_ns}.pianoview`;
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
-    let ns = "extension.werckmeister";
-    let disposable = vscode.commands.registerCommand(`${ns}.terminal.play`, excuteCommand.bind(null, PlayTerminal_1.PlayTerminal, context));
+    let disposable = vscode.commands.registerCommand(exports.WMCommandPlayTerminal, excuteCommand.bind(null, PlayTerminal_1.PlayTerminal, context));
     context.subscriptions.push(disposable);
-    disposable = vscode.commands.registerCommand(`${ns}.play`, excuteCommand.bind(null, Play_1.Play, context));
+    disposable = vscode.commands.registerCommand(exports.WMCommandPlay, excuteCommand.bind(null, Play_1.Play, context));
     context.subscriptions.push(disposable);
-    disposable = vscode.commands.registerCommand(`${ns}.stop`, excuteCommand.bind(null, Stop_1.Stop, context));
+    disposable = vscode.commands.registerCommand(exports.WMCommandStop, excuteCommand.bind(null, Stop_1.Stop, context));
     context.subscriptions.push(disposable);
-    disposable = vscode.commands.registerCommand(`${ns}.sheetview`, excuteCommand.bind(null, ShowSheetView_1.ShowSheetView, context));
+    disposable = vscode.commands.registerCommand(exports.WMCommandPause, excuteCommand.bind(null, Pause_1.Pause, context));
     context.subscriptions.push(disposable);
-    disposable = vscode.commands.registerCommand(`${ns}.pianoview`, excuteCommand.bind(null, ShowPianoView_1.ShowPianoView, context));
+    disposable = vscode.commands.registerCommand(exports.WMCommandOpenSheeView, excuteCommand.bind(null, ShowSheetView_1.ShowSheetView, context));
+    context.subscriptions.push(disposable);
+    disposable = vscode.commands.registerCommand(exports.WMCommandOpenPianoView, excuteCommand.bind(null, ShowPianoView_1.ShowPianoView, context));
     context.subscriptions.push(disposable);
 }
 exports.activate = activate;

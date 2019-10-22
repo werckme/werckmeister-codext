@@ -14,6 +14,7 @@ const path = require("path");
 const fs = require("fs");
 const Player_1 = require("../com/Player");
 const AWebView_1 = require("./AWebView");
+const extension_1 = require("../extension");
 class SheetView extends AWebView_1.AWebView {
     constructor(context) {
         super(context);
@@ -72,6 +73,18 @@ class SheetView extends AWebView_1.AWebView {
         player.playerMessage.removeListener(Player_1.OnPlayerMessageEvent, this.onPlayerMessageBound);
         player.playerMessage.removeListener(Player_1.OnPlayerStateChanged, this.onPlayerStateChangedBound);
     }
+    onStopReceived() {
+        vscode.commands.executeCommand(extension_1.WMCommandStop);
+    }
+    onPlayReceived() {
+        vscode.commands.executeCommand(extension_1.WMCommandPlay);
+    }
+    onWebViewMessage(message) {
+        switch (message.command) {
+            case "player-stop": return this.onStopReceived();
+            case "player-play": return this.onPlayReceived();
+        }
+    }
     createPanelImpl() {
         return new Promise((resolve, reject) => {
             this.currentPanel = vscode.window.createWebviewPanel('werckmeister.SheetView', // Identifies the type of the webview. Used internally
@@ -82,6 +95,7 @@ class SheetView extends AWebView_1.AWebView {
             });
             let jsPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'dist', 'WebViewApp.dist.js'));
             let htmlPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'sheetView.html'));
+            this.currentPanel.webview.onDidReceiveMessage(this.onWebViewMessage.bind(this), undefined, this.context.subscriptions);
             fs.readFile(htmlPath.fsPath, 'utf8', (err, data) => {
                 data = data.replace("$mainSrc", this.toWebViewUri(jsPath));
                 this.currentPanel.webview.html = data;

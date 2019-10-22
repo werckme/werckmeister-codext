@@ -66,20 +66,45 @@ var PlayerState;
     PlayerState[PlayerState["Undefined"] = 0] = "Undefined";
     PlayerState[PlayerState["Playing"] = 1] = "Playing";
     PlayerState[PlayerState["Stopped"] = 2] = "Stopped";
+    PlayerState[PlayerState["Stopping"] = 3] = "Stopping";
+    PlayerState[PlayerState["Paused"] = 4] = "Paused";
 })(PlayerState = exports.PlayerState || (exports.PlayerState = {}));
 class Player {
     constructor() {
+        this._state = PlayerState.Stopped;
         this.socket = null;
         this.playerMessage = new EventEmitter();
         this.process = null;
         this.sourceMap = null;
         this.currentFile = null;
+        this._sheetTime = 0;
     }
     get wmPlayerPath() {
         return toWMBINPath(PlayerExecutable);
     }
     get isPlaying() {
         return !!this.process;
+    }
+    get sheetTime() {
+        return this._sheetTime;
+    }
+    set sheetTime(val) {
+        this._sheetTime = val;
+        if (val === 0) {
+            this.playerMessage.emit(exports.OnPlayerMessageEvent, { sheetTime: 0 });
+        }
+    }
+    get state() {
+        return this._state;
+    }
+    set state(val) {
+        this._state = val;
+        this.playerMessage.emit.bind(this.playerMessage, exports.OnPlayerStateChanged, this._state);
+    }
+    updateSheetTime(udpMessage) {
+        if (udpMessage.sheetTime) {
+            this.sheetTime = udpMessage.sheetTime;
+        }
     }
     startUdpListener(port) {
         if (this.socket !== null) {
@@ -90,6 +115,7 @@ class Player {
         }
         this.socket.on('message', (msg) => {
             let object = JSON.parse(msg.toString());
+            this.updateSheetTime(object);
             this.playerMessage.emit(exports.OnPlayerMessageEvent, object);
         });
         this.socket.bind(port);
@@ -140,6 +166,9 @@ class Player {
             return this._startPlayer(sheetPath);
         });
     }
+    pause() {
+        return this.stop();
+    }
     _startPlayer(sheetPath) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
@@ -153,7 +182,7 @@ class Player {
                 config.port = nextFreePort;
                 config.sheetPath = sheetPath;
                 let cmd = `${this.wmPlayerPath} ${this.configToString(config)}`;
-                setTimeout(this.playerMessage.emit.bind(this.playerMessage, exports.OnPlayerStateChanged, PlayerState.Playing), 10);
+                setTimeout(() => { this.state = PlayerState.Playing; }, 10);
                 this.process = this._execute(cmd, (err, stdout, stderr) => {
                     if (!!err) {
                         reject(stderr);
@@ -164,7 +193,10 @@ class Player {
                     resolve();
                     this.stopUdpListener();
                     this.process = null;
-                    this.currentFile = null;
+                    if (this.state === PlayerState.Stopped || this.state === PlayerState.Stopping) {
+                        this.currentFile = null;
+                        this.sheetTime = 0;
+                    }
                 });
                 this.startUdpListener(config.port);
             }));
@@ -177,11 +209,12 @@ class Player {
                 return;
             }
             this.stopUdpListener();
+            this._state = PlayerState.Stopping;
             killProcess(this.process);
             let waitUntilEnd = () => {
                 if (!this.isPlaying) {
                     resolve();
-                    this.playerMessage.emit(exports.OnPlayerStateChanged, PlayerState.Stopped);
+                    this._state = PlayerState.Stopped;
                     return;
                 }
                 setTimeout(waitUntilEnd, 100);

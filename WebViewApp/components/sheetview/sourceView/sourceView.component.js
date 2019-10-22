@@ -2,6 +2,7 @@ import React from "react";
 import * as ace from 'werckmeister-ace-build';
 import 'werckmeister-ace-build/src-noconflict/mode-sheet';
 import 'werckmeister-ace-build/src-noconflict/theme-dracula';
+import { BaseComponent } from "../../shared/base/base.component";
 
 const ContainerStyle = {
     position: 'static',
@@ -25,10 +26,16 @@ const EditorOptions = {
     readOnly: true,
     highlightActiveLine: false,
     highlightSelectedWord: false,
-    newLineMode: 'unix'
 };
 
 const MarkerClass = "sheet-marker";
+
+function dos2Unix(text) {
+    if (!text) {
+        return text;
+    }
+    return text.replace(/\r\n/g, ' \n');
+}
 
 function getRowAndColumn(text, position, fixTrailingWhitespaces) {
     while(position > 0 && fixTrailingWhitespaces) {
@@ -64,7 +71,7 @@ function getRowAndColumn(text, position, fixTrailingWhitespaces) {
     return {row, col};
 }
 
-export class SourceViewComponent extends React.Component {
+export class SourceViewComponent extends BaseComponent {
     constructor(props) {
         super(props);
         this.refEditor = null;
@@ -117,7 +124,7 @@ export class SourceViewComponent extends React.Component {
     }
 
     render() {
-        const sourceText = this.state.fileInfo.text;
+        const sourceText = dos2Unix(this.state.fileInfo.text);
         this.updateEventMarkers();
         return (
             <div style={ContainerStyle}>

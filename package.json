@@ -13,6 +13,7 @@
         "onCommand:extension.werckmeister.terminal.play",
         "onCommand:extension.werckmeister.play",
         "onCommand:extension.werckmeister.stop",
+        "onCommand:extension.werckmeister.pause",
         "onCommand:extension.werckmeister.sheetview",
         "onCommand:extension.werckmeister.pianoview"
     ],
@@ -31,6 +32,10 @@
                 "command": "extension.werckmeister.stop",
                 "title": "Werckmeister: Stop"
             },
+            {
+                "command": "extension.werckmeister.pause",
+                "title": "Werckmeister: Pause"
+            },            
             {
                 "command": "extension.werckmeister.sheetview",
                 "title": "Werckmeister: Sheetview"

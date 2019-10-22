@@ -1,6 +1,8 @@
 import React from "react";
 import * as _ from 'lodash';
 import { SourceViewComponent } from "./sourceView/sourceView.component";
+import { TransportComponent } from "../shared/transport/transport.component";
+import { BaseComponent } from "../shared/base/base.component";
 
 function getSourceKey(sourceId) {
     return Number(sourceId).toString();
@@ -11,7 +13,7 @@ function isSheetFile(fileInfo) {
         || fileInfo.extension === '.template'
 }
 
-export class SheetViewComponent extends React.Component {
+export class SheetViewComponent extends BaseComponent {
     constructor(props) {
         super(props);
         this.state = {
@@ -28,7 +30,7 @@ export class SheetViewComponent extends React.Component {
     }
 
     handleMessage(message) {
-        if (message.sheetTime) {
+        if (message.sheetTime !== undefined) {
             this.updateSheetTime(message.sheetTime);
         }
         if (message.fileInfos) {
@@ -83,7 +85,7 @@ export class SheetViewComponent extends React.Component {
         
         return (
             <div>
-                <h5> { this.state.sheetTime } </h5>  
+                <TransportComponent position={this.state.sheetTime}></TransportComponent>
                 {
                     _(keys)
                     .filter(x=> isSheetFile(this.state.sheetfiles[x]))
