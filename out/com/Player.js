@@ -113,7 +113,7 @@ class Player {
             const config = new Config();
             config.sourceMap = true;
             config.sheetPath = this.currentFile;
-            let cmd = `${this.wmPlayerPath} ${this.configToString(config)}"`;
+            let cmd = `${this.wmPlayerPath} ${this.configToString(config)}`;
             this._execute(cmd, (err, stdout, stderr) => {
                 if (!!err) {
                     reject(err);
