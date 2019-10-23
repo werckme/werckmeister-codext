@@ -98,7 +98,7 @@ export class Player {
 
     set state(val: PlayerState) {
         this._state = val;
-        this.playerMessage.emit.bind(this.playerMessage, OnPlayerStateChanged, this._state);
+        this.playerMessage.emit(OnPlayerStateChanged, this._state);
     }
 
     updateSheetTime(udpMessage:any) {

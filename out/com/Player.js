@@ -99,7 +99,7 @@ class Player {
     }
     set state(val) {
         this._state = val;
-        this.playerMessage.emit.bind(this.playerMessage, exports.OnPlayerStateChanged, this._state);
+        this.playerMessage.emit(exports.OnPlayerStateChanged, this._state);
     }
     updateSheetTime(udpMessage) {
         if (udpMessage.sheetTime) {
