@@ -38,6 +38,7 @@ class Config {
     funkfeuer: boolean = false;
     info: boolean = false;
     port: number = 8080;
+    begin: number = 0;
     sheetPath: string = "";
     sigintWorkaround:boolean = IsWindows ? true : false;
 };
@@ -59,9 +60,11 @@ export const OnPlayerStateChanged = 'OnPlayerStateChanged';
 
 export enum PlayerState {
     Undefined,
+    StartPlaying,
     Playing,
     Stopped,
     Stopping,
+    Pausing,
     Paused
 }
 
@@ -97,7 +100,15 @@ export class Player {
     }
 
     set state(val: PlayerState) {
+        if (this.state === val) {
+            return;
+        }
+        console.log(PlayerState[val]);
         this._state = val;
+        if (this._state === PlayerState.Stopped) {
+            this.currentFile = null;
+            this.sheetTime = 0;
+        }
         this.playerMessage.emit(OnPlayerStateChanged, this._state);
     }
 
@@ -115,6 +126,9 @@ export class Player {
             this.socket = dgram.createSocket('udp4');
         }
         this.socket.on('message', (msg) => {
+            if (this.state === PlayerState.StartPlaying) {
+                this.state = PlayerState.Playing;
+            }
             let object = JSON.parse(msg.toString());
             this.updateSheetTime(object);
             this.playerMessage.emit(exports.OnPlayerMessageEvent, object);
@@ -170,13 +184,14 @@ export class Player {
     }
 
     pause(): Promise<void> {
+        this.state = PlayerState.Pausing;
         return this.stop();
     }
 
     private async _startPlayer(sheetPath: string): Promise<void> {
         return new Promise(async (resolve, reject) => {
             if (this.isPlaying) {
-                await this.stop();
+                await this.stop(); // restart
             }
             const nextFreePort = await getFreeUdpPort();
             const config = new Config();
@@ -184,8 +199,13 @@ export class Player {
             config.watch = true;
             config.port = nextFreePort;
             config.sheetPath = sheetPath;
+            if (this.state === PlayerState.Paused) {
+                config.begin = this.sheetTime;
+            } else {
+                config.begin = 0;
+            }
             let cmd = `${this.wmPlayerPath} ${this.configToString(config)}`;
-            setTimeout(()=>{this.state = PlayerState.Playing}, 10);
+            this.state = PlayerState.StartPlaying;
             this.process = this._execute(cmd, (err:any, stdout: any, stderr: any) => {
                 if (!!err) {
                     reject(stderr);
@@ -196,10 +216,6 @@ export class Player {
                 resolve();
                 this.stopUdpListener();
                 this.process = null;
-                if (this.state === PlayerState.Stopped || this.state === PlayerState.Stopping) {
-                    this.currentFile = null;
-                    this.sheetTime = 0;
-                }
             });
             this.startUdpListener(config.port);
         });
@@ -207,17 +223,22 @@ export class Player {
 
     stop(): Promise<void> {
         return new Promise((resolve, reject) => {
+            if (this.state === PlayerState.Paused) {
+                this.state = PlayerState.Stopped;
+            }
             if (!this.isPlaying) {
                 resolve();
                 return;
             }
             this.stopUdpListener();
-            this._state = PlayerState.Stopping;
+            if (this.state !== PlayerState.Pausing) {
+                this.state = PlayerState.Stopping;
+            }
             killProcess(this.process as ChildProcess);
             let waitUntilEnd = () => {
                 if (!this.isPlaying) {
                     resolve();
-                    this._state = PlayerState.Stopped;
+                    this.state = this.state === PlayerState.Stopping ? PlayerState.Stopped : PlayerState.Paused;
                     return;
                 }
                 setTimeout(waitUntilEnd, 100);
@@ -245,6 +266,9 @@ export class Player {
         }
         if (config.sigintWorkaround) {
             options.push('--win32-sigint-workaround');
+        }
+        if (config.begin > 0) {
+            options.push(`--begin=${config.begin}`);
         }
         return options.join(" ");
     }

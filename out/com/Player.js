@@ -43,6 +43,7 @@ class Config {
         this.funkfeuer = false;
         this.info = false;
         this.port = 8080;
+        this.begin = 0;
         this.sheetPath = "";
         this.sigintWorkaround = IsWindows ? true : false;
     }
@@ -64,10 +65,12 @@ exports.OnPlayerStateChanged = 'OnPlayerStateChanged';
 var PlayerState;
 (function (PlayerState) {
     PlayerState[PlayerState["Undefined"] = 0] = "Undefined";
-    PlayerState[PlayerState["Playing"] = 1] = "Playing";
-    PlayerState[PlayerState["Stopped"] = 2] = "Stopped";
-    PlayerState[PlayerState["Stopping"] = 3] = "Stopping";
-    PlayerState[PlayerState["Paused"] = 4] = "Paused";
+    PlayerState[PlayerState["StartPlaying"] = 1] = "StartPlaying";
+    PlayerState[PlayerState["Playing"] = 2] = "Playing";
+    PlayerState[PlayerState["Stopped"] = 3] = "Stopped";
+    PlayerState[PlayerState["Stopping"] = 4] = "Stopping";
+    PlayerState[PlayerState["Pausing"] = 5] = "Pausing";
+    PlayerState[PlayerState["Paused"] = 6] = "Paused";
 })(PlayerState = exports.PlayerState || (exports.PlayerState = {}));
 class Player {
     constructor() {
@@ -98,7 +101,15 @@ class Player {
         return this._state;
     }
     set state(val) {
+        if (this.state === val) {
+            return;
+        }
+        console.log(PlayerState[val]);
         this._state = val;
+        if (this._state === PlayerState.Stopped) {
+            this.currentFile = null;
+            this.sheetTime = 0;
+        }
         this.playerMessage.emit(exports.OnPlayerStateChanged, this._state);
     }
     updateSheetTime(udpMessage) {
@@ -114,6 +125,9 @@ class Player {
             this.socket = dgram.createSocket('udp4');
         }
         this.socket.on('message', (msg) => {
+            if (this.state === PlayerState.StartPlaying) {
+                this.state = PlayerState.Playing;
+            }
             let object = JSON.parse(msg.toString());
             this.updateSheetTime(object);
             this.playerMessage.emit(exports.OnPlayerMessageEvent, object);
@@ -167,13 +181,14 @@ class Player {
         });
     }
     pause() {
+        this.state = PlayerState.Pausing;
         return this.stop();
     }
     _startPlayer(sheetPath) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
                 if (this.isPlaying) {
-                    yield this.stop();
+                    yield this.stop(); // restart
                 }
                 const nextFreePort = yield getFreeUdpPort();
                 const config = new Config();
@@ -181,8 +196,14 @@ class Player {
                 config.watch = true;
                 config.port = nextFreePort;
                 config.sheetPath = sheetPath;
+                if (this.state === PlayerState.Paused) {
+                    config.begin = this.sheetTime;
+                }
+                else {
+                    config.begin = 0;
+                }
                 let cmd = `${this.wmPlayerPath} ${this.configToString(config)}`;
-                setTimeout(() => { this.state = PlayerState.Playing; }, 10);
+                this.state = PlayerState.StartPlaying;
                 this.process = this._execute(cmd, (err, stdout, stderr) => {
                     if (!!err) {
                         reject(stderr);
@@ -193,10 +214,6 @@ class Player {
                     resolve();
                     this.stopUdpListener();
                     this.process = null;
-                    if (this.state === PlayerState.Stopped || this.state === PlayerState.Stopping) {
-                        this.currentFile = null;
-                        this.sheetTime = 0;
-                    }
                 });
                 this.startUdpListener(config.port);
             }));
@@ -204,17 +221,22 @@ class Player {
     }
     stop() {
         return new Promise((resolve, reject) => {
+            if (this.state === PlayerState.Paused) {
+                this.state = PlayerState.Stopped;
+            }
             if (!this.isPlaying) {
                 resolve();
                 return;
             }
             this.stopUdpListener();
-            this._state = PlayerState.Stopping;
+            if (this.state !== PlayerState.Pausing) {
+                this.state = PlayerState.Stopping;
+            }
             killProcess(this.process);
             let waitUntilEnd = () => {
                 if (!this.isPlaying) {
                     resolve();
-                    this._state = PlayerState.Stopped;
+                    this.state = this.state === PlayerState.Stopping ? PlayerState.Stopped : PlayerState.Paused;
                     return;
                 }
                 setTimeout(waitUntilEnd, 100);
@@ -241,6 +263,9 @@ class Player {
         }
         if (config.sigintWorkaround) {
             options.push('--win32-sigint-workaround');
+        }
+        if (config.begin > 0) {
+            options.push(`--begin=${config.begin}`);
         }
         return options.join(" ");
     }
