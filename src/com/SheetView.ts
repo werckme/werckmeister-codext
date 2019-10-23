@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { Player, getPlayer, OnPlayerMessageEvent, OnPlayerStateChanged, PlayerState } from "../com/Player";
 import { AWebView } from './AWebView';
-import { WMCommandStop, WMCommandPlay } from '../extension';
+import { WMCommandStop, WMCommandPlay, WMCommandPause } from '../extension';
 
 export class SheetView extends AWebView {
 
@@ -17,6 +17,9 @@ export class SheetView extends AWebView {
 	}
 
 	onPlayerStateChanged(state: PlayerState) {
+		this.currentPanel!.webview.postMessage({
+			playerState: {newState: PlayerState[state]}
+		});
 		if (state===PlayerState.Playing) {
 			this.updateSheetSourceMap();
 		}
@@ -81,10 +84,15 @@ export class SheetView extends AWebView {
 		vscode.commands.executeCommand(WMCommandPlay);
 	}
 
+	onPauseReceived() {
+		vscode.commands.executeCommand(WMCommandPause);
+	}
+
 	onWebViewMessage(message: any) {
 		switch(message.command) {
 			case "player-stop": return this.onStopReceived();
 			case "player-play": return this.onPlayReceived();
+			case "player-pause": return this.onPauseReceived();
 		}
 	}
 

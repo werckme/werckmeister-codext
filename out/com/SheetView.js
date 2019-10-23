@@ -23,6 +23,9 @@ class SheetView extends AWebView_1.AWebView {
         this.onPlayerStateChangedBound = this.onPlayerStateChanged.bind(this);
     }
     onPlayerStateChanged(state) {
+        this.currentPanel.webview.postMessage({
+            playerState: { newState: Player_1.PlayerState[state] }
+        });
         if (state === Player_1.PlayerState.Playing) {
             this.updateSheetSourceMap();
         }
@@ -79,10 +82,14 @@ class SheetView extends AWebView_1.AWebView {
     onPlayReceived() {
         vscode.commands.executeCommand(extension_1.WMCommandPlay);
     }
+    onPauseReceived() {
+        vscode.commands.executeCommand(extension_1.WMCommandPause);
+    }
     onWebViewMessage(message) {
         switch (message.command) {
             case "player-stop": return this.onStopReceived();
             case "player-play": return this.onPlayReceived();
+            case "player-pause": return this.onPauseReceived();
         }
     }
     createPanelImpl() {

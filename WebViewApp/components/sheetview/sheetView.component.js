@@ -20,7 +20,8 @@ export class SheetViewComponent extends BaseComponent {
             sheetTime: 0,
             sheetfiles: {},
             mainSheet: null,
-            text: ""
+            text: "",
+            playerState: ""
         }
        
         window.addEventListener('message', event => { // get vscode message
@@ -39,6 +40,13 @@ export class SheetViewComponent extends BaseComponent {
         if(message.sheetEventInfos) {
             this.updateSheetEventInfos(message.sheetEventInfos);
         }
+        if(message.playerState) {
+            this.updatePlayerState(message.playerState);
+        }
+    }
+
+    updatePlayerState(playerState) {
+        this.setState({playerState: playerState.newState});
     }
 
     updateSheetTime(sheetTime) {
@@ -85,7 +93,7 @@ export class SheetViewComponent extends BaseComponent {
         
         return (
             <div>
-                <TransportComponent position={this.state.sheetTime}></TransportComponent>
+                <TransportComponent playerState={this.state.playerState} position={this.state.sheetTime}></TransportComponent>
                 {
                     _(keys)
                     .filter(x=> isSheetFile(this.state.sheetfiles[x]))

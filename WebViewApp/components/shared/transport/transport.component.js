@@ -2,6 +2,8 @@ import React from "react";
 import { playIcon } from "./play.icon";
 import { stopIcon } from "./stop.icon";
 import { BaseComponent } from "../base/base.component";
+import { PlayerState } from "../com/playerStates";
+import { pauseIcon } from "./pause.icon";
 
 
 export class TransportComponent extends BaseComponent {
@@ -20,11 +22,15 @@ export class TransportComponent extends BaseComponent {
         this.sendMessageToHost("player-play");
     }
 
+    onPauseClicked() {
+        this.sendMessageToHost("player-pause");
+    }
     render() {
         const position = this.props.position || 0;
         return (
             <div>
-                <style dangerouslySetInnerHTML={{__html:`
+                <style dangerouslySetInnerHTML={{
+                    __html: `
                     .ccontainer {
                         padding: 0px;
                         display: grid;
@@ -72,20 +78,25 @@ export class TransportComponent extends BaseComponent {
                     
                 `}}></style>
                 <div className="ccontainer">
-                    {/* <button [hidden]="werck.isPlaying" (click)="play()" class="btn-play"><i class="ion-md-play"></i></button>
-                    <button [hidden]="!werck.isPlaying" (click)="pause()" class="btn-play"><i class="ion-md-pause"></i></button> */}
-
-                    {/* <button (click)="stop()" class="btn-stop"><i class="ion-md-square"></i></button> */}
-                    <button className="btn-play" onClick={this.onPlayClicked.bind(this)}>
-                        {playIcon()}
-                    </button>
+                    {
+                        this.props.playerState !== PlayerState.Playing ?
+                        <button className="btn-play" onClick={this.onPlayClicked.bind(this)}>
+                            {playIcon()}
+                        </button>
+                        :
+                        <button className="btn-paused" onClick={this.onPauseClicked.bind(this)}>
+                            {pauseIcon()}
+                        </button>   
+                    }                 
                     <button className="btn-stop" onClick={this.onStopClicked.bind(this)}>
                         {stopIcon()}
-                    </button>                
+                    </button>
                     <div className="display">
-                        <span>{ position.toFixed(2) }</span>
+                        <span>{position.toFixed(2)}</span>
                     </div>
+                    
                 </div>
+                {this.props.playerState}
             </div>
         );
     }
