@@ -41,7 +41,7 @@ class Config {
     constructor() {
         this.watch = false;
         this.funkfeuer = false;
-        this.sourceMap = false;
+        this.info = false;
         this.port = 8080;
         this.sheetPath = "";
         this.sigintWorkaround = IsWindows ? true : false;
@@ -137,7 +137,7 @@ class Player {
     updateSourceMap() {
         return new Promise((resolve, reject) => {
             const config = new Config();
-            config.sourceMap = true;
+            config.info = true;
             config.sheetPath = this.currentFile;
             let cmd = `${this.wmPlayerPath} ${this.configToString(config)}`;
             this._execute(cmd, (err, stdout, stderr) => {
@@ -236,8 +236,8 @@ class Player {
         if (config.funkfeuer) {
             options.push(`--funkfeuer=localhost:${config.port}`);
         }
-        if (config.sourceMap) {
-            options.push('--sources');
+        if (config.info) {
+            options.push('--info');
         }
         if (config.sigintWorkaround) {
             options.push('--win32-sigint-workaround');

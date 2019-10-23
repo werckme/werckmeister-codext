@@ -36,7 +36,7 @@ const PlayerExecutable = IsWindows ? 'sheetp.exe' : 'sheetp';
 class Config {
     watch: boolean = false;
     funkfeuer: boolean = false;
-    sourceMap: boolean = false;
+    info: boolean = false;
     port: number = 8080;
     sheetPath: string = "";
     sigintWorkaround:boolean = IsWindows ? true : false;
@@ -141,7 +141,7 @@ export class Player {
     private updateSourceMap(): Promise<ISourceMap> {
         return new Promise((resolve, reject) => {
             const config = new Config();
-            config.sourceMap = true;
+            config.info = true;
             config.sheetPath = this.currentFile as string;
             let cmd = `${this.wmPlayerPath} ${this.configToString(config)}`;
             this._execute(cmd, (err:any, stdout: any, stderr: any) => {
@@ -240,8 +240,8 @@ export class Player {
         if (config.funkfeuer) {
             options.push(`--funkfeuer=localhost:${config.port}`);
         }
-        if (config.sourceMap) {
-            options.push('--sources');
+        if (config.info) {
+            options.push('--info');
         }
         if (config.sigintWorkaround) {
             options.push('--win32-sigint-workaround');
