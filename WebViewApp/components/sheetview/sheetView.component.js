@@ -109,7 +109,11 @@ export class SheetViewComponent extends BaseComponent {
                     zIndex: "10",
                     background: "var(--vscode-editor-background)"
                 }}>
-                    <TransportComponent sheetDuration={this.state.duration} playerState={this.state.playerState} position={this.state.sheetTime}></TransportComponent>
+                    <TransportComponent 
+                        sheetDuration={this.state.duration} 
+                        playerState={this.state.playerState} 
+                        position={this.state.sheetTime}>
+                    </TransportComponent>
                     <hr></hr>
                 </div>
                 <div style={{

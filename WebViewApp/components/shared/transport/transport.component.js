@@ -10,8 +10,10 @@ export class TransportComponent extends BaseComponent {
     constructor(props) {
         super(props);
         this.state = {
-            position: 0
+            position: 0,
+            begin: 0
         }
+        this.updateBeginBounced = _.debounce(this.updateBegin.bind(this), 100);
     }
 
     onStopClicked() {
@@ -25,6 +27,17 @@ export class TransportComponent extends BaseComponent {
     onPauseClicked() {
         this.sendMessageToHost("player-pause");
     }
+
+    updateBegin() {
+        this.sendMessageToHost("player-update-range", {begin: this.state.begin});
+    }
+
+    onBeginChanged(ev) {
+        const value = ev.target.value;
+        this.setState({begin: value})
+        this.updateBeginBounced();
+    }
+
     render() {
         const position = this.props.position || 0;
         return (
@@ -35,11 +48,11 @@ export class TransportComponent extends BaseComponent {
                         padding: 0px;
                         display: grid;
                         grid-template-rows: 25px 25px;
-                        grid-template-columns: 48px 48px auto 45px;
+                        grid-template-columns: 48px 48px auto 80px;
                         grid-template-areas: 
-                        "play stop display range-from"
-                        "play stop display range-to";
-                        width: 300px;
+                            "play stop display range-from" 
+                            "play stop display range-to";
+                        width: 288px;
                         font-weight: lighter;
                     }
                     .btn-play, .btn-paused {
@@ -75,6 +88,12 @@ export class TransportComponent extends BaseComponent {
                         position: relative;
                         top: -10px;
                     }
+                    input {
+                        background: #0000;
+                        border: none;
+                        color: var(--vscode-editor-foreground);
+                        text-align: right;
+                    }
                     
                 `}}></style>
                 <div className="ccontainer">
@@ -94,7 +113,11 @@ export class TransportComponent extends BaseComponent {
                     <div className="display">
                         <span>{position.toFixed(2)}</span>
                     </div>
-                    <input className="range-from" type="number" min="0"/>
+                    <input className="range-from" type="number" 
+                        value={this.state.begin} 
+                        onChange={this.onBeginChanged.bind(this)} 
+                        disabled={this.props.playerState === PlayerState.Playing}
+                        min="0"/>
 	                <input className="range-to" type="number" value={this.props.sheetDuration} disabled/>
                 </div>
                 {this.props.playerState}

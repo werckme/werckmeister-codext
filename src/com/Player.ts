@@ -75,6 +75,7 @@ export class Player {
     private process: ChildProcess|null = null;
     sheetInfo: ISheetInfo|null = null;
     currentFile: string|null = null;
+    begin: number = 0;
     private _sheetTime: number = 0;
     get wmPlayerPath(): string {
         return toWMBINPath(PlayerExecutable);
@@ -202,7 +203,7 @@ export class Player {
             if (this.state === PlayerState.Paused) {
                 config.begin = this.sheetTime;
             } else {
-                config.begin = 0;
+                config.begin = this.begin;
             }
             let cmd = `${this.wmPlayerPath} ${this.configToString(config)}`;
             this.state = PlayerState.StartPlaying;

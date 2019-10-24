@@ -51,8 +51,6 @@ export class SheetView extends AWebView {
 			fileInfo.text = await this.readFile(source.path);
 			return fileInfo;
 		});
-		console.log(sheetInfo);
-		
 		fileInfos = await Promise.all(fileInfos);
 		this.currentPanel.webview.postMessage({fileInfos, duration: sheetInfo!.duration});
 	}
@@ -88,11 +86,16 @@ export class SheetView extends AWebView {
 		vscode.commands.executeCommand(WMCommandPause);
 	}
 
+	onRangeChanged(begin: number) {
+		getPlayer().begin = begin;
+	}
+
 	onWebViewMessage(message: any) {
 		switch(message.command) {
 			case "player-stop": return this.onStopReceived();
 			case "player-play": return this.onPlayReceived();
 			case "player-pause": return this.onPauseReceived();
+			case "player-update-range": return this.onRangeChanged(message.begin);
 		}
 	}
 

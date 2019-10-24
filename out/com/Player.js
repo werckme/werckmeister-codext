@@ -80,6 +80,7 @@ class Player {
         this.process = null;
         this.sheetInfo = null;
         this.currentFile = null;
+        this.begin = 0;
         this._sheetTime = 0;
     }
     get wmPlayerPath() {
@@ -200,7 +201,7 @@ class Player {
                     config.begin = this.sheetTime;
                 }
                 else {
-                    config.begin = 0;
+                    config.begin = this.begin;
                 }
                 let cmd = `${this.wmPlayerPath} ${this.configToString(config)}`;
                 this.state = PlayerState.StartPlaying;
