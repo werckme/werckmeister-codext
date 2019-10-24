@@ -93,14 +93,28 @@ export class SheetViewComponent extends BaseComponent {
         
         return (
             <div>
-                <TransportComponent playerState={this.state.playerState} position={this.state.sheetTime}></TransportComponent>
-                {
-                    _(keys)
-                    .filter(x=> isSheetFile(this.state.sheetfiles[x]))
-                    .sort(sortValues)
-                    .map(x=> <SourceViewComponent key={getSourceKey(this.state.sheetfiles[x].sourceId)} fileInfo={this.state.sheetfiles[x]}></SourceViewComponent> )
-                    .value()
-                }
+                <div style={{
+                    position: "fixed",
+                    top: "0px",
+                    left: "20px",
+                    right: "20px",
+                    zIndex: "10",
+                    background: "var(--vscode-editor-background)"
+                }}>
+                    <TransportComponent playerState={this.state.playerState} position={this.state.sheetTime}></TransportComponent>
+                    <hr></hr>
+                </div>
+                <div style={{
+                    marginTop: "100px"
+                }}>
+                    {
+                        _(keys)
+                        .filter(x=> isSheetFile(this.state.sheetfiles[x]))
+                        .sort(sortValues)
+                        .map(x=> <SourceViewComponent key={getSourceKey(this.state.sheetfiles[x].sourceId)} fileInfo={this.state.sheetfiles[x]}></SourceViewComponent> )
+                        .value()
+                    }
+                </div>
             </div>
         );
     }

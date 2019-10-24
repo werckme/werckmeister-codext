@@ -128,13 +128,13 @@ export class SourceViewComponent extends BaseComponent {
         this.updateEventMarkers();
         return (
             <div style={ContainerStyle}>
-                <hr></hr>
                 <h5>{this.state.fileInfo.basename}</h5>
                 <div style={EditorWrapperStyle}>
                     <div ref={this.updateRef.bind(this)} style={EditorStyle}>
                         {sourceText}
                     </div>
                 </div>
+                <hr></hr>
             </div>
         );
     }

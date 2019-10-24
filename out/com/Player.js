@@ -214,6 +214,9 @@ class Player {
                     resolve();
                     this.stopUdpListener();
                     this.process = null;
+                    if (this.state === PlayerState.Playing) {
+                        this.state = PlayerState.Stopped;
+                    }
                 });
                 this.startUdpListener(config.port);
             }));
