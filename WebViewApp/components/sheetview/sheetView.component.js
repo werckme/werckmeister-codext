@@ -21,7 +21,8 @@ export class SheetViewComponent extends BaseComponent {
             sheetfiles: {},
             mainSheet: null,
             text: "",
-            playerState: ""
+            playerState: "",
+            duration: 0
         }
        
         window.addEventListener('message', event => { // get vscode message
@@ -35,7 +36,7 @@ export class SheetViewComponent extends BaseComponent {
             this.updateSheetTime(message.sheetTime);
         }
         if (message.fileInfos) {
-            this.updateFileInfos(message.fileInfos);
+            this.updateSourceMap(message.fileInfos);
         }
         if(message.sheetEventInfos) {
             this.updateSheetEventInfos(message.sheetEventInfos);
@@ -43,6 +44,13 @@ export class SheetViewComponent extends BaseComponent {
         if(message.playerState) {
             this.updatePlayerState(message.playerState);
         }
+        if(message.duration) {
+            this.updateDuration(message.duration);
+        }
+    }
+
+    updateDuration(duration) {
+        this.setState({duration: duration});
     }
 
     updatePlayerState(playerState) {
@@ -53,7 +61,7 @@ export class SheetViewComponent extends BaseComponent {
         this.setState({sheetTime: sheetTime});
     }
 
-    updateFileInfos(infos) {
+    updateSourceMap(infos) {
         const sheetfiles = _(infos)
             .map(x=> Object.assign(x, {eventInfos:[]}))
             .mapKeys(x=>getSourceKey(x.sourceId))
@@ -101,7 +109,7 @@ export class SheetViewComponent extends BaseComponent {
                     zIndex: "10",
                     background: "var(--vscode-editor-background)"
                 }}>
-                    <TransportComponent playerState={this.state.playerState} position={this.state.sheetTime}></TransportComponent>
+                    <TransportComponent sheetDuration={this.state.duration} playerState={this.state.playerState} position={this.state.sheetTime}></TransportComponent>
                     <hr></hr>
                 </div>
                 <div style={{

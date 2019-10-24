@@ -47,8 +47,8 @@ class SheetView extends AWebView_1.AWebView {
                 return;
             }
             let player = Player_1.getPlayer();
-            let sourceMap = player.sourceMap;
-            let fileInfos = sourceMap.sources.map((source) => __awaiter(this, void 0, void 0, function* () {
+            let sheetInfo = player.sheetInfo;
+            let fileInfos = sheetInfo.sources.map((source) => __awaiter(this, void 0, void 0, function* () {
                 const fileInfo = {};
                 Object.assign(fileInfo, source);
                 fileInfo.extension = path.extname(source.path);
@@ -56,8 +56,9 @@ class SheetView extends AWebView_1.AWebView {
                 fileInfo.text = yield this.readFile(source.path);
                 return fileInfo;
             }));
+            console.log(sheetInfo);
             fileInfos = yield Promise.all(fileInfos);
-            this.currentPanel.webview.postMessage({ fileInfos });
+            this.currentPanel.webview.postMessage({ fileInfos, duration: sheetInfo.duration });
         });
     }
     onPlayerMessage(message) {

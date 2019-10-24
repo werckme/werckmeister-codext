@@ -78,7 +78,7 @@ class Player {
         this.socket = null;
         this.playerMessage = new EventEmitter();
         this.process = null;
-        this.sourceMap = null;
+        this.sheetInfo = null;
         this.currentFile = null;
         this._sheetTime = 0;
     }
@@ -168,9 +168,9 @@ class Player {
                 }
             });
         }).then((sourceMap) => {
-            this.sourceMap = sourceMap;
-            this.sourceMap.mainDocument = this.currentFile;
-            return this.sourceMap;
+            this.sheetInfo = sourceMap;
+            this.sheetInfo.mainDocument = this.currentFile;
+            return this.sheetInfo;
         });
     }
     play(sheetPath) {

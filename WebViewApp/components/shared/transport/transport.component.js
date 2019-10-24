@@ -42,7 +42,7 @@ export class TransportComponent extends BaseComponent {
                         width: 300px;
                         font-weight: lighter;
                     }
-                    .btn-play {
+                    .btn-play, .btn-paused {
                         grid-area: play;
                     }
                     
@@ -94,7 +94,8 @@ export class TransportComponent extends BaseComponent {
                     <div className="display">
                         <span>{position.toFixed(2)}</span>
                     </div>
-                    
+                    <input className="range-from" type="number" min="0"/>
+	                <input className="range-to" type="number" value={this.props.sheetDuration} disabled/>
                 </div>
                 {this.props.playerState}
             </div>

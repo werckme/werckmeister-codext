@@ -1,7 +1,7 @@
 import { exec, ChildProcess } from 'child_process';
 import * as dgram from 'dgram';
 import * as EventEmitter from 'events';
-import { ISourceMap } from './SourceMap';
+import { ISheetInfo } from './SourceMap';
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -73,7 +73,7 @@ export class Player {
     socket: dgram.Socket|null = null;
     playerMessage: EventEmitter = new EventEmitter();
     private process: ChildProcess|null = null;
-    sourceMap: ISourceMap|null = null;
+    sheetInfo: ISheetInfo|null = null;
     currentFile: string|null = null;
     private _sheetTime: number = 0;
     get wmPlayerPath(): string {
@@ -152,7 +152,7 @@ export class Player {
         return exec(cmd, {cwd: playerWorkingDirectory()}, callback);
     }
 
-    private updateSourceMap(): Promise<ISourceMap> {
+    private updateSourceMap(): Promise<ISheetInfo> {
         return new Promise((resolve, reject) => {
             const config = new Config();
             config.info = true;
@@ -171,9 +171,9 @@ export class Player {
                 }
             });
         }).then((sourceMap)=>{
-            this.sourceMap = sourceMap as ISourceMap;
-            this.sourceMap.mainDocument = this.currentFile as string;
-            return this.sourceMap;
+            this.sheetInfo = sourceMap as ISheetInfo;
+            this.sheetInfo.mainDocument = this.currentFile as string;
+            return this.sheetInfo;
         });
     }
 
