@@ -4,8 +4,6 @@ import { stopIcon } from "./stop.icon";
 import { BaseComponent } from "../base/base.component";
 import { PlayerState } from "../com/playerStates";
 import { pauseIcon } from "./pause.icon";
-
-
 export class TransportComponent extends BaseComponent {
     constructor(props) {
         super(props);
@@ -118,7 +116,7 @@ export class TransportComponent extends BaseComponent {
                         onChange={this.onBeginChanged.bind(this)} 
                         disabled={this.props.playerState === PlayerState.Playing}
                         min="0"/>
-	                <input className="range-to" type="number" value={this.props.sheetDuration} disabled/>
+	                <input className="range-to" type="number" value={this.props.sheetDuration.toFixed(0)} disabled/>
                 </div>
                 {this.props.playerState}
             </div>

@@ -3,6 +3,7 @@ import * as ace from 'werckmeister-ace-build';
 import 'werckmeister-ace-build/src-noconflict/mode-sheet';
 import 'werckmeister-ace-build/src-noconflict/theme-dracula';
 import { BaseComponent } from "../../shared/base/base.component";
+import { Affix } from 'antd';
 
 const ContainerStyle = {
     position: 'static',
@@ -30,7 +31,7 @@ const EditorOptions = {
 
 const MarkerClass = "sheet-marker";
 
-function dos2Unix(text) {
+function fixNewlines(text) {
     if (!text) {
         return text;
     }
@@ -124,11 +125,13 @@ export class SourceViewComponent extends BaseComponent {
     }
 
     render() {
-        const sourceText = dos2Unix(this.state.fileInfo.text);
+        const sourceText = fixNewlines(this.state.fileInfo.text);
         this.updateEventMarkers();
         return (
             <div style={ContainerStyle}>
-                <h5>{this.state.fileInfo.basename}</h5>
+                 <Affix offsetTop={60}>
+                    <h5>{this.state.fileInfo.basename}</h5>
+                 </Affix>
                 <div style={EditorWrapperStyle}>
                     <div ref={this.updateRef.bind(this)} style={EditorStyle}>
                         {sourceText}

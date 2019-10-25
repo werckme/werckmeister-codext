@@ -107,7 +107,8 @@ export class SheetViewComponent extends BaseComponent {
                     left: "20px",
                     right: "20px",
                     zIndex: "10",
-                    background: "var(--vscode-editor-background)"
+                    background: "var(--vscode-editor-background)",
+                    paddingBottom: "17px"
                 }}>
                     <TransportComponent 
                         sheetDuration={this.state.duration} 

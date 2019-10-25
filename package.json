@@ -35,7 +35,7 @@
             {
                 "command": "extension.werckmeister.pause",
                 "title": "Werckmeister: Pause"
-            },            
+            },
             {
                 "command": "extension.werckmeister.sheetview",
                 "title": "Werckmeister: Sheetview"
@@ -105,6 +105,7 @@
     },
     "dependencies": {
         "ace-builds": "^1.4.6",
+        "antd": "^3.24.2",
         "lodash": "^4.17.15",
         "react": "^16.10.2",
         "react-dom": "^16.10.2",
