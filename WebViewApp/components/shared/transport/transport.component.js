@@ -109,7 +109,7 @@ export class TransportComponent extends BaseComponent {
                         {stopIcon()}
                     </button>
                     <div className="display">
-                        <span>{position.toFixed(2)}</span>
+                        <span>{ _.padStart(position.toFixed(2), 2+4, "0") }</span>
                     </div>
                     <input className="range-from" type="number" 
                         value={this.state.begin} 
