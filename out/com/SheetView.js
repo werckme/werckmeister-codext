@@ -23,6 +23,7 @@ class SheetView extends AWebView_1.AWebView {
         this.onSheetViewReady = () => { };
         this.onPlayerMessageBound = this.onPlayerMessage.bind(this);
         this.onPlayerStateChangedBound = this.onPlayerStateChanged.bind(this);
+        this.onSourcesChangedBound = this.onSourcesChanged.bind(this);
         this.sheetViewReady = new Promise(resolve => {
             this.onSheetViewReady = resolve;
         });
@@ -74,15 +75,20 @@ class SheetView extends AWebView_1.AWebView {
         }
         this.currentPanel.webview.postMessage(message);
     }
+    onSourcesChanged() {
+        console.log("UP DATE UP");
+    }
     registerListener() {
         let player = Player_1.getPlayer();
         player.playerMessage.on(Player_1.OnPlayerMessageEvent, this.onPlayerMessageBound);
+        player.playerMessage.on(Player_1.OnSourcesChanged, this.onSourcesChangedBound);
         player.playerMessage.on(Player_1.OnPlayerStateChanged, this.onPlayerStateChangedBound);
     }
     removeListener() {
         let player = Player_1.getPlayer();
         player.playerMessage.removeListener(Player_1.OnPlayerMessageEvent, this.onPlayerMessageBound);
         player.playerMessage.removeListener(Player_1.OnPlayerStateChanged, this.onPlayerStateChangedBound);
+        player.playerMessage.removeListener(Player_1.OnSourcesChanged, this.onSourcesChangedBound);
     }
     onStopReceived() {
         vscode.commands.executeCommand(extension_1.WMCommandStop);

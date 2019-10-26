@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { Player, getPlayer, OnPlayerMessageEvent, OnPlayerStateChanged, PlayerState } from "../com/Player";
+import { Player, getPlayer, OnPlayerMessageEvent, OnPlayerStateChanged, PlayerState, OnSourcesChanged } from "../com/Player";
 import { AWebView } from './AWebView';
 import { WMCommandStop, WMCommandPlay, WMCommandPause } from '../extension';
 import { ISheetInfo } from './SourceMap';
@@ -11,6 +11,7 @@ export class SheetView extends AWebView {
 	currentPanel: vscode.WebviewPanel|null = null;
 	onPlayerMessageBound: any;
 	onPlayerStateChangedBound: any;
+	onSourcesChangedBound: any;
 	sheetInfo: ISheetInfo|null = null;
 	onSheetViewReady: ()=>void = ()=>{};
 	sheetViewReady: Promise<void>;
@@ -18,6 +19,7 @@ export class SheetView extends AWebView {
 		super(context);
 		this.onPlayerMessageBound = this.onPlayerMessage.bind(this);
 		this.onPlayerStateChangedBound = this.onPlayerStateChanged.bind(this);
+		this.onSourcesChangedBound = this.onSourcesChanged.bind(this);
 		this.sheetViewReady = new Promise(resolve => {
 			this.onSheetViewReady = resolve;
 		});
@@ -72,9 +74,14 @@ export class SheetView extends AWebView {
 		this.currentPanel.webview.postMessage(message);
 	}
 
+	onSourcesChanged() {
+		console.log("UP DATE UP");
+	}
+
 	registerListener() {
 		let player:Player = getPlayer();
 		player.playerMessage.on(OnPlayerMessageEvent, this.onPlayerMessageBound);
+		player.playerMessage.on(OnSourcesChanged, this.onSourcesChangedBound);
 		player.playerMessage.on(OnPlayerStateChanged, this.onPlayerStateChangedBound);
 	}
 
@@ -82,6 +89,7 @@ export class SheetView extends AWebView {
 		let player:Player = getPlayer();
 		player.playerMessage.removeListener(OnPlayerMessageEvent, this.onPlayerMessageBound);
 		player.playerMessage.removeListener(OnPlayerStateChanged, this.onPlayerStateChangedBound);
+		player.playerMessage.removeListener(OnSourcesChanged, this.onSourcesChangedBound);
 	}
 
 	onStopReceived() {

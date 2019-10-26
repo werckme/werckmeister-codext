@@ -62,6 +62,7 @@ function getFreeUdpPort() {
 }
 exports.OnPlayerMessageEvent = 'OnPlayerMessageEvent';
 exports.OnPlayerStateChanged = 'OnPlayerStateChanged';
+exports.OnSourcesChanged = 'OnSourcesChanged';
 var PlayerState;
 (function (PlayerState) {
     PlayerState[PlayerState["Undefined"] = 0] = "Undefined";
@@ -82,6 +83,7 @@ class Player {
         this.currentFile = null;
         this.begin = 0;
         this._sheetTime = 0;
+        this.lastUpdateTimestamp = 0;
     }
     get wmPlayerPath() {
         return toWMBINPath(PlayerExecutable);
@@ -101,6 +103,11 @@ class Player {
     get state() {
         return this._state;
     }
+    reset() {
+        this.currentFile = null;
+        this.sheetTime = 0;
+        this.lastUpdateTimestamp = 0;
+    }
     set state(val) {
         if (this.state === val) {
             return;
@@ -108,14 +115,26 @@ class Player {
         console.log(PlayerState[val]);
         this._state = val;
         if (this._state === PlayerState.Stopped) {
-            this.currentFile = null;
-            this.sheetTime = 0;
+            this.reset();
         }
         this.playerMessage.emit(exports.OnPlayerStateChanged, this._state);
     }
-    updateSheetTime(udpMessage) {
-        if (udpMessage.sheetTime) {
-            this.sheetTime = udpMessage.sheetTime;
+    updateSheetTime(message) {
+        if (message.sheetTime) {
+            this.sheetTime = message.sheetTime;
+        }
+    }
+    checkForUpdate(message) {
+        if (!message.lastUpdateTimestamp) {
+            return;
+        }
+        if (this.lastUpdateTimestamp === 0) {
+            this.lastUpdateTimestamp = message.lastUpdateTimestamp;
+            return;
+        }
+        if (message.lastUpdateTimestamp !== this.lastUpdateTimestamp) {
+            this.lastUpdateTimestamp = message.lastUpdateTimestamp;
+            this.playerMessage.emit(exports.OnSourcesChanged);
         }
     }
     startUdpListener(port) {
@@ -129,9 +148,10 @@ class Player {
             if (this.state === PlayerState.StartPlaying) {
                 this.state = PlayerState.Playing;
             }
-            let object = JSON.parse(msg.toString());
-            this.updateSheetTime(object);
-            this.playerMessage.emit(exports.OnPlayerMessageEvent, object);
+            let message = JSON.parse(msg.toString());
+            this.updateSheetTime(message);
+            this.checkForUpdate(message);
+            this.playerMessage.emit(exports.OnPlayerMessageEvent, message);
         });
         this.socket.bind(port);
         console.log(`listen udp messages on port ${port}`);

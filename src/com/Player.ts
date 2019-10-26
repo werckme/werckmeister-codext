@@ -10,6 +10,12 @@ const freeUdpPort = require('udp-free-port');
 const Win32SigintWorkaroundFile = "keepalive";
 const IsWindows:boolean = process.platform === 'win32';
 
+export interface IFunkfeuerMessage {
+    sheetTime: number;
+    lastUpdateTimestamp: number;
+    sheetEventInfos: any[];
+}
+
 function playerWorkingDirectory() {
     const settings = vscode.workspace.getConfiguration('werckmeister');
     const strPath = settings.werckmeisterBinaryDirectory as string;
@@ -57,6 +63,7 @@ function getFreeUdpPort(): Promise<number> {
 
 export const OnPlayerMessageEvent = 'OnPlayerMessageEvent';
 export const OnPlayerStateChanged = 'OnPlayerStateChanged';
+export const OnSourcesChanged = 'OnSourcesChanged';
 
 export enum PlayerState {
     Undefined,
@@ -77,6 +84,7 @@ export class Player {
     currentFile: string|null = null;
     begin: number = 0;
     private _sheetTime: number = 0;
+    private lastUpdateTimestamp = 0;
     get wmPlayerPath(): string {
         return toWMBINPath(PlayerExecutable);
     }
@@ -92,7 +100,7 @@ export class Player {
     set sheetTime(val: number) {
         this._sheetTime = val;
         if (val === 0) {
-            this.playerMessage.emit(exports.OnPlayerMessageEvent, {sheetTime: 0});
+            this.playerMessage.emit(OnPlayerMessageEvent, {sheetTime: 0});
         }
     }
    
@@ -100,6 +108,11 @@ export class Player {
         return this._state;
     }
 
+    private reset() {
+        this.currentFile = null;
+        this.sheetTime = 0;
+        this.lastUpdateTimestamp = 0;
+    }
     set state(val: PlayerState) {
         if (this.state === val) {
             return;
@@ -107,15 +120,28 @@ export class Player {
         console.log(PlayerState[val]);
         this._state = val;
         if (this._state === PlayerState.Stopped) {
-            this.currentFile = null;
-            this.sheetTime = 0;
+            this.reset();
         }
         this.playerMessage.emit(OnPlayerStateChanged, this._state);
     }
 
-    updateSheetTime(udpMessage:any) {
-        if (udpMessage.sheetTime) {
-            this.sheetTime = udpMessage.sheetTime;
+    updateSheetTime(message:IFunkfeuerMessage) {
+        if (message.sheetTime) {
+            this.sheetTime = message.sheetTime;
+        }
+    }
+
+    checkForUpdate(message:IFunkfeuerMessage) {
+        if (!message.lastUpdateTimestamp) {
+            return;
+        }
+        if (this.lastUpdateTimestamp === 0) {
+            this.lastUpdateTimestamp = message.lastUpdateTimestamp;
+            return;
+        }
+        if (message.lastUpdateTimestamp !== this.lastUpdateTimestamp) {
+            this.lastUpdateTimestamp = message.lastUpdateTimestamp;
+            this.playerMessage.emit(OnSourcesChanged)
         }
     }
 
@@ -130,9 +156,10 @@ export class Player {
             if (this.state === PlayerState.StartPlaying) {
                 this.state = PlayerState.Playing;
             }
-            let object = JSON.parse(msg.toString());
-            this.updateSheetTime(object);
-            this.playerMessage.emit(exports.OnPlayerMessageEvent, object);
+            let message:IFunkfeuerMessage = JSON.parse(msg.toString());
+            this.updateSheetTime(message);
+            this.checkForUpdate(message);
+            this.playerMessage.emit(exports.OnPlayerMessageEvent, message);
         });
         this.socket.bind(port);
         console.log(`listen udp messages on port ${port}`);
