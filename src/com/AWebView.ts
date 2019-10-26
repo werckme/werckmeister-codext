@@ -26,6 +26,8 @@ export abstract class AWebView  {
 	removeListener() {
 	}
 
+    onPanelDidDispose() {}
+
     protected abstract createPanelImpl(): Promise<vscode.WebviewPanel>;
 
     async createPanel(): Promise<void> {
@@ -34,6 +36,7 @@ export abstract class AWebView  {
         panel.onDidDispose(()=>{
             this.removeListener();
             this.onLifecycleEvent.emit(OnDispose);
+            this.onPanelDidDispose();
         });
     }
 

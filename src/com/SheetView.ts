@@ -30,7 +30,7 @@ export class SheetView extends AWebView {
 			playerState: {newState: PlayerState[state]}
 		});
 		if (state===PlayerState.Playing) {
-			this.updateSheetSourceMap();
+			this.updateSheetSourceMapAndSend();
 		}
 	}
 
@@ -46,7 +46,14 @@ export class SheetView extends AWebView {
 		});
 	}
 
-	async updateSheetSourceMap() {
+	async updateSheetSourceMapAndSend() {
+		if (this.currentPanel === null) {
+			return;
+		}
+		const message = await this.updateSheetSourceMap();
+		this.currentPanel.webview.postMessage(message);
+	}
+	async updateSheetSourceMap(): Promise<any> {
 		if (!this.currentPanel) {
 			return;
 		}
@@ -64,7 +71,7 @@ export class SheetView extends AWebView {
 			return fileInfo;
 		});
 		fileInfos = await Promise.all(fileInfos);
-		this.currentPanel.webview.postMessage({fileInfos, duration: this.sheetInfo!.duration});
+		return {fileInfos, duration: this.sheetInfo!.duration};
 	}
 
 	onPlayerMessage(message:any) {
@@ -74,8 +81,13 @@ export class SheetView extends AWebView {
 		this.currentPanel.webview.postMessage(message);
 	}
 
-	onSourcesChanged() {
-		console.log("UP DATE UP");
+	async onSourcesChanged() {
+		if (!this.currentPanel) {
+			return;
+		}
+		const message = await this.updateSheetSourceMap();
+		message.sourcesChanged = true;
+		this.currentPanel.webview.postMessage(message);
 	}
 
 	registerListener() {
@@ -121,6 +133,11 @@ export class SheetView extends AWebView {
 	onWebViewStateChanged(ev:vscode.WebviewPanelOnDidChangeViewStateEvent) {
 	}
 
+	onPanelDidDispose() {
+		super.onPanelDidDispose();
+		getPlayer().begin = 0;
+	}
+
     protected createPanelImpl(): Promise<vscode.WebviewPanel> {
         return new Promise<vscode.WebviewPanel>((resolve, reject) => {
             this.currentPanel = vscode.window.createWebviewPanel(
@@ -138,7 +155,7 @@ export class SheetView extends AWebView {
 			this.currentPanel.webview.onDidReceiveMessage(this.onWebViewMessage.bind(this), undefined, this.context.subscriptions);
 			this.currentPanel.onDidChangeViewState(this.onWebViewStateChanged.bind(this));
 			this.sheetViewReady.then(()=>{
-				this.updateSheetSourceMap();
+				this.updateSheetSourceMapAndSend();
 			});
 
             fs.readFile(htmlPath.fsPath, 'utf8', (err, data) => {

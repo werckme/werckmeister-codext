@@ -47,12 +47,12 @@
         ],
         "menus": {
             "commandPalette": [
-              {
-                "when": "resourceExtname == .sheet",
-                "command": "extension.werckmeister.play"
-              }
+                {
+                    "when": "resourceExtname == .sheet",
+                    "command": "extension.werckmeister.play"
+                }
             ]
-          },
+        },
         "languages": [
             {
                 "id": "werckmeister",

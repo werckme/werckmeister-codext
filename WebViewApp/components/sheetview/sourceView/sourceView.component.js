@@ -94,6 +94,17 @@ export class SourceViewComponent extends BaseComponent {
         this.refEditor = item;
     }
 
+    clearMarkers() {
+        if (!this.positionMarkerMap) {
+            return;
+        }
+        const markers = _.values(this.positionMarkerMap);
+        for (let marker of markers) {
+            this.editor.session.removeMarker(marker);
+        }
+        this.positionMarkerMap = {};
+    }
+
     updateEventMarkers() {
         if (!this.editor && !this.text) {
             return;
@@ -125,8 +136,19 @@ export class SourceViewComponent extends BaseComponent {
         }
     }
 
+    updateEditorTextIfNeccessary() {
+        if (!this.editor) {
+            return;
+        }
+        const source = this.props.fileInfo.text;
+        const editorText = this.editor.session.doc.getValue();
+        if (source !== editorText) {
+            this.editor.session.doc.setValue(source);
+        }
+    }
+
     render() {
-        const sourceText = fixNewlines(this.state.fileInfo.text);
+        this.updateEditorTextIfNeccessary();
         this.updateEventMarkers();
         return (
             <div style={ContainerStyle}>
@@ -135,7 +157,6 @@ export class SourceViewComponent extends BaseComponent {
                  </Affix>
                 <div style={EditorWrapperStyle}>
                     <div ref={this.updateRef.bind(this)} style={EditorStyle}>
-                        {sourceText}
                     </div>
                 </div>
                 <hr></hr>

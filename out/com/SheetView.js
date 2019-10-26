@@ -33,7 +33,7 @@ class SheetView extends AWebView_1.AWebView {
             playerState: { newState: Player_1.PlayerState[state] }
         });
         if (state === Player_1.PlayerState.Playing) {
-            this.updateSheetSourceMap();
+            this.updateSheetSourceMapAndSend();
         }
     }
     readFile(path) {
@@ -45,6 +45,15 @@ class SheetView extends AWebView_1.AWebView {
                 }
                 resolve(data);
             });
+        });
+    }
+    updateSheetSourceMapAndSend() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.currentPanel === null) {
+                return;
+            }
+            const message = yield this.updateSheetSourceMap();
+            this.currentPanel.webview.postMessage(message);
         });
     }
     updateSheetSourceMap() {
@@ -66,7 +75,7 @@ class SheetView extends AWebView_1.AWebView {
                 return fileInfo;
             }));
             fileInfos = yield Promise.all(fileInfos);
-            this.currentPanel.webview.postMessage({ fileInfos, duration: this.sheetInfo.duration });
+            return { fileInfos, duration: this.sheetInfo.duration };
         });
     }
     onPlayerMessage(message) {
@@ -76,7 +85,14 @@ class SheetView extends AWebView_1.AWebView {
         this.currentPanel.webview.postMessage(message);
     }
     onSourcesChanged() {
-        console.log("UP DATE UP");
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.currentPanel) {
+                return;
+            }
+            const message = yield this.updateSheetSourceMap();
+            message.sourcesChanged = true;
+            this.currentPanel.webview.postMessage(message);
+        });
     }
     registerListener() {
         let player = Player_1.getPlayer();
@@ -113,6 +129,10 @@ class SheetView extends AWebView_1.AWebView {
     }
     onWebViewStateChanged(ev) {
     }
+    onPanelDidDispose() {
+        super.onPanelDidDispose();
+        Player_1.getPlayer().begin = 0;
+    }
     createPanelImpl() {
         return new Promise((resolve, reject) => {
             this.currentPanel = vscode.window.createWebviewPanel('werckmeister.SheetView', // Identifies the type of the webview. Used internally
@@ -127,7 +147,7 @@ class SheetView extends AWebView_1.AWebView {
             this.currentPanel.webview.onDidReceiveMessage(this.onWebViewMessage.bind(this), undefined, this.context.subscriptions);
             this.currentPanel.onDidChangeViewState(this.onWebViewStateChanged.bind(this));
             this.sheetViewReady.then(() => {
-                this.updateSheetSourceMap();
+                this.updateSheetSourceMapAndSend();
             });
             fs.readFile(htmlPath.fsPath, 'utf8', (err, data) => {
                 data = data.replace("$mainSrc", this.toWebViewUri(jsPath));

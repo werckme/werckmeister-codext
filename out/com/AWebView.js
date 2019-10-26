@@ -28,6 +28,7 @@ class AWebView {
     }
     removeListener() {
     }
+    onPanelDidDispose() { }
     createPanel() {
         return __awaiter(this, void 0, void 0, function* () {
             const panel = yield this.createPanelImpl();
@@ -35,6 +36,7 @@ class AWebView {
             panel.onDidDispose(() => {
                 this.removeListener();
                 this.onLifecycleEvent.emit(exports.OnDispose);
+                this.onPanelDidDispose();
             });
         });
     }

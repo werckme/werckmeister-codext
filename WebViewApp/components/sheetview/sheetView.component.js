@@ -35,7 +35,7 @@ export class SheetViewComponent extends BaseComponent {
         this.sendMessageToHost("sheetview-ready");
     }
 
-    handleMessage(message) {
+    handleMessage(message) {      
         if (message.sheetTime !== undefined) {
             this.updateSheetTime(message.sheetTime);
         }
