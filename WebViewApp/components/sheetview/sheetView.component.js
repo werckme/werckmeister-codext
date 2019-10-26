@@ -66,14 +66,12 @@ export class SheetViewComponent extends BaseComponent {
     }
 
     updateSourceMap(infos) {
-        console.log(infos);
         const sheetfiles = _(infos)
             .map(x=> Object.assign(x, {eventInfos:[]}))
             .mapKeys(x=>getSourceKey(x.sourceId))
             .value()
         ;
         const mainSheet = _(sheetfiles).find(x=>x.extension==='.sheet');
-        this.setState({sheetfiles: {}, mainSheet: {}}); // force hard reset
         this.setState({sheetfiles, mainSheet});
     }
 
@@ -129,7 +127,9 @@ export class SheetViewComponent extends BaseComponent {
                         _(keys)
                         .filter(x=> isSheetFile(this.state.sheetfiles[x]))
                         .sort(sortValues)
-                        .map(x=> <SourceViewComponent key={getSourceKey(this.state.sheetfiles[x].sourceId)} fileInfo={this.state.sheetfiles[x]}></SourceViewComponent> )
+                        .map(x=> <SourceViewComponent 
+                            key={getSourceKey(this.state.sheetfiles[x].sourceId)} 
+                            fileInfo={this.state.sheetfiles[x]}></SourceViewComponent> )
                         .value()
                     }
                 </div>

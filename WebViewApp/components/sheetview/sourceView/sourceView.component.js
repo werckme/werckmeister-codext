@@ -98,17 +98,18 @@ export class SourceViewComponent extends BaseComponent {
         if (!this.editor && !this.text) {
             return;
         }
+        const eventInfos = this.props.fileInfo.eventInfos;
         const sourceText = this.editor.session.doc.getValue();
         const toRemove = _(this.positionMarkerMap)
             .keys()
-            .without( ..._(this.state.fileInfo.eventInfos).map(x=>x.beginPosition).value() )
+            .without( ..._(eventInfos).map(x=>x.beginPosition).value() )
             .value();
         for (let key of toRemove) {
             let aceId = this.positionMarkerMap[key];
             this.editor.session.removeMarker(aceId);
             delete this.positionMarkerMap[key];
         }        
-        for (let eventInfo of this.state.fileInfo.eventInfos) {
+        for (let eventInfo of eventInfos) {
             if (!eventInfo.beginPosition || !eventInfo.endPosition) {
                 continue;
             }
