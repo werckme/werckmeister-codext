@@ -45,6 +45,14 @@
                 "title": "Werckmeister: PianoView"
             }
         ],
+        "menus": {
+            "commandPalette": [
+              {
+                "when": "resourceExtname == .sheet",
+                "command": "extension.werckmeister.play"
+              }
+            ]
+          },
         "languages": [
             {
                 "id": "werckmeister",

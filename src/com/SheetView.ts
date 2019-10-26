@@ -4,16 +4,23 @@ import * as fs from 'fs';
 import { Player, getPlayer, OnPlayerMessageEvent, OnPlayerStateChanged, PlayerState } from "../com/Player";
 import { AWebView } from './AWebView';
 import { WMCommandStop, WMCommandPlay, WMCommandPause } from '../extension';
+import { ISheetInfo } from './SourceMap';
 
 export class SheetView extends AWebView {
 
 	currentPanel: vscode.WebviewPanel|null = null;
 	onPlayerMessageBound: any;
-    onPlayerStateChangedBound: any;
+	onPlayerStateChangedBound: any;
+	sheetInfo: ISheetInfo|null = null;
+	onSheetViewReady: ()=>void = ()=>{};
+	sheetViewReady: Promise<void>;
 	constructor(context: vscode.ExtensionContext) {
 		super(context);
 		this.onPlayerMessageBound = this.onPlayerMessage.bind(this);
 		this.onPlayerStateChangedBound = this.onPlayerStateChanged.bind(this);
+		this.sheetViewReady = new Promise(resolve => {
+			this.onSheetViewReady = resolve;
+		});
 	}
 
 	onPlayerStateChanged(state: PlayerState) {
@@ -42,8 +49,11 @@ export class SheetView extends AWebView {
 			return;
 		}
 		let player:Player = getPlayer();
-		let sheetInfo = player.sheetInfo;
-		let fileInfos = sheetInfo!.sources.map(async (source)=>{
+		this.sheetInfo = player.sheetInfo;
+		if (!this.sheetInfo) {
+			return;
+		}
+		let fileInfos = this.sheetInfo!.sources.map(async (source)=>{
 			const fileInfo:any = {};
 			Object.assign(fileInfo, source);
 			fileInfo.extension = path.extname(source.path);
@@ -52,7 +62,7 @@ export class SheetView extends AWebView {
 			return fileInfo;
 		});
 		fileInfos = await Promise.all(fileInfos);
-		this.currentPanel.webview.postMessage({fileInfos, duration: sheetInfo!.duration});
+		this.currentPanel.webview.postMessage({fileInfos, duration: this.sheetInfo!.duration});
 	}
 
 	onPlayerMessage(message:any) {
@@ -96,7 +106,11 @@ export class SheetView extends AWebView {
 			case "player-play": return this.onPlayReceived();
 			case "player-pause": return this.onPauseReceived();
 			case "player-update-range": return this.onRangeChanged(message.begin);
+			case "sheetview-ready": return this.onSheetViewReady();
 		}
+	}
+
+	onWebViewStateChanged(ev:vscode.WebviewPanelOnDidChangeViewStateEvent) {
 	}
 
     protected createPanelImpl(): Promise<vscode.WebviewPanel> {
@@ -106,14 +120,19 @@ export class SheetView extends AWebView {
                 'Sheet', // Title of the panel displayed to the user
                 vscode.ViewColumn.Beside, // Editor column to show the new webview panel in.
                 {
-                    enableScripts: true,
+					enableScripts: true,
+					retainContextWhenHidden: true
                 }
             );
             let jsPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'dist', 'WebViewApp.dist.js'));
             let htmlPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'sheetView.html'));
 			
 			this.currentPanel.webview.onDidReceiveMessage(this.onWebViewMessage.bind(this), undefined, this.context.subscriptions);
-			
+			this.currentPanel.onDidChangeViewState(this.onWebViewStateChanged.bind(this));
+			this.sheetViewReady.then(()=>{
+				this.updateSheetSourceMap();
+			});
+
             fs.readFile(htmlPath.fsPath, 'utf8', (err, data) => {
                 data = data.replace("$mainSrc", this.toWebViewUri(jsPath))
                 this.currentPanel!.webview.html = data;

@@ -31,6 +31,10 @@ export class SheetViewComponent extends BaseComponent {
         });
     }
 
+    componentDidMount() {
+        this.sendMessageToHost("sheetview-ready");
+    }
+
     handleMessage(message) {
         if (message.sheetTime !== undefined) {
             this.updateSheetTime(message.sheetTime);
@@ -62,6 +66,7 @@ export class SheetViewComponent extends BaseComponent {
     }
 
     updateSourceMap(infos) {
+        console.log(infos);
         const sheetfiles = _(infos)
             .map(x=> Object.assign(x, {eventInfos:[]}))
             .mapKeys(x=>getSourceKey(x.sourceId))
