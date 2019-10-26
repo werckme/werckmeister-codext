@@ -36,6 +36,12 @@ export class TransportComponent extends BaseComponent {
         this.updateBeginBounced();
     }
 
+    inbetweenStates() {
+        return this.props.playerState === PlayerState.StartPlaying
+            || this.props.playerState === PlayerState.Stopping
+            || this.props.playerState === PlayerState.Pausing;
+    }
+
     render() {
         const position = this.props.position || 0;
         return (
@@ -97,15 +103,15 @@ export class TransportComponent extends BaseComponent {
                 <div className="ccontainer">
                     {
                         this.props.playerState !== PlayerState.Playing ?
-                        <button className="btn-play" onClick={this.onPlayClicked.bind(this)}>
+                        <button className="btn-play" onClick={this.onPlayClicked.bind(this)} disabled={ this.inbetweenStates() }>
                             {playIcon()}
                         </button>
                         :
-                        <button className="btn-paused" onClick={this.onPauseClicked.bind(this)}>
+                        <button className="btn-paused" onClick={this.onPauseClicked.bind(this)} disabled={ this.inbetweenStates() }>
                             {pauseIcon()}
                         </button>   
                     }                 
-                    <button className="btn-stop" onClick={this.onStopClicked.bind(this)}>
+                    <button className="btn-stop" onClick={this.onStopClicked.bind(this)} disabled={ this.inbetweenStates() }>
                         {stopIcon()}
                     </button>
                     <div className="display">
