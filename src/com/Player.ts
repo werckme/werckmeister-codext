@@ -9,6 +9,7 @@ import * as fs from 'fs';
 const freeUdpPort = require('udp-free-port');
 const Win32SigintWorkaroundFile = "keepalive";
 const IsWindows:boolean = process.platform === 'win32';
+export const PlayerExecutable = IsWindows ? 'sheetp.exe' : 'sheetp';
 
 export interface IFunkfeuerMessage {
     sheetTime: number;
@@ -25,7 +26,7 @@ function playerWorkingDirectory() {
     return strPath;
 }
 
-function toWMBINPath(executable: string) {
+export function toWMBINPath(executable: string) {
     return path.join(playerWorkingDirectory(), executable);
 }
 
@@ -37,7 +38,6 @@ function killProcess(childProcess:ChildProcess) {
     childProcess!.kill("SIGINT");
 }
 
-const PlayerExecutable = IsWindows ? 'sheetp.exe' : 'sheetp';
 
 class Config {
     watch: boolean = false;

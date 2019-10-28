@@ -26,11 +26,19 @@
             },
             {
                 "command": "extension.werckmeister.play",
-                "title": "Werckmeister: Play"
+                "title": "Werckmeister: Play",
+                "icon": {
+                    "light": "./resources/play_light.svg",
+                    "dark": "./resources/play_dark.svg"
+                }
             },
             {
                 "command": "extension.werckmeister.stop",
-                "title": "Werckmeister: Stop"
+                "title": "Werckmeister: Stop",
+                "icon": {
+                    "light": "./resources/stop_light.svg",
+                    "dark": "./resources/stop_dark.svg"
+                }
             },
             {
                 "command": "extension.werckmeister.pause",
@@ -38,7 +46,11 @@
             },
             {
                 "command": "extension.werckmeister.sheetview",
-                "title": "Werckmeister: Sheetview"
+                "title": "Werckmeister: Sheet Monitor",
+                "icon": {
+                    "light": "./resources/monitor_light.svg",
+                    "dark": "./resources/monitor_dark.svg"
+                }
             },
             {
                 "command": "extension.werckmeister.pianoview",
@@ -47,6 +59,27 @@
         ],
         "menus": {
             "commandPalette": [
+                {
+                    "when": "resourceExtname == .sheet",
+                    "command": "extension.werckmeister.play"
+                }
+            ],
+            "editor/title": [
+                {
+                    "when": "resourceExtname == .sheet",
+                    "command": "extension.werckmeister.play",
+                    "group": "navigation"
+                },
+                {
+                    "command": "extension.werckmeister.stop",
+                    "group": "navigation"
+                },
+                {
+                    "command": "extension.werckmeister.sheetview",
+                    "group": "navigation"
+                }
+            ],
+            "editor/context": [
                 {
                     "when": "resourceExtname == .sheet",
                     "command": "extension.werckmeister.play"

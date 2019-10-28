@@ -12,11 +12,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const ACommand_1 = require("./ACommand");
 const SheetView_1 = require("../com/SheetView");
 const AWebView_1 = require("../com/AWebView");
+const vscode = require("vscode");
 let currentView = null;
 class ShowSheetView extends ACommand_1.ACommand {
     execute() {
         return __awaiter(this, void 0, void 0, function* () {
             if (currentView !== null) {
+                vscode;
                 return;
             }
             currentView = new SheetView_1.SheetView(this.context);

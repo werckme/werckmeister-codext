@@ -6,6 +6,8 @@ import { AWebView } from './AWebView';
 import { WMCommandStop, WMCommandPlay, WMCommandPause } from '../extension';
 import { ISheetInfo } from './SourceMap';
 
+const ViewTitle = "Sheet Monitor (stopped)";
+const TitleUpdaterIntervalMillis = 500;
 export class SheetView extends AWebView {
 
 	currentPanel: vscode.WebviewPanel|null = null;
@@ -15,6 +17,7 @@ export class SheetView extends AWebView {
 	sheetInfo: ISheetInfo|null = null;
 	onSheetViewReady: ()=>void = ()=>{};
 	sheetViewReady: Promise<void>;
+	titleUpdater: NodeJS.Timeout|null = null;
 	constructor(context: vscode.ExtensionContext) {
 		super(context);
 		this.onPlayerMessageBound = this.onPlayerMessage.bind(this);
@@ -25,12 +28,43 @@ export class SheetView extends AWebView {
 		});
 	}
 
+	startTitleUpdater() {
+		if (this.titleUpdater) {
+			return;
+		}
+		this.titleUpdater = setInterval(this.updatePlayingTitle.bind(this), TitleUpdaterIntervalMillis);
+	}
+
+	stopTitleUpdater() {
+		if (this.titleUpdater !== null) {
+			clearInterval(this.titleUpdater);
+			this.titleUpdater = null;
+		}
+	}
+
 	onPlayerStateChanged(state: PlayerState) {
 		this.currentPanel!.webview.postMessage({
 			playerState: {newState: PlayerState[state]}
 		});
 		if (state===PlayerState.Playing) {
 			this.updateSheetSourceMapAndSend();
+			this.startTitleUpdater();
+			
+		}
+		if (state===PlayerState.Stopped) {
+			this.currentPanel!.title = ViewTitle;
+			this.stopTitleUpdater();
+		}
+	}
+
+	updatePlayingTitle() {
+		if (!this.currentPanel) {
+			return;
+		}
+		const player = getPlayer();
+		if (player.sheetTime) {
+			const time = (player.sheetTime as number).toFixed(1);
+			this.currentPanel!.title = `▶ ${time}`;
 		}
 	}
 
@@ -142,20 +176,27 @@ export class SheetView extends AWebView {
         return new Promise<vscode.WebviewPanel>((resolve, reject) => {
             this.currentPanel = vscode.window.createWebviewPanel(
                 'werckmeister.SheetView', // Identifies the type of the webview. Used internally
-                'Sheet', // Title of the panel displayed to the user
-                vscode.ViewColumn.Beside, // Editor column to show the new webview panel in.
+                ViewTitle, // Title of the panel displayed to the user
+                vscode.ViewColumn.Active, // Editor column to show the new webview panel in.
                 {
 					enableScripts: true,
 					retainContextWhenHidden: true
                 }
-            );
+			);
             let jsPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'dist', 'WebViewApp.dist.js'));
             let htmlPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'sheetView.html'));
-			
+			this.currentPanel.iconPath = {
+				light: vscode.Uri.file(this.getExtensionPath('resources', 'monitor_light.svg')),
+				dark: vscode.Uri.file(this.getExtensionPath('resources', 'monitor_dark.svg'))
+			};
 			this.currentPanel.webview.onDidReceiveMessage(this.onWebViewMessage.bind(this), undefined, this.context.subscriptions);
 			this.currentPanel.onDidChangeViewState(this.onWebViewStateChanged.bind(this));
 			this.sheetViewReady.then(()=>{
 				this.updateSheetSourceMapAndSend();
+				const player = getPlayer();
+				if (player.state === PlayerState.Playing || player.state === PlayerState.StartPlaying) {
+					this.startTitleUpdater();
+				}
 			});
 
             fs.readFile(htmlPath.fsPath, 'utf8', (err, data) => {

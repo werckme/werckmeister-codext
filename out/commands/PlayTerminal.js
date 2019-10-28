@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const ACommand_1 = require("./ACommand");
 const vscode = require("vscode");
 const path_1 = require("path");
-const WmPlayerPath = "/home/samba/workspace/werckmeister/build/sheetp";
+const Player_1 = require("../com/Player");
 class PlayTerminal extends ACommand_1.ACommand {
     execute() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -21,7 +21,7 @@ class PlayTerminal extends ACommand_1.ACommand {
                 return;
             }
             let sheetPath = editor.document.fileName;
-            let cmd = `${WmPlayerPath} ${sheetPath}`;
+            let cmd = `${Player_1.toWMBINPath(Player_1.PlayerExecutable)} ${sheetPath} --watch`;
             let filename = path_1.basename(sheetPath);
             let terminalName = `Werckmeister: ${filename}`;
             let terminal = vscode.window.terminals.find(x => x.name === terminalName);

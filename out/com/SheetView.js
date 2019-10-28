@@ -15,12 +15,15 @@ const fs = require("fs");
 const Player_1 = require("../com/Player");
 const AWebView_1 = require("./AWebView");
 const extension_1 = require("../extension");
+const ViewTitle = "Sheet Monitor (stopped)";
+const TitleUpdaterIntervalMillis = 500;
 class SheetView extends AWebView_1.AWebView {
     constructor(context) {
         super(context);
         this.currentPanel = null;
         this.sheetInfo = null;
         this.onSheetViewReady = () => { };
+        this.titleUpdater = null;
         this.onPlayerMessageBound = this.onPlayerMessage.bind(this);
         this.onPlayerStateChangedBound = this.onPlayerStateChanged.bind(this);
         this.onSourcesChangedBound = this.onSourcesChanged.bind(this);
@@ -28,12 +31,39 @@ class SheetView extends AWebView_1.AWebView {
             this.onSheetViewReady = resolve;
         });
     }
+    startTitleUpdater() {
+        if (this.titleUpdater) {
+            return;
+        }
+        this.titleUpdater = setInterval(this.updatePlayingTitle.bind(this), TitleUpdaterIntervalMillis);
+    }
+    stopTitleUpdater() {
+        if (this.titleUpdater !== null) {
+            clearInterval(this.titleUpdater);
+            this.titleUpdater = null;
+        }
+    }
     onPlayerStateChanged(state) {
         this.currentPanel.webview.postMessage({
             playerState: { newState: Player_1.PlayerState[state] }
         });
         if (state === Player_1.PlayerState.Playing) {
             this.updateSheetSourceMapAndSend();
+            this.startTitleUpdater();
+        }
+        if (state === Player_1.PlayerState.Stopped) {
+            this.currentPanel.title = ViewTitle;
+            this.stopTitleUpdater();
+        }
+    }
+    updatePlayingTitle() {
+        if (!this.currentPanel) {
+            return;
+        }
+        const player = Player_1.getPlayer();
+        if (player.sheetTime) {
+            const time = player.sheetTime.toFixed(1);
+            this.currentPanel.title = `▶ ${time}`;
         }
     }
     readFile(path) {
@@ -136,18 +166,26 @@ class SheetView extends AWebView_1.AWebView {
     createPanelImpl() {
         return new Promise((resolve, reject) => {
             this.currentPanel = vscode.window.createWebviewPanel('werckmeister.SheetView', // Identifies the type of the webview. Used internally
-            'Sheet', // Title of the panel displayed to the user
-            vscode.ViewColumn.Beside, // Editor column to show the new webview panel in.
+            ViewTitle, // Title of the panel displayed to the user
+            vscode.ViewColumn.Active, // Editor column to show the new webview panel in.
             {
                 enableScripts: true,
                 retainContextWhenHidden: true
             });
             let jsPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'dist', 'WebViewApp.dist.js'));
             let htmlPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'sheetView.html'));
+            this.currentPanel.iconPath = {
+                light: vscode.Uri.file(this.getExtensionPath('resources', 'monitor_light.svg')),
+                dark: vscode.Uri.file(this.getExtensionPath('resources', 'monitor_dark.svg'))
+            };
             this.currentPanel.webview.onDidReceiveMessage(this.onWebViewMessage.bind(this), undefined, this.context.subscriptions);
             this.currentPanel.onDidChangeViewState(this.onWebViewStateChanged.bind(this));
             this.sheetViewReady.then(() => {
                 this.updateSheetSourceMapAndSend();
+                const player = Player_1.getPlayer();
+                if (player.state === Player_1.PlayerState.Playing || player.state === Player_1.PlayerState.StartPlaying) {
+                    this.startTitleUpdater();
+                }
             });
             fs.readFile(htmlPath.fsPath, 'utf8', (err, data) => {
                 data = data.replace("$mainSrc", this.toWebViewUri(jsPath));

@@ -1,9 +1,9 @@
 import { ACommand } from "./ACommand";
 import * as vscode from 'vscode';
 import { basename } from 'path';
-import { exec } from 'child_process';
+import { toWMBINPath, PlayerExecutable } from "../com/Player";
 
-const WmPlayerPath = "/home/samba/workspace/werckmeister/build/sheetp";
+
 
 export class PlayTerminal extends ACommand {
     async execute(): Promise<void> {
@@ -12,7 +12,7 @@ export class PlayTerminal extends ACommand {
             return;
         }
         let sheetPath = editor.document.fileName;
-        let cmd = `${WmPlayerPath} ${sheetPath}`;
+        let cmd = `${toWMBINPath(PlayerExecutable)} ${sheetPath} --watch`;
         let filename = basename(sheetPath);
         let terminalName = `Werckmeister: ${filename}`;
         let terminal:vscode.Terminal|undefined = vscode.window.terminals.find(x=>x.name===terminalName);

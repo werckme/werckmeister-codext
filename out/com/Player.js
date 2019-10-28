@@ -18,6 +18,7 @@ const fs = require("fs");
 const freeUdpPort = require('udp-free-port');
 const Win32SigintWorkaroundFile = "keepalive";
 const IsWindows = process.platform === 'win32';
+exports.PlayerExecutable = IsWindows ? 'sheetp.exe' : 'sheetp';
 function playerWorkingDirectory() {
     const settings = vscode.workspace.getConfiguration('werckmeister');
     const strPath = settings.werckmeisterBinaryDirectory;
@@ -29,6 +30,7 @@ function playerWorkingDirectory() {
 function toWMBINPath(executable) {
     return path.join(playerWorkingDirectory(), executable);
 }
+exports.toWMBINPath = toWMBINPath;
 function killProcess(childProcess) {
     if (IsWindows) {
         fs.unlinkSync(toWMBINPath(Win32SigintWorkaroundFile));
@@ -36,7 +38,6 @@ function killProcess(childProcess) {
     }
     childProcess.kill("SIGINT");
 }
-const PlayerExecutable = IsWindows ? 'sheetp.exe' : 'sheetp';
 class Config {
     constructor() {
         this.watch = false;
@@ -86,7 +87,7 @@ class Player {
         this.lastUpdateTimestamp = 0;
     }
     get wmPlayerPath() {
-        return toWMBINPath(PlayerExecutable);
+        return toWMBINPath(exports.PlayerExecutable);
     }
     get isPlaying() {
         return !!this.process;

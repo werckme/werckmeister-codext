@@ -16,7 +16,6 @@ export class Play extends ACommand {
         .catch((ex)=>{
             vscode.window.showErrorMessage(`Werckmeister: ${ex}`);
         });
-        vscode.commands.executeCommand('extension.werckmeister.sheetview');
     }
 
     isSheetFile(strPath:string): boolean {
