@@ -231,6 +231,8 @@ class Player {
                         reject(stderr);
                         this.process = null;
                         this.currentFile = null;
+                        this.stopUdpListener();
+                        this.state = PlayerState.Stopped;
                         return;
                     }
                     resolve();

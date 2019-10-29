@@ -1,7 +1,7 @@
 import { exec, ChildProcess } from 'child_process';
 import * as dgram from 'dgram';
 import * as EventEmitter from 'events';
-import { ISheetInfo } from './SourceMap';
+import { ISheetInfo } from './SheetInfo';
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -239,6 +239,8 @@ export class Player {
                     reject(stderr);
                     this.process = null;
                     this.currentFile = null;
+                    this.stopUdpListener();
+                    this.state = PlayerState.Stopped;
                     return;
                 }
                 resolve();

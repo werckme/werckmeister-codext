@@ -3,8 +3,10 @@ import * as vscode from 'vscode';
 import { basename } from 'path';
 import { getPlayer, Player } from '../com/Player';
 import * as path from 'path';
+import { EditorEventDecorator, getEditorEventDecorator } from "../com/EditorEventDecorator";
 
 let lastSheetFile:string|null = null;
+
 
 export class Play extends ACommand {
 
@@ -16,6 +18,7 @@ export class Play extends ACommand {
         .catch((ex)=>{
             vscode.window.showErrorMessage(`Werckmeister: ${ex}`);
         });
+        getEditorEventDecorator();
     }
 
     isSheetFile(strPath:string): boolean {

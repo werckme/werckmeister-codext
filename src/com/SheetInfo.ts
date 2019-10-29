@@ -7,3 +7,9 @@ export interface ISheetInfo {
     duration: number;
     sources: Array<ISourceInfo>;
 }
+
+export interface ISheetEventInfo {
+    beginPosition: number;
+    endPosition: number;
+    sourceId: number;
+}

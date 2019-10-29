@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import { Player, getPlayer, OnPlayerMessageEvent, OnPlayerStateChanged, PlayerState, OnSourcesChanged } from "../com/Player";
 import { AWebView } from './AWebView';
 import { WMCommandStop, WMCommandPlay, WMCommandPause } from '../extension';
-import { ISheetInfo } from './SourceMap';
+import { ISheetInfo } from './SheetInfo';
 
 const ViewTitle = "Sheet Monitor (stopped)";
 const TitleUpdaterIntervalMillis = 500;

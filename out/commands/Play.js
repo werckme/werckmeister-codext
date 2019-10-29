@@ -14,6 +14,7 @@ const vscode = require("vscode");
 const path_1 = require("path");
 const Player_1 = require("../com/Player");
 const path = require("path");
+const EditorEventDecorator_1 = require("../com/EditorEventDecorator");
 let lastSheetFile = null;
 class Play extends ACommand_1.ACommand {
     startPlayer(sheetPath) {
@@ -24,6 +25,7 @@ class Play extends ACommand_1.ACommand {
             .catch((ex) => {
             vscode.window.showErrorMessage(`Werckmeister: ${ex}`);
         });
+        EditorEventDecorator_1.getEditorEventDecorator();
     }
     isSheetFile(strPath) {
         if (path.extname(strPath) === '.sheet') {
