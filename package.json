@@ -66,16 +66,11 @@
             ],
             "editor/title": [
                 {
-                    "when": "resourceExtname == .sheet",
                     "command": "extension.werckmeister.play",
                     "group": "navigation"
                 },
                 {
                     "command": "extension.werckmeister.stop",
-                    "group": "navigation"
-                },
-                {
-                    "command": "extension.werckmeister.sheetview",
                     "group": "navigation"
                 }
             ],

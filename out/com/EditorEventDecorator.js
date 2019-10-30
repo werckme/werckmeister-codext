@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const vscode = require("vscode");
+const path = require("path");
 const Player_1 = require("../com/Player");
 const EventDecorationType = vscode.window.createTextEditorDecorationType({
     fontWeight: 'bold',
@@ -13,12 +14,30 @@ const EventDecorationType = vscode.window.createTextEditorDecorationType({
 });
 class EditorEventDecorator {
     constructor() {
+        this.sheetInfo = null;
+        this.sources = new Map();
         this.onPlayerMessageBound = this.onPlayerMessage.bind(this);
         this.onPlayerStateChangedBound = this.onPlayerStateChanged.bind(this);
     }
     onPlayerStateChanged(state) {
         if (state === Player_1.PlayerState.Stopped) {
             vscode.window.activeTextEditor.setDecorations(EventDecorationType, []);
+        }
+        if (state === Player_1.PlayerState.StartPlaying) {
+            this.updateSheetInfo();
+        }
+    }
+    getSourceInfo(id) {
+        return this.sources.get(id);
+    }
+    updateSheetInfo() {
+        let player = Player_1.getPlayer();
+        this.sheetInfo = player.sheetInfo;
+        if (!this.sheetInfo) {
+            return;
+        }
+        for (let sourceInfo of this.sheetInfo.sources) {
+            this.sources.set(sourceInfo.sourceId, sourceInfo);
         }
     }
     onPlayerMessage(message) {
@@ -39,6 +58,11 @@ class EditorEventDecorator {
         const to = document.positionAt(eventInfo.endPosition - trimAmmount);
         return new vscode.Range(range.start, to);
     }
+    sourceIsCurrentEditor(sourceInfo) {
+        const editorPath = path.resolve(vscode.window.activeTextEditor.document.uri.fsPath);
+        const sourcePath = path.resolve(sourceInfo.path);
+        return editorPath === sourcePath;
+    }
     updateSheetEventInfos(sheetEventInfos) {
         if (!vscode.window.activeTextEditor) {
             return;
@@ -50,6 +74,10 @@ class EditorEventDecorator {
         }
         let decorations = [];
         for (let eventInfo of sheetEventInfos) {
+            const source = this.getSourceInfo(eventInfo.sourceId);
+            if (!source || !this.sourceIsCurrentEditor(source)) {
+                continue;
+            }
             const from = document.positionAt(eventInfo.beginPosition);
             const to = document.positionAt(eventInfo.endPosition);
             const range = new vscode.Range(from, to);

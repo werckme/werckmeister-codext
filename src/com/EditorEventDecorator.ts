@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
+import * as path from 'path';
 import { Player, getPlayer, OnPlayerMessageEvent, OnPlayerStateChanged, PlayerState } from "../com/Player";
-import { ISheetInfo, ISheetEventInfo } from './SheetInfo';
+import { ISheetInfo, ISheetEventInfo, ISourceInfo } from './SheetInfo';
 
 
 const EventDecorationType = vscode.window.createTextEditorDecorationType({
@@ -16,7 +17,8 @@ const EventDecorationType = vscode.window.createTextEditorDecorationType({
 
 
 export class EditorEventDecorator {
-
+    sheetInfo: ISheetInfo|null = null;
+    sources = new Map<number, ISourceInfo>();
 	onPlayerMessageBound: any;
     onPlayerStateChangedBound: any;
 	constructor() {
@@ -28,7 +30,25 @@ export class EditorEventDecorator {
         if (state===PlayerState.Stopped) {
             vscode.window.activeTextEditor!.setDecorations(EventDecorationType, []);
         }
+        if (state===PlayerState.StartPlaying) {
+            this.updateSheetInfo();
+        }
 	}
+
+    getSourceInfo(id:number): ISourceInfo|undefined {
+        return this.sources.get(id);
+    }
+
+    updateSheetInfo() {
+        let player:Player = getPlayer();
+		this.sheetInfo = player.sheetInfo;
+		if (!this.sheetInfo) {
+			return;
+        }
+        for (let sourceInfo of this.sheetInfo.sources) {
+            this.sources.set(sourceInfo.sourceId, sourceInfo);
+        }
+    }
 
 	onPlayerMessage(message:any) {
         if (message.sheetEventInfos) {
@@ -50,6 +70,12 @@ export class EditorEventDecorator {
         return new vscode.Range(range.start, to);
     }
 
+    protected sourceIsCurrentEditor(sourceInfo: ISourceInfo): boolean {
+        const editorPath = path.resolve(vscode.window.activeTextEditor!.document.uri.fsPath);
+        const sourcePath = path.resolve(sourceInfo.path);
+        return editorPath === sourcePath;
+    }
+
     protected updateSheetEventInfos(sheetEventInfos: ISheetEventInfo[]) {
         if (!vscode.window.activeTextEditor) {
             return;
@@ -61,6 +87,10 @@ export class EditorEventDecorator {
         }
         let decorations = [];
         for (let eventInfo of sheetEventInfos) {
+            const source = this.getSourceInfo(eventInfo.sourceId);
+            if (!source || !this.sourceIsCurrentEditor(source)) {
+                continue;
+            }
             const from = document.positionAt(eventInfo.beginPosition);
             const to = document.positionAt(eventInfo.endPosition);
             const range = new vscode.Range(from, to);
