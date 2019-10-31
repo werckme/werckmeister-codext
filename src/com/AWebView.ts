@@ -12,7 +12,7 @@ export abstract class AWebView  {
 	}
 
 	toWebViewUri(uri: vscode.Uri): string {
-		// panel.webview.asWebviewUri is not available at runtime for some reason
+        // panel.webview.asWebviewUri is not available at runtime for some reason
 		return `vscode-resource:${uri.fsPath}`;
     }
     

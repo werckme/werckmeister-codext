@@ -8,6 +8,7 @@ import { Stop } from './commands/Stop';
 import { ShowSheetView } from './commands/ShowSheetView';
 import { ShowPianoView } from './commands/ShowPianoView';
 import { Pause } from './commands/Pause';
+import { ShowTransportView } from './commands/ShowTransportView';
 
 function excuteCommand(type: (new (context: vscode.ExtensionContext) => ACommand), context: vscode.ExtensionContext): void {
 	let cmd = new type(context);
@@ -21,6 +22,7 @@ export const WMCommandStop = `${_ns}.stop`;
 export const WMCommandPause = `${_ns}.pause`;
 export const WMCommandOpenSheeView = `${_ns}.sheetview`;
 export const WMCommandOpenPianoView = `${_ns}.pianoview`;
+export const WMCommandOpenTransportView = `${_ns}.transportview`;
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -43,6 +45,9 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);	
 
 	disposable = vscode.commands.registerCommand(WMCommandOpenPianoView, excuteCommand.bind(null, ShowPianoView, context));
+	context.subscriptions.push(disposable);	
+	
+	disposable = vscode.commands.registerCommand(WMCommandOpenTransportView, excuteCommand.bind(null, ShowTransportView, context));
 	context.subscriptions.push(disposable);		
 }
 

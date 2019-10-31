@@ -15,7 +15,8 @@
         "onCommand:extension.werckmeister.stop",
         "onCommand:extension.werckmeister.pause",
         "onCommand:extension.werckmeister.sheetview",
-        "onCommand:extension.werckmeister.pianoview"
+        "onCommand:extension.werckmeister.pianoview",
+        "onCommand:extension.werckmeister.transportview"
     ],
     "main": "./out/extension.js",
     "contributes": {
@@ -55,6 +56,10 @@
             {
                 "command": "extension.werckmeister.pianoview",
                 "title": "Werckmeister: PianoView"
+            },
+            {
+                "command": "extension.werckmeister.transportview",
+                "title": "Werckmeister: Transport"
             }
         ],
         "menus": {
