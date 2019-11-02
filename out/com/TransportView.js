@@ -30,6 +30,9 @@ class TransportView extends AWebView_1.AWebView {
             this.onViewReady = resolve;
         });
     }
+    get panel() {
+        return this.currentPanel;
+    }
     startTitleUpdater() {
         if (this.titleUpdater) {
             return;

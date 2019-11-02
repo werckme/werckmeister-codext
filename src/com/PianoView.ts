@@ -4,8 +4,10 @@ import { Player, getPlayer, OnPlayerMessageEvent, OnPlayerStateChanged, PlayerSt
 import { AWebView } from './AWebView';
 
 export class PianoView extends AWebView {
-
 	currentPanel: vscode.WebviewPanel|null = null;
+	get panel():  vscode.WebviewPanel|null {
+		return this.currentPanel;
+	}
 	onPlayerMessageBound: any;
     onPlayerStateChangedBound: any;
 	constructor(context: vscode.ExtensionContext) {

@@ -9,8 +9,10 @@ import { ISheetInfo } from './SheetInfo';
 const ViewTitle = "Sheet Monitor (stopped)";
 const TitleUpdaterIntervalMillis = 500;
 export class TransportView extends AWebView {
-
 	currentPanel: vscode.WebviewPanel|null = null;
+	get panel():  vscode.WebviewPanel|null {
+		return this.currentPanel;
+	}
 	onPlayerMessageBound: any;
 	onPlayerStateChangedBound: any;
 	onSourcesChangedBound: any;

@@ -31,6 +31,9 @@ class SheetView extends AWebView_1.AWebView {
             this.onSheetViewReady = resolve;
         });
     }
+    get panel() {
+        return this.currentPanel;
+    }
     startTitleUpdater() {
         if (this.titleUpdater) {
             return;

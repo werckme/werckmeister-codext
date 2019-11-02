@@ -18,8 +18,10 @@ class AWebView {
         this.onLifecycleEvent = new events_1.EventEmitter();
     }
     toWebViewUri(uri) {
-        // panel.webview.asWebviewUri is not available at runtime for some reason
-        return `vscode-resource:${uri.fsPath}`;
+        if (!this.panel) {
+            throw new Error("panel == null");
+        }
+        return this.panel.webview.asWebviewUri(uri).toString();
     }
     getExtensionPath(...pathComponents) {
         return path.join(this.context.extensionPath, ...pathComponents);

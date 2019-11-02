@@ -11,6 +11,9 @@ class PianoView extends AWebView_1.AWebView {
         this.onPlayerMessageBound = this.onPlayerMessage.bind(this);
         this.onPlayerStateChangedBound = this.onPlayerStateChanged.bind(this);
     }
+    get panel() {
+        return this.currentPanel;
+    }
     onPlayerStateChanged(state) {
         if (state === Player_1.PlayerState.Playing) {
         }

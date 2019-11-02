@@ -6,14 +6,17 @@ export const OnDispose = "OnDispose";
 
 export abstract class AWebView  {
 
+    abstract panel: vscode.WebviewPanel|null;
     onLifecycleEvent: EventEmitter = new EventEmitter();
 
 	constructor(protected context: vscode.ExtensionContext) {
 	}
 
 	toWebViewUri(uri: vscode.Uri): string {
-        // panel.webview.asWebviewUri is not available at runtime for some reason
-		return `vscode-resource:${uri.fsPath}`;
+        if (!this.panel) {
+            throw new Error("panel == null");
+        }
+        return this.panel.webview.asWebviewUri(uri).toString();
     }
     
     getExtensionPath(...pathComponents:string[]): string {
