@@ -1,10 +1,11 @@
 {
     "name": "werckmeister",
+    "publisher": "sambagodschysnki",
     "displayName": "werckmeister",
     "description": "Werckmeister for VS Code",
     "version": "0.0.1",
     "engines": {
-        "vscode": "^1.37.0"
+        "vscode": "^1.38.0"
     },
     "categories": [
         "Other"
@@ -16,7 +17,8 @@
         "onCommand:extension.werckmeister.pause",
         "onCommand:extension.werckmeister.sheetview",
         "onCommand:extension.werckmeister.pianoview",
-        "onCommand:extension.werckmeister.transportview"
+        "onCommand:extension.werckmeister.transportview",
+        "onLanguage:werckmeister"
     ],
     "main": "./out/extension.js",
     "contributes": {
@@ -145,6 +147,7 @@
         "webpack-cli": "^3.3.9"
     },
     "dependencies": {
+        "@types/lodash": "^4.14.144",
         "ace-builds": "^1.4.6",
         "antd": "^3.24.2",
         "lodash": "^4.17.15",

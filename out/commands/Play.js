@@ -15,7 +15,14 @@ const path_1 = require("path");
 const Player_1 = require("../com/Player");
 const path = require("path");
 const EditorEventDecorator_1 = require("../com/EditorEventDecorator");
-let lastSheetFile = null;
+const SheetHistory_1 = require("../com/SheetHistory");
+function isSheetFile(strPath) {
+    if (path.extname(strPath) === '.sheet') {
+        return true;
+    }
+    return false;
+}
+exports.isSheetFile = isSheetFile;
 class Play extends ACommand_1.ACommand {
     startPlayer(sheetPath) {
         let filename = path_1.basename(sheetPath);
@@ -27,30 +34,18 @@ class Play extends ACommand_1.ACommand {
         });
         EditorEventDecorator_1.getEditorEventDecorator();
     }
-    isSheetFile(strPath) {
-        if (path.extname(strPath) === '.sheet') {
-            return true;
-        }
-        return false;
-    }
     execute() {
         return __awaiter(this, void 0, void 0, function* () {
-            let editor = vscode.window.activeTextEditor;
-            if (!editor) {
-                if (lastSheetFile !== null) {
-                    this.startPlayer(lastSheetFile);
-                }
+            const history = SheetHistory_1.getSheetHistory();
+            let sheetpath = history.currentFile;
+            if (!sheetpath) {
+                sheetpath = history.lastPlayedSheetFile;
+            }
+            if (!sheetpath) {
+                vscode.window.showErrorMessage("no sheet file to play");
                 return;
             }
-            let sheetPath = editor.document.fileName;
-            if (!this.isSheetFile(sheetPath)) {
-                if (lastSheetFile !== null) {
-                    this.startPlayer(lastSheetFile);
-                }
-                return;
-            }
-            this.startPlayer(sheetPath);
-            lastSheetFile = sheetPath;
+            this.startPlayer(sheetpath);
         });
     }
 }

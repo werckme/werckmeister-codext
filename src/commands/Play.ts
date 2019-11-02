@@ -4,9 +4,14 @@ import { basename } from 'path';
 import { getPlayer, Player } from '../com/Player';
 import * as path from 'path';
 import { EditorEventDecorator, getEditorEventDecorator } from "../com/EditorEventDecorator";
+import { getSheetHistory } from "../com/SheetHistory";
 
-let lastSheetFile:string|null = null;
-
+export function isSheetFile(strPath:string): boolean {
+    if (path.extname(strPath) === '.sheet') {
+        return true;
+    }
+    return false;
+}
 
 export class Play extends ACommand {
 
@@ -21,29 +26,17 @@ export class Play extends ACommand {
         getEditorEventDecorator();
     }
 
-    isSheetFile(strPath:string): boolean {
-        if (path.extname(strPath) === '.sheet') {
-            return true;
-        }
-        return false;
-    }
-
     async execute(): Promise<void> {
-        let editor = vscode.window.activeTextEditor;
-        if (!editor) {
-            if (lastSheetFile !== null) {
-                this.startPlayer(lastSheetFile)
-            }
+        
+        const history = getSheetHistory();
+        let sheetpath = history.currentFile;
+        if (!sheetpath) {
+            sheetpath = history.lastPlayedSheetFile;
+        }
+        if (!sheetpath) {
+            vscode.window.showErrorMessage("no sheet file to play");
             return;
         }
-        let sheetPath = editor.document.fileName;
-        if (!this.isSheetFile(sheetPath)) {
-            if (lastSheetFile !== null) {
-                this.startPlayer(lastSheetFile)
-            }
-            return; 
-        }
-        this.startPlayer(sheetPath);
-        lastSheetFile = sheetPath;
+        this.startPlayer(sheetpath);
     }
 }

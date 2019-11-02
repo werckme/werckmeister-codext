@@ -77,7 +77,7 @@ export enum PlayerState {
 
 export class Player {
     private _state: PlayerState = PlayerState.Stopped;
-    socket: dgram.Socket|null = null;
+    private socket: dgram.Socket|null = null;
     playerMessage: EventEmitter = new EventEmitter();
     private process: ChildProcess|null = null;
     sheetInfo: ISheetInfo|null = null;
@@ -125,13 +125,13 @@ export class Player {
         this.playerMessage.emit(OnPlayerStateChanged, this._state);
     }
 
-    updateSheetTime(message:IFunkfeuerMessage) {
+    private updateSheetTime(message:IFunkfeuerMessage) {
         if (message.sheetTime) {
             this.sheetTime = message.sheetTime;
         }
     }
 
-    checkForUpdate(message:IFunkfeuerMessage) {
+    private checkForUpdate(message:IFunkfeuerMessage) {
         if (!message.lastUpdateTimestamp) {
             return;
         }
@@ -145,7 +145,7 @@ export class Player {
         }
     }
 
-    startUdpListener(port: number) {
+    private startUdpListener(port: number) {
         if (this.socket !== null) {
             return;
         }
@@ -165,7 +165,7 @@ export class Player {
         console.log(`listen udp messages on port ${port}`);
     }
 
-    stopUdpListener() {
+    private stopUdpListener() {
         if (this.socket === null) {
             return;
         }

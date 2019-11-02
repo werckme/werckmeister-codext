@@ -9,6 +9,7 @@ import { ShowSheetView } from './commands/ShowSheetView';
 import { ShowPianoView } from './commands/ShowPianoView';
 import { Pause } from './commands/Pause';
 import { ShowTransportView } from './commands/ShowTransportView';
+import { getSheetHistory } from './com/SheetHistory';
 
 function excuteCommand(type: (new (context: vscode.ExtensionContext) => ACommand), context: vscode.ExtensionContext): void {
 	let cmd = new type(context);
@@ -49,6 +50,8 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	disposable = vscode.commands.registerCommand(WMCommandOpenTransportView, excuteCommand.bind(null, ShowTransportView, context));
 	context.subscriptions.push(disposable);		
+
+	getSheetHistory(); // create singleton
 }
 
 // this method is called when your extension is deactivated

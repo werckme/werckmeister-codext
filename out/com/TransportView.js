@@ -148,10 +148,11 @@ class TransportView extends AWebView_1.AWebView {
         return new Promise((resolve, reject) => {
             this.currentPanel = vscode.window.createWebviewPanel('werckmeister.TransportView', // Identifies the type of the webview. Used internally
             ViewTitle, // Title of the panel displayed to the user
-            vscode.ViewColumn.Active, // Editor column to show the new webview panel in.
+            vscode.ViewColumn.Beside, // Editor column to show the new webview panel in.
             {
                 enableScripts: true,
-                retainContextWhenHidden: true
+                retainContextWhenHidden: true,
+                localResourceRoots: []
             });
             let jsPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'dist', 'WebViewApp.dist.js'));
             let htmlPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'transportView.html'));
