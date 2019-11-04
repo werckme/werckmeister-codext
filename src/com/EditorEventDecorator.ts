@@ -70,34 +70,38 @@ export class EditorEventDecorator {
         return new vscode.Range(range.start, to);
     }
 
-    protected sourceIsCurrentEditor(sourceInfo: ISourceInfo): boolean {
-        const editorPath = path.resolve(vscode.window.activeTextEditor!.document.uri.fsPath);
+    protected sourceIsEditor(sourceInfo: ISourceInfo|undefined, editor: vscode.TextEditor): boolean {
+        if (!sourceInfo) {
+            return false;
+        }
+        const editorPath = path.resolve(editor.document.uri.fsPath);
         const sourcePath = path.resolve(sourceInfo.path);
         return editorPath === sourcePath;
     }
 
     protected updateSheetEventInfos(sheetEventInfos: ISheetEventInfo[]) {
-        if (!vscode.window.activeTextEditor) {
-            return;
-        }
-        const editor:vscode.TextEditor = vscode.window.activeTextEditor as vscode.TextEditor;
-        const document:vscode.TextDocument = editor.document;
-        if (document.isDirty) {
-            return;
-        }
-        let decorations = [];
-        for (let eventInfo of sheetEventInfos) {
-            const source = this.getSourceInfo(eventInfo.sourceId);
-            if (!source || !this.sourceIsCurrentEditor(source)) {
+        for (let visibleEditor of vscode.window.visibleTextEditors) {
+            const eventInfos = sheetEventInfos
+                .filter(x => this.sourceIsEditor(this.getSourceInfo(x.sourceId), visibleEditor))
+            ;
+            if (eventInfos.length === 0) {
                 continue;
             }
-            const from = document.positionAt(eventInfo.beginPosition);
-            const to = document.positionAt(eventInfo.endPosition);
-            const range = new vscode.Range(from, to);
-            const decoration = {range};
-            decorations.push(decoration);
+            const document:vscode.TextDocument = visibleEditor.document;
+            if (document.isDirty) {
+                return;
+            }
+            let decorations = [];
+            for (let eventInfo of eventInfos) {
+                const source = this.getSourceInfo(eventInfo.sourceId);
+                const from = document.positionAt(eventInfo.beginPosition);
+                const to = document.positionAt(eventInfo.endPosition);
+                const range = new vscode.Range(from, to);
+                const decoration = {range};
+                decorations.push(decoration);
+            }
+            visibleEditor.setDecorations(EventDecorationType, decorations);
         }
-        vscode.window.activeTextEditor!.setDecorations(EventDecorationType, decorations);
     }
 
 	registerListener() {
