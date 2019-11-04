@@ -73,7 +73,7 @@
 		},
 		"voicemeta": {
 			"name": "entity.name.voicemeta",
-			"begin": "(/)",
+			"begin": "(/\\w+:)",
 			"beginCaptures": {
 				"1": {
 					"name": "entity.name.function.voicemeta.begin.werckmeister"
