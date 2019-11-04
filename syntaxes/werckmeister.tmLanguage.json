@@ -64,6 +64,7 @@
 			},
 			"end": ";",
 			"patterns": [
+				{ "include": "#comments" },
 				{
 					"name": "variable.parameter.meta.werckmeister",
 					"match": "[a-zA-Z0-9]+"
@@ -85,6 +86,7 @@
 				}
 			},			
 			"patterns": [
+				{ "include": "#comments" },
 				{
 					"name": "entity.name.function.voicemeta.werckmeister",
 					"match": "\\w+:"
