@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { EventEmitter } from 'events';
+import { IsWindows } from './Player';
 
 export const OnDispose = "OnDispose";
 
@@ -16,7 +17,8 @@ export abstract class AWebView  {
         if (!this.panel) {
             throw new Error("panel == null");
         }
-        return this.panel.webview.asWebviewUri(uri).toString();
+        const result = this.panel.webview.asWebviewUri(uri).toString();
+        return result;
     }
     
     getExtensionPath(...pathComponents:string[]): string {

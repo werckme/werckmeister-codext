@@ -14,7 +14,7 @@ const fs = require("fs");
 const Player_1 = require("../com/Player");
 const AWebView_1 = require("./AWebView");
 const extension_1 = require("../extension");
-const ViewTitle = "Sheet Monitor (stopped)";
+const ViewTitle = "Sheet";
 const TitleUpdaterIntervalMillis = 500;
 class TransportView extends AWebView_1.AWebView {
     constructor(context) {
@@ -74,7 +74,7 @@ class TransportView extends AWebView_1.AWebView {
         const player = Player_1.getPlayer();
         if (player.sheetTime) {
             const time = player.sheetTime.toFixed(1);
-            this.currentPanel.title = `▶ ${time}`;
+            this.currentPanel.title = `${ViewTitle} ${time}`;
         }
     }
     onPlayerMessage(message) {
@@ -152,7 +152,6 @@ class TransportView extends AWebView_1.AWebView {
             {
                 enableScripts: true,
                 retainContextWhenHidden: true,
-                localResourceRoots: []
             });
             let jsPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'dist', 'WebViewApp.dist.js'));
             let htmlPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'transportView.html'));

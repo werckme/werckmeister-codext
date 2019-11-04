@@ -21,7 +21,8 @@ class AWebView {
         if (!this.panel) {
             throw new Error("panel == null");
         }
-        return this.panel.webview.asWebviewUri(uri).toString();
+        const result = this.panel.webview.asWebviewUri(uri).toString();
+        return result;
     }
     getExtensionPath(...pathComponents) {
         return path.join(this.context.extensionPath, ...pathComponents);

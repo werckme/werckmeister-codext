@@ -6,7 +6,7 @@ import { AWebView } from './AWebView';
 import { WMCommandStop, WMCommandPlay, WMCommandPause } from '../extension';
 import { ISheetInfo } from './SheetInfo';
 
-const ViewTitle = "Sheet Monitor (stopped)";
+const ViewTitle = "Sheet";
 const TitleUpdaterIntervalMillis = 500;
 export class TransportView extends AWebView {
 	currentPanel: vscode.WebviewPanel|null = null;
@@ -74,7 +74,7 @@ export class TransportView extends AWebView {
 		const player = getPlayer();
 		if (player.sheetTime) {
 			const time = (player.sheetTime as number).toFixed(1);
-			this.currentPanel!.title = `▶ ${time}`;
+			this.currentPanel!.title = `${ViewTitle} ${time}`;
 		}
 	}
 
@@ -162,7 +162,6 @@ export class TransportView extends AWebView {
                 {
 					enableScripts: true,
 					retainContextWhenHidden: true,
-					localResourceRoots: []
                 }
 			);
             let jsPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'dist', 'WebViewApp.dist.js'));

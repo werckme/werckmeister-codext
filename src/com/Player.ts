@@ -8,7 +8,7 @@ import * as fs from 'fs';
 
 const freeUdpPort = require('udp-free-port');
 const Win32SigintWorkaroundFile = "keepalive";
-const IsWindows:boolean = process.platform === 'win32';
+export const IsWindows:boolean = process.platform === 'win32';
 export const PlayerExecutable = IsWindows ? 'sheetp.exe' : 'sheetp';
 
 export interface IFunkfeuerMessage {
