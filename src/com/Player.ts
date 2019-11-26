@@ -1,7 +1,7 @@
 import { exec, ChildProcess } from 'child_process';
 import * as dgram from 'dgram';
 import * as EventEmitter from 'events';
-import { ISheetInfo } from './SheetInfo';
+import { ISheetInfo, IWarning } from './SheetInfo';
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -180,7 +180,7 @@ export class Player {
         return exec(cmd, {cwd: playerWorkingDirectory()}, callback);
     }
 
-    private updateSourceMap(): Promise<ISheetInfo> {
+    private updateDocumentInfo(): Promise<ISheetInfo> {
         return new Promise((resolve, reject) => {
             const config = new Config();
             config.info = true;
@@ -207,7 +207,8 @@ export class Player {
 
     async play(sheetPath: string): Promise<void> {
         this.currentFile = sheetPath;
-        await this.updateSourceMap();
+        await this.updateDocumentInfo();
+        this.notifyDocumentWarningsIfAny();
         return this._startPlayer(sheetPath);
     }
 
@@ -278,6 +279,15 @@ export class Player {
             }
             waitUntilEnd();
         });
+    }
+
+    notifyDocumentWarningsIfAny() {
+        if (!this.sheetInfo || !this.sheetInfo.warnings || this.sheetInfo.warnings.length === 0) {
+            return;
+        }
+        for (let warning of this.sheetInfo.warnings) {
+            vscode.window.showWarningMessage(warning.message);
+        }
     }
 
     private configToString(config: Config) {

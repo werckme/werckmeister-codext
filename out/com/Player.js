@@ -170,7 +170,7 @@ class Player {
         console.log(cmd);
         return child_process_1.exec(cmd, { cwd: playerWorkingDirectory() }, callback);
     }
-    updateSourceMap() {
+    updateDocumentInfo() {
         return new Promise((resolve, reject) => {
             const config = new Config();
             config.info = true;
@@ -198,7 +198,8 @@ class Player {
     play(sheetPath) {
         return __awaiter(this, void 0, void 0, function* () {
             this.currentFile = sheetPath;
-            yield this.updateSourceMap();
+            yield this.updateDocumentInfo();
+            this.notifyDocumentWarningsIfAny();
             return this._startPlayer(sheetPath);
         });
     }
@@ -270,6 +271,14 @@ class Player {
             };
             waitUntilEnd();
         });
+    }
+    notifyDocumentWarningsIfAny() {
+        if (!this.sheetInfo || !this.sheetInfo.warnings || this.sheetInfo.warnings.length === 0) {
+            return;
+        }
+        for (let warning of this.sheetInfo.warnings) {
+            vscode.window.showWarningMessage(warning.message);
+        }
     }
     configToString(config) {
         if (!config.sheetPath) {
