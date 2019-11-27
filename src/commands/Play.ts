@@ -5,6 +5,7 @@ import { getPlayer, Player } from '../com/Player';
 import * as path from 'path';
 import { EditorEventDecorator, getEditorEventDecorator } from "../com/EditorEventDecorator";
 import { getSheetHistory } from "../com/SheetHistory";
+import { WMCommandPlayTerminal } from "../extension";
 
 export function isSheetFile(strPath:string): boolean {
     if (path.extname(strPath) === '.sheet') {
@@ -21,7 +22,15 @@ export class Play extends ACommand {
         player.play(sheetPath) 
         .then(()=>{})
         .catch((ex)=>{
-            vscode.window.showErrorMessage(`Werckmeister: ${ex}`);
+            vscode.window.showErrorMessage(`Werckmeister has dectected an error`, "show")
+                .then((item: string|undefined) =>{
+                    if (!item) {
+                        return;
+                    }
+                    if (item === 'show') {
+                        vscode.commands.executeCommand(WMCommandPlayTerminal);
+                    }
+                });
         });
         getEditorEventDecorator();
     }

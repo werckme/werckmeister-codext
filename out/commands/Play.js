@@ -16,6 +16,7 @@ const Player_1 = require("../com/Player");
 const path = require("path");
 const EditorEventDecorator_1 = require("../com/EditorEventDecorator");
 const SheetHistory_1 = require("../com/SheetHistory");
+const extension_1 = require("../extension");
 function isSheetFile(strPath) {
     if (path.extname(strPath) === '.sheet') {
         return true;
@@ -30,7 +31,15 @@ class Play extends ACommand_1.ACommand {
         player.play(sheetPath)
             .then(() => { })
             .catch((ex) => {
-            vscode.window.showErrorMessage(`Werckmeister: ${ex}`);
+            vscode.window.showErrorMessage(`Werckmeister has dectected an error`, "show")
+                .then((item) => {
+                if (!item) {
+                    return;
+                }
+                if (item === 'show') {
+                    vscode.commands.executeCommand(extension_1.WMCommandPlayTerminal);
+                }
+            });
         });
         EditorEventDecorator_1.getEditorEventDecorator();
     }
