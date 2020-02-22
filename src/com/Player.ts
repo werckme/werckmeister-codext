@@ -21,7 +21,7 @@ function playerWorkingDirectory() {
     const settings = vscode.workspace.getConfiguration('werckmeister');
     const strPath = settings.werckmeisterBinaryDirectory as string;
     if (!strPath) {
-        throw new Error(`missing \"Werckmeister BinaryDirectory\" configuration. (Settings->Extensions->Werckmeister)`);
+        return "";
     }
     return strPath;
 }
