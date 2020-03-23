@@ -14,7 +14,6 @@ const dgram = require("dgram");
 const EventEmitter = require("events");
 const vscode = require("vscode");
 const path = require("path");
-const fs = require("fs");
 const freeUdpPort = require('udp-free-port');
 const Win32SigintWorkaroundFile = "keepalive";
 exports.IsWindows = process.platform === 'win32';
@@ -31,9 +30,20 @@ function toWMBINPath(executable) {
     return path.join(playerWorkingDirectory(), executable);
 }
 exports.toWMBINPath = toWMBINPath;
-function killProcess(childProcess) {
+function killProcess(childProcess, pid) {
     if (exports.IsWindows) {
-        fs.unlinkSync(toWMBINPath(Win32SigintWorkaroundFile));
+        if (!pid) {
+            return;
+        }
+        const cmd = toWMBINPath(`win32-kill-sheetp-process.exe ${pid}`);
+        child_process_1.exec(cmd, (err, stdout, stderr) => {
+            if (stderr.toString()) {
+                vscode.window.showErrorMessage(stderr.toString());
+            }
+            if (err != null) {
+                vscode.window.showInformationMessage(err.message || "");
+            }
+        });
         return;
     }
     childProcess.kill("SIGINT");
@@ -76,6 +86,7 @@ var PlayerState;
 })(PlayerState = exports.PlayerState || (exports.PlayerState = {}));
 class Player {
     constructor() {
+        this._pid = 0;
         this._state = PlayerState.Stopped;
         this.socket = null;
         this.playerMessage = new EventEmitter();
@@ -150,6 +161,9 @@ class Player {
                 this.state = PlayerState.Playing;
             }
             let message = JSON.parse(msg.toString());
+            if (this._pid === 0) {
+                this._pid = message.pid;
+            }
             this.updateSheetTime(message);
             this.checkForUpdate(message);
             this.playerMessage.emit(exports.OnPlayerMessageEvent, message);
@@ -260,7 +274,8 @@ class Player {
             if (this.state !== PlayerState.Pausing) {
                 this.state = PlayerState.Stopping;
             }
-            killProcess(this.process);
+            killProcess(this.process, this._pid);
+            this._pid = 0;
             let waitUntilEnd = () => {
                 if (!this.isPlaying) {
                     resolve();
