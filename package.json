@@ -172,7 +172,6 @@
         "react-dom": "^16.10.2",
         "taskkill": "^3.0.0",
         "udp-free-port": "^1.0.0",
-        "werckmeister-ace-build": "^1.4.6",
-        "windows-kill": "^0.3.3"
+        "werckmeister-ace-build": "^1.4.6"
     }
 }
