@@ -1,4 +1,4 @@
-import { exec, ChildProcess } from 'child_process';
+import { exec, ChildProcess, ExecException } from 'child_process';
 import * as dgram from 'dgram';
 import * as EventEmitter from 'events';
 import { ISheetInfo, IWarning } from './SheetInfo';
@@ -14,6 +14,7 @@ export const IsWindows:boolean = process.platform === 'win32';
 export const PlayerExecutable = IsWindows ? 'sheetp.exe' : 'sheetp';
 
 export interface IFunkfeuerMessage {
+    pid: number;
     sheetTime: number;
     lastUpdateTimestamp: number;
     sheetEventInfos: any[];
@@ -23,7 +24,7 @@ function playerWorkingDirectory() {
     const settings = vscode.workspace.getConfiguration('werckmeister');
     const strPath = settings.werckmeisterBinaryDirectory as string;
     if (!strPath) {
-        throw new Error(`missing \"Werckmeister BinaryDirectory\" configuration. (Settings->Extensions->Werckmeister)`);
+        return "";
     }
     return strPath;
 }
@@ -32,9 +33,20 @@ export function toWMBINPath(executable: string) {
     return path.join(playerWorkingDirectory(), executable);
 }
 
-function killProcess(childProcess:ChildProcess) {
+function killProcess(childProcess:ChildProcess, pid: number) {
     if (IsWindows) {
-        fs.unlinkSync(toWMBINPath(Win32SigintWorkaroundFile));
+        if (!pid) {
+            return;
+        }
+        const cmd = toWMBINPath(`win32-kill-sheetp-process.exe ${pid}`)
+        exec(cmd, (err:ExecException|null, stdout: string, stderr: string)=>{
+            if (stderr.toString()) {
+                vscode.window.showErrorMessage(stderr.toString());
+            }
+            if (err != null) {
+                vscode.window.showInformationMessage(err.message || "");
+            }
+        });
         return;
     }
     childProcess!.kill("SIGINT");
@@ -78,6 +90,7 @@ export enum PlayerState {
 }
 
 export class Player {
+    private _pid: number = 0;
     private _state: PlayerState = PlayerState.Stopped;
     private socket: dgram.Socket|null = null;
     playerMessage: EventEmitter = new EventEmitter();
@@ -159,6 +172,9 @@ export class Player {
                 this.state = PlayerState.Playing;
             }
             let message:IFunkfeuerMessage = JSON.parse(msg.toString());
+            if (this._pid === 0) {
+                this._pid = message.pid;
+            }
             this.updateSheetTime(message);
             this.checkForUpdate(message);
             this.playerMessage.emit(exports.OnPlayerMessageEvent, message);
@@ -270,7 +286,8 @@ export class Player {
             if (this.state !== PlayerState.Pausing) {
                 this.state = PlayerState.Stopping;
             }
-            killProcess(this.process as ChildProcess);
+            killProcess(this.process as ChildProcess,  this._pid);
+            this._pid = 0;
             let waitUntilEnd = () => {
                 if (!this.isPlaying) {
                     resolve();
