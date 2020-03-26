@@ -23,6 +23,7 @@ exports.WMCommandPause = `${_ns}.pause`;
 exports.WMCommandOpenSheeView = `${_ns}.sheetview`;
 exports.WMCommandOpenPianoView = `${_ns}.pianoview`;
 exports.WMCommandOpenTransportView = `${_ns}.transportview`;
+let diagnosticCollection;
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -40,6 +41,8 @@ function activate(context) {
     context.subscriptions.push(disposable);
     disposable = vscode.commands.registerCommand(exports.WMCommandOpenTransportView, excuteCommand.bind(null, ShowTransportView_1.ShowTransportView, context));
     context.subscriptions.push(disposable);
+    diagnosticCollection = vscode.languages.createDiagnosticCollection('werckmeister');
+    context.subscriptions.push(diagnosticCollection);
     SheetHistory_1.getSheetHistory(); // create singleton
 }
 exports.activate = activate;

@@ -25,12 +25,30 @@ function isSheetFile(strPath) {
 }
 exports.isSheetFile = isSheetFile;
 class Play extends ACommand_1.ACommand {
+    onError() {
+        const document = vscode.workspace.textDocuments[0];
+        const diagnosticCollection = vscode.languages.createDiagnosticCollection("werckmeister");
+        diagnosticCollection.clear();
+        let diagnosticMap = new Map();
+        let canonicalFile = vscode.Uri.file(document.fileName).toString();
+        let range = new vscode.Range(1, 1, 1, 5);
+        let diagnostics = diagnosticMap.get(canonicalFile);
+        if (!diagnostics) {
+            diagnostics = [];
+        }
+        diagnostics.push(new vscode.Diagnostic(range, "ACHTUNG!", vscode.DiagnosticSeverity.Error));
+        diagnosticMap.set(canonicalFile, diagnostics);
+        diagnosticMap.forEach((diags, file) => {
+            diagnosticCollection.set(vscode.Uri.parse(file), diags);
+        });
+    }
     startPlayer(sheetPath) {
         let filename = path_1.basename(sheetPath);
         let player = Player_1.getPlayer();
         player.play(sheetPath)
             .then(() => { })
             .catch((ex) => {
+            this.onError();
             vscode.window.showErrorMessage(`Werckmeister has dectected an error`, "show")
                 .then((item) => {
                 if (!item) {

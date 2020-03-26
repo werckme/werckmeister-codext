@@ -15,7 +15,6 @@ const EventEmitter = require("events");
 const vscode = require("vscode");
 const path = require("path");
 const freeUdpPort = require('udp-free-port');
-const Win32SigintWorkaroundFile = "keepalive";
 exports.IsWindows = process.platform === 'win32';
 exports.PlayerExecutable = exports.IsWindows ? 'sheetp.exe' : 'sheetp';
 function playerWorkingDirectory() {

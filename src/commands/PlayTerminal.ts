@@ -1,9 +1,7 @@
 import { ACommand } from "./ACommand";
 import * as vscode from 'vscode';
 import { basename } from 'path';
-import { toWMBINPath, PlayerExecutable } from "../com/Player";
-
-
+import { toWMBINPath, PlayerExecutable, IsWindows } from "../com/Player";
 
 export class PlayTerminal extends ACommand {
     async execute(): Promise<void> {

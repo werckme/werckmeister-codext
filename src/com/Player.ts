@@ -4,10 +4,9 @@ import * as EventEmitter from 'events';
 import { ISheetInfo, IWarning } from './SheetInfo';
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as fs from 'fs';
+
 
 const freeUdpPort = require('udp-free-port');
-const Win32SigintWorkaroundFile = "keepalive";
 export const IsWindows:boolean = process.platform === 'win32';
 export const PlayerExecutable = IsWindows ? 'sheetp.exe' : 'sheetp';
 
