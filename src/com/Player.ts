@@ -8,6 +8,8 @@ import * as fs from 'fs';
 
 const freeUdpPort = require('udp-free-port');
 const Win32SigintWorkaroundFile = "keepalive";
+const MaxWarnings = 5;
+const MaxWarningsExceedMessage = `More than ${MaxWarnings} warnings.`;
 export const IsWindows:boolean = process.platform === 'win32';
 export const PlayerExecutable = IsWindows ? 'sheetp.exe' : 'sheetp';
 
@@ -285,8 +287,13 @@ export class Player {
         if (!this.sheetInfo || !this.sheetInfo.warnings || this.sheetInfo.warnings.length === 0) {
             return;
         }
+        let c = 0;
         for (let warning of this.sheetInfo.warnings) {
             vscode.window.showWarningMessage(warning.message);
+            if (++c > MaxWarnings) {
+                vscode.window.showWarningMessage(MaxWarningsExceedMessage);
+                break;
+            }
         }
     }
 
