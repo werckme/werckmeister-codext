@@ -17,7 +17,7 @@ export interface IFunkfeuerMessage {
     sheetEventInfos: any[];
 }
 
-function playerWorkingDirectory() {
+export function werckmeisterWorkingDirectory() {
     const settings = vscode.workspace.getConfiguration('werckmeister');
     const strPath = settings.werckmeisterBinaryDirectory as string;
     if (!strPath) {
@@ -27,7 +27,7 @@ function playerWorkingDirectory() {
 }
 
 export function toWMBINPath(executable: string) {
-    return path.join(playerWorkingDirectory(), executable);
+    return path.join(werckmeisterWorkingDirectory(), executable);
 }
 
 function killProcess(childProcess:ChildProcess, pid: number) {
@@ -191,8 +191,7 @@ export class Player {
     }
     
     private _execute(cmd:string, callback: (err:any, stdout: any, stderr: any)=>void): ChildProcess {
-        console.log(cmd);
-        return exec(cmd, {cwd: playerWorkingDirectory()}, callback);
+        return exec(cmd, {cwd: werckmeisterWorkingDirectory()}, callback);
     }
 
     private updateDocumentInfo(): Promise<ISheetInfo> {

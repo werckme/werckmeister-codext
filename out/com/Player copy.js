@@ -17,7 +17,7 @@ const path = require("path");
 const freeUdpPort = require('udp-free-port');
 exports.IsWindows = process.platform === 'win32';
 exports.PlayerExecutable = exports.IsWindows ? 'sheetp.exe' : 'sheetp';
-function werckmeisterWorkingDirectory() {
+function playerWorkingDirectory() {
     const settings = vscode.workspace.getConfiguration('werckmeister');
     const strPath = settings.werckmeisterBinaryDirectory;
     if (!strPath) {
@@ -25,9 +25,8 @@ function werckmeisterWorkingDirectory() {
     }
     return strPath;
 }
-exports.werckmeisterWorkingDirectory = werckmeisterWorkingDirectory;
 function toWMBINPath(executable) {
-    return path.join(werckmeisterWorkingDirectory(), executable);
+    return path.join(playerWorkingDirectory(), executable);
 }
 exports.toWMBINPath = toWMBINPath;
 function killProcess(childProcess, pid) {
@@ -181,7 +180,8 @@ class Player {
         console.log('udp listener stopped');
     }
     _execute(cmd, callback) {
-        return child_process_1.exec(cmd, { cwd: werckmeisterWorkingDirectory() }, callback);
+        console.log(cmd);
+        return child_process_1.exec(cmd, { cwd: playerWorkingDirectory() }, callback);
     }
     updateDocumentInfo() {
         return new Promise((resolve, reject) => {
@@ -329,4 +329,4 @@ function getPlayer() {
     return globalPlayer;
 }
 exports.getPlayer = getPlayer;
-//# sourceMappingURL=Player.js.map
+//# sourceMappingURL=Player copy.js.map
