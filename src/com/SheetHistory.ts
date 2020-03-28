@@ -1,3 +1,7 @@
+/**
+ * stores the used sheet files in a history
+ */
+
 import * as vscode from 'vscode';
 import { getPlayer, OnPlayerStateChanged, PlayerState } from './Player';
 import { isSheetFile } from '../commands/Play';

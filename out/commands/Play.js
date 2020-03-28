@@ -11,12 +11,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const ACommand_1 = require("./ACommand");
 const vscode = require("vscode");
-const path_1 = require("path");
 const Player_1 = require("../com/Player");
 const path = require("path");
 const EditorEventDecorator_1 = require("../com/EditorEventDecorator");
 const SheetHistory_1 = require("../com/SheetHistory");
 const extension_1 = require("../extension");
+const Language_1 = require("../language/Language");
+const Diagnostic_1 = require("../language/features/Diagnostic");
 function isSheetFile(strPath) {
     if (path.extname(strPath) === '.sheet') {
         return true;
@@ -26,7 +27,6 @@ function isSheetFile(strPath) {
 exports.isSheetFile = isSheetFile;
 class Play extends ACommand_1.ACommand {
     startPlayer(sheetPath) {
-        let filename = path_1.basename(sheetPath);
         let player = Player_1.getPlayer();
         player.play(sheetPath)
             .then(() => { })
@@ -52,6 +52,11 @@ class Play extends ACommand_1.ACommand {
             }
             if (!sheetpath) {
                 vscode.window.showErrorMessage("no sheet file to play");
+                return;
+            }
+            const diagnose = yield Language_1.getLanguage().features.diagnostic.update(sheetpath);
+            if (diagnose === Diagnostic_1.DiagnoseState.HasErrors) {
+                vscode.window.showErrorMessage(`Werckmeister: failed to compile`);
                 return;
             }
             this.startPlayer(sheetpath);

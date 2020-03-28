@@ -1,15 +1,16 @@
+/**
+ * exceutes the werckmeister player: sheetp
+ */
+
 import { exec, ChildProcess, ExecException } from 'child_process';
 import * as dgram from 'dgram';
 import * as EventEmitter from 'events';
 import { ISheetInfo, IWarning } from './SheetInfo';
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as fs from 'fs';
+
 
 const freeUdpPort = require('udp-free-port');
-const Win32SigintWorkaroundFile = "keepalive";
-const MaxWarnings = 5;
-const MaxWarningsExceedMessage = `More than ${MaxWarnings} warnings.`;
 export const IsWindows:boolean = process.platform === 'win32';
 export const PlayerExecutable = IsWindows ? 'sheetp.exe' : 'sheetp';
 
@@ -20,7 +21,7 @@ export interface IFunkfeuerMessage {
     sheetEventInfos: any[];
 }
 
-function playerWorkingDirectory() {
+export function werckmeisterWorkingDirectory() {
     const settings = vscode.workspace.getConfiguration('werckmeister');
     const strPath = settings.werckmeisterBinaryDirectory as string;
     if (!strPath) {
@@ -30,7 +31,7 @@ function playerWorkingDirectory() {
 }
 
 export function toWMBINPath(executable: string) {
-    return path.join(playerWorkingDirectory(), executable);
+    return path.join(werckmeisterWorkingDirectory(), executable);
 }
 
 function killProcess(childProcess:ChildProcess, pid: number) {
@@ -194,8 +195,7 @@ export class Player {
     }
     
     private _execute(cmd:string, callback: (err:any, stdout: any, stderr: any)=>void): ChildProcess {
-        console.log(cmd);
-        return exec(cmd, {cwd: playerWorkingDirectory()}, callback);
+        return exec(cmd, {cwd: werckmeisterWorkingDirectory()}, callback);
     }
 
     private updateDocumentInfo(): Promise<ISheetInfo> {
@@ -304,13 +304,8 @@ export class Player {
         if (!this.sheetInfo || !this.sheetInfo.warnings || this.sheetInfo.warnings.length === 0) {
             return;
         }
-        let c = 0;
         for (let warning of this.sheetInfo.warnings) {
             vscode.window.showWarningMessage(warning.message);
-            if (++c > MaxWarnings) {
-                vscode.window.showWarningMessage(MaxWarningsExceedMessage);
-                break;
-            }
         }
     }
 

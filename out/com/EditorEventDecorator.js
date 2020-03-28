@@ -1,5 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * highlights werckmeister events if a sheet file is playing
+ */
 const vscode = require("vscode");
 const path = require("path");
 const Player_1 = require("../com/Player");
