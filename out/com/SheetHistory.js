@@ -1,4 +1,7 @@
 "use strict";
+/**
+ * stores the used sheet files in a history
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 const vscode = require("vscode");
 const Player_1 = require("./Player");

@@ -24,6 +24,7 @@ export const WMCommandPause = `${_ns}.pause`;
 export const WMCommandOpenSheeView = `${_ns}.sheetview`;
 export const WMCommandOpenPianoView = `${_ns}.pianoview`;
 export const WMCommandOpenTransportView = `${_ns}.transportview`;
+export const WMDiagnosticCollectionName = "werckmeister";
 
 let diagnosticCollection: vscode.DiagnosticCollection;
 
@@ -53,7 +54,7 @@ export function activate(context: vscode.ExtensionContext) {
 	disposable = vscode.commands.registerCommand(WMCommandOpenTransportView, excuteCommand.bind(null, ShowTransportView, context));
 	context.subscriptions.push(disposable);		
 
-	diagnosticCollection = vscode.languages.createDiagnosticCollection('werckmeister');
+	diagnosticCollection = vscode.languages.createDiagnosticCollection(WMDiagnosticCollectionName);
 	context.subscriptions.push(diagnosticCollection);
 
 	getSheetHistory(); // create singleton

@@ -1,5 +1,7 @@
+/**
+ * highlights werckmeister events if a sheet file is playing
+ */
 import * as vscode from 'vscode';
-import * as fs from 'fs';
 import * as path from 'path';
 import { Player, getPlayer, OnPlayerMessageEvent, OnPlayerStateChanged, PlayerState } from "../com/Player";
 import { ISheetInfo, ISheetEventInfo, ISourceInfo } from './SheetInfo';

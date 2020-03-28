@@ -1,3 +1,7 @@
+/**
+ * exceutes the werckmeister player: sheetp
+ */
+
 import { exec, ChildProcess, ExecException } from 'child_process';
 import * as dgram from 'dgram';
 import * as EventEmitter from 'events';

@@ -16,7 +16,8 @@ const path = require("path");
 const EditorEventDecorator_1 = require("../com/EditorEventDecorator");
 const SheetHistory_1 = require("../com/SheetHistory");
 const extension_1 = require("../extension");
-const Compiler_1 = require("../com/Compiler");
+const Language_1 = require("../language/Language");
+const Diagnostic_1 = require("../language/features/Diagnostic");
 function isSheetFile(strPath) {
     if (path.extname(strPath) === '.sheet') {
         return true;
@@ -25,23 +26,6 @@ function isSheetFile(strPath) {
 }
 exports.isSheetFile = isSheetFile;
 class Play extends ACommand_1.ACommand {
-    onError() {
-        const document = vscode.workspace.textDocuments[0];
-        const diagnosticCollection = vscode.languages.createDiagnosticCollection("werckmeister");
-        diagnosticCollection.clear();
-        let diagnosticMap = new Map();
-        let canonicalFile = vscode.Uri.file(document.fileName).toString();
-        let range = new vscode.Range(1, 1, 1, 5);
-        let diagnostics = diagnosticMap.get(canonicalFile);
-        if (!diagnostics) {
-            diagnostics = [];
-        }
-        diagnostics.push(new vscode.Diagnostic(range, "ACHTUNG!", vscode.DiagnosticSeverity.Error));
-        diagnosticMap.set(canonicalFile, diagnostics);
-        diagnosticMap.forEach((diags, file) => {
-            diagnosticCollection.set(vscode.Uri.parse(file), diags);
-        });
-    }
     startPlayer(sheetPath) {
         let player = Player_1.getPlayer();
         player.play(sheetPath)
@@ -70,10 +54,9 @@ class Play extends ACommand_1.ACommand {
                 vscode.window.showErrorMessage("no sheet file to play");
                 return;
             }
-            const compiler = new Compiler_1.Compiler();
-            const result = yield compiler.validate(sheetpath);
-            if (result.isError) {
-                this.onError();
+            const diagnose = yield Language_1.getLanguage().features.diagnostic.update(sheetpath);
+            if (diagnose === Diagnostic_1.DiagnoseState.HasErrors) {
+                vscode.window.showErrorMessage(`Werckmeister: failed to compile`);
                 return;
             }
             this.startPlayer(sheetpath);

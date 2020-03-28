@@ -1,12 +1,12 @@
 import { ACommand } from "./ACommand";
 import * as vscode from 'vscode';
-import { basename } from 'path';
 import { getPlayer, Player } from '../com/Player';
 import * as path from 'path';
 import { getEditorEventDecorator } from "../com/EditorEventDecorator";
 import { getSheetHistory } from "../com/SheetHistory";
 import { WMCommandPlayTerminal } from "../extension";
-import { Compiler, CompilerMode, IValidationResult } from "../com/Compiler";
+import { getLanguage } from "../language/Language";
+import { DiagnoseState } from "../language/features/Diagnostic";
 
 export function isSheetFile(strPath:string): boolean {
     if (path.extname(strPath) === '.sheet') {
@@ -17,23 +17,6 @@ export function isSheetFile(strPath:string): boolean {
 
 export class Play extends ACommand {
 
-    onError() {
-        const document = vscode.workspace.textDocuments[0];
-        const diagnosticCollection = vscode.languages.createDiagnosticCollection("werckmeister");
-       
-        diagnosticCollection.clear();
-
-        let diagnosticMap: Map<string, vscode.Diagnostic[]> = new Map();
-        let canonicalFile = vscode.Uri.file(document.fileName).toString();
-        let range = new vscode.Range(1, 1, 1, 5);
-        let diagnostics = diagnosticMap.get(canonicalFile);
-        if (!diagnostics) { diagnostics = []; }
-        diagnostics.push(new vscode.Diagnostic(range, "ACHTUNG!", vscode.DiagnosticSeverity.Error));
-        diagnosticMap.set(canonicalFile, diagnostics);
-        diagnosticMap.forEach((diags, file) => {
-            diagnosticCollection.set(vscode.Uri.parse(file), diags);
-        });
-    }
     startPlayer(sheetPath:string) {
         let player:Player = getPlayer();
         player.play(sheetPath) 
@@ -63,10 +46,9 @@ export class Play extends ACommand {
             return;
         }
         
-        const compiler = new Compiler();
-        const result = await compiler.validate(sheetpath);
-        if (result.isError) {
-            this.onError();
+        const diagnose = await getLanguage().features.diagnostic.update(sheetpath);
+        if (diagnose === DiagnoseState.HasErrors) {
+            vscode.window.showErrorMessage(`Werckmeister: failed to compile`)
             return;
         }
         this.startPlayer(sheetpath);

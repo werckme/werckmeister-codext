@@ -1,3 +1,7 @@
+/**
+ * executes the werckmeister compiler: sheetc
+ */
+
 import { exec, ChildProcess, ExecException } from 'child_process';
 import { IsWindows, toWMBINPath } from './Player';
 
@@ -24,16 +28,16 @@ export interface IWarning {
 }
 
 export interface IValidationResult {
-    sources: IValidationSource[] | undefined;
-    duration: number | undefined;
-    warings: IWarning[] | undefined;
+    sources: IValidationSource[];
+    duration: number;
+    warings: IWarning[];
 }
 
 export interface IValidationErrorResult {
-    sourceId: number | undefined;
-    positionBegin: number | undefined;
-    sourceFile: string | undefined;
-    errorMessage: string | undefined;
+    sourceId: number;
+    positionBegin: number;
+    sourceFile: string;
+    errorMessage: string;
 }
 
 export class ValidationResult {
@@ -84,7 +88,6 @@ export class Compiler {
 
     async validate(sheetPath: string): Promise<ValidationResult> {
         const str: string = await this.compile(sheetPath, CompilerMode.validate);
-        console.log(str);
         const obj = JSON.parse(str);
         return new ValidationResult(obj);
     }
