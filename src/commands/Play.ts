@@ -6,7 +6,6 @@ import { getEditorEventDecorator } from "../com/EditorEventDecorator";
 import { getSheetHistory } from "../com/SheetHistory";
 import { WMCommandPlayTerminal } from "../extension";
 import { getLanguage } from "../language/Language";
-import { DiagnoseState } from "../language/features/Diagnostic";
 
 export function isSheetFile(strPath:string): boolean {
     if (path.extname(strPath) === '.sheet') {
@@ -47,8 +46,8 @@ export class Play extends ACommand {
         }
         
         const diagnose = await getLanguage().features.diagnostic.update(sheetpath);
-        if (diagnose === DiagnoseState.HasErrors) {
-            vscode.window.showErrorMessage(`Werckmeister: failed to compile`)
+        if (diagnose.hasErrors) {
+            vscode.window.showErrorMessage(`Werckmeister: ${diagnose.errorResult.errorMessage}`)
             return;
         }
         this.startPlayer(sheetpath);

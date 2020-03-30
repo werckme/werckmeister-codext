@@ -42,7 +42,7 @@ export interface IValidationErrorResult {
 
 export class ValidationResult {
     constructor(public source: IValidationResult|IValidationErrorResult) {}
-    get isError(): boolean {
+    get hasErrors(): boolean {
         return !!this.errorResult.errorMessage;
     }
     get validationResult(): IValidationResult {

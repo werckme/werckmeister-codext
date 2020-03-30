@@ -33,7 +33,7 @@ class ValidationResult {
     constructor(source) {
         this.source = source;
     }
-    get isError() {
+    get hasErrors() {
         return !!this.errorResult.errorMessage;
     }
     get validationResult() {

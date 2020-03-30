@@ -6,11 +6,6 @@ import { WMDiagnosticCollectionName } from "../../extension";
 const FallbackCharactersRange = 5;
 
 
-export enum DiagnoseState {
-    IsValid,
-    HasErrors
-}
-
 function createError(error: IValidationErrorResult): vscode.Diagnostic|null {
     const document = findDocument(error.sourceFile);
     if (!document) {
@@ -28,7 +23,7 @@ function createError(error: IValidationErrorResult): vscode.Diagnostic|null {
 export class Diagnostic {
     diagnosticCollection: vscode.DiagnosticCollection = vscode.languages.createDiagnosticCollection(WMDiagnosticCollectionName);
 
-    async update(sheetPath: string): Promise<DiagnoseState> {
+    async update(sheetPath: string): Promise<ValidationResult> {
         const compiler = new Compiler();
         const result = await compiler.validate(sheetPath);
         this.diagnosticCollection.clear();
@@ -37,11 +32,11 @@ export class Diagnostic {
         diagnosticMap.forEach((diags, file) => {
             this.diagnosticCollection.set(vscode.Uri.parse(file), diags);
         });
-        return result.isError ? DiagnoseState.HasErrors : DiagnoseState.IsValid;
+        return result;
     }
 
     private updateDiagnostics(diagnosticMap: Map<string, vscode.Diagnostic[]>, validation: ValidationResult): void {
-        if (!validation.isError || !validation.errorResult.sourceFile) {
+        if (!validation.hasErrors || !validation.errorResult.sourceFile) {
             return;
         }
         const error = validation.errorResult;

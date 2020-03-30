@@ -17,7 +17,6 @@ const EditorEventDecorator_1 = require("../com/EditorEventDecorator");
 const SheetHistory_1 = require("../com/SheetHistory");
 const extension_1 = require("../extension");
 const Language_1 = require("../language/Language");
-const Diagnostic_1 = require("../language/features/Diagnostic");
 function isSheetFile(strPath) {
     if (path.extname(strPath) === '.sheet') {
         return true;
@@ -55,8 +54,8 @@ class Play extends ACommand_1.ACommand {
                 return;
             }
             const diagnose = yield Language_1.getLanguage().features.diagnostic.update(sheetpath);
-            if (diagnose === Diagnostic_1.DiagnoseState.HasErrors) {
-                vscode.window.showErrorMessage(`Werckmeister: failed to compile`);
+            if (diagnose.hasErrors) {
+                vscode.window.showErrorMessage(`Werckmeister: ${diagnose.errorResult.errorMessage}`);
                 return;
             }
             this.startPlayer(sheetpath);

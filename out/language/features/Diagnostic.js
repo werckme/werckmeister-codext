@@ -14,11 +14,6 @@ const vscode = require("vscode");
 const Tools_1 = require("../../com/Tools");
 const extension_1 = require("../../extension");
 const FallbackCharactersRange = 5;
-var DiagnoseState;
-(function (DiagnoseState) {
-    DiagnoseState[DiagnoseState["IsValid"] = 0] = "IsValid";
-    DiagnoseState[DiagnoseState["HasErrors"] = 1] = "HasErrors";
-})(DiagnoseState = exports.DiagnoseState || (exports.DiagnoseState = {}));
 function createError(error) {
     const document = Tools_1.findDocument(error.sourceFile);
     if (!document) {
@@ -46,11 +41,11 @@ class Diagnostic {
             diagnosticMap.forEach((diags, file) => {
                 this.diagnosticCollection.set(vscode.Uri.parse(file), diags);
             });
-            return result.isError ? DiagnoseState.HasErrors : DiagnoseState.IsValid;
+            return result;
         });
     }
     updateDiagnostics(diagnosticMap, validation) {
-        if (!validation.isError || !validation.errorResult.sourceFile) {
+        if (!validation.hasErrors || !validation.errorResult.sourceFile) {
             return;
         }
         const error = validation.errorResult;
