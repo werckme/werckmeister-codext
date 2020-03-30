@@ -15,17 +15,19 @@ const Tools_1 = require("../../com/Tools");
 const extension_1 = require("../../extension");
 const FallbackCharactersRange = 5;
 function createError(error) {
-    const document = Tools_1.findDocument(error.sourceFile);
-    if (!document) {
-        return null;
-    }
-    const beginPosition = document.positionAt(error.positionBegin);
-    let range = document.getWordRangeAtPosition(beginPosition);
-    if (!range) {
-        range = new vscode.Range(beginPosition, beginPosition.translate(0, FallbackCharactersRange));
-    }
-    const result = new vscode.Diagnostic(range, error.errorMessage, vscode.DiagnosticSeverity.Error);
-    return result;
+    return __awaiter(this, void 0, void 0, function* () {
+        const document = yield Tools_1.findDocument(error.sourceFile);
+        if (!document) {
+            return null;
+        }
+        const beginPosition = document.positionAt(error.positionBegin);
+        let range = document.getWordRangeAtPosition(beginPosition);
+        if (!range) {
+            range = new vscode.Range(beginPosition, beginPosition.translate(0, FallbackCharactersRange));
+        }
+        const result = new vscode.Diagnostic(range, error.errorMessage, vscode.DiagnosticSeverity.Error);
+        return result;
+    });
 }
 class Diagnostic {
     constructor() {
@@ -37,7 +39,7 @@ class Diagnostic {
             const result = yield compiler.validate(sheetPath);
             this.diagnosticCollection.clear();
             let diagnosticMap = new Map();
-            this.updateDiagnostics(diagnosticMap, result);
+            yield this.updateDiagnostics(diagnosticMap, result);
             diagnosticMap.forEach((diags, file) => {
                 this.diagnosticCollection.set(vscode.Uri.parse(file), diags);
             });
@@ -45,21 +47,23 @@ class Diagnostic {
         });
     }
     updateDiagnostics(diagnosticMap, validation) {
-        if (!validation.hasErrors || !validation.errorResult.sourceFile) {
-            return;
-        }
-        const error = validation.errorResult;
-        let canonicalFile = vscode.Uri.file(validation.errorResult.sourceFile).toString();
-        let diagnostics = diagnosticMap.get(canonicalFile);
-        if (!diagnostics) {
-            diagnostics = [];
-        }
-        const diagnose = createError(error);
-        if (!diagnose) {
-            return;
-        }
-        diagnostics.push(diagnose);
-        diagnosticMap.set(canonicalFile, diagnostics);
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!validation.hasErrors || !validation.errorResult.sourceFile) {
+                return;
+            }
+            const error = validation.errorResult;
+            let canonicalFile = vscode.Uri.file(validation.errorResult.sourceFile).toString();
+            let diagnostics = diagnosticMap.get(canonicalFile);
+            if (!diagnostics) {
+                diagnostics = [];
+            }
+            const diagnose = yield createError(error);
+            if (!diagnose) {
+                return;
+            }
+            diagnostics.push(diagnose);
+            diagnosticMap.set(canonicalFile, diagnostics);
+        });
     }
 }
 exports.Diagnostic = Diagnostic;

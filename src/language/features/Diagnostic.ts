@@ -6,8 +6,8 @@ import { WMDiagnosticCollectionName } from "../../extension";
 const FallbackCharactersRange = 5;
 
 
-function createError(error: IValidationErrorResult): vscode.Diagnostic|null {
-    const document = findDocument(error.sourceFile);
+async function createError(error: IValidationErrorResult): Promise<vscode.Diagnostic|null> {
+    const document = await findDocument(error.sourceFile);
     if (!document) {
         return null;
     }
@@ -28,14 +28,14 @@ export class Diagnostic {
         const result = await compiler.validate(sheetPath);
         this.diagnosticCollection.clear();
         let diagnosticMap: Map<string, vscode.Diagnostic[]> = new Map();
-        this.updateDiagnostics(diagnosticMap, result);
+        await this.updateDiagnostics(diagnosticMap, result);
         diagnosticMap.forEach((diags, file) => {
             this.diagnosticCollection.set(vscode.Uri.parse(file), diags);
         });
         return result;
     }
 
-    private updateDiagnostics(diagnosticMap: Map<string, vscode.Diagnostic[]>, validation: ValidationResult): void {
+    private async updateDiagnostics(diagnosticMap: Map<string, vscode.Diagnostic[]>, validation: ValidationResult): Promise<void> {
         if (!validation.hasErrors || !validation.errorResult.sourceFile) {
             return;
         }
@@ -45,7 +45,7 @@ export class Diagnostic {
         if (!diagnostics) { 
             diagnostics = []; 
         }
-        const diagnose = createError(error);
+        const diagnose = await createError(error);
         if (!diagnose) {
             return;
         }

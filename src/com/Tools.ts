@@ -5,11 +5,6 @@ export function isSamePath(pathA:string, pathB: string): boolean {
     return result;
 }
 
-export function findDocument(filePath: string): vscode.TextDocument | undefined {
-    return vscode
-        .workspace
-        .textDocuments
-        .filter(x => isSamePath(x.fileName, filePath))
-        [0]
-    ;
+export async function findDocument(filePath: string): Promise<vscode.TextDocument> {
+   return vscode.workspace.openTextDocument(vscode.Uri.file(filePath));
 }
