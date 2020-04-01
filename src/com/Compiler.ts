@@ -25,12 +25,15 @@ export interface IValidationSource {
 
 export interface IWarning {
     message: string;
+    sourceId: number;
+    positionBegin: number;
+    sourceFile: string;
 }
 
 export interface IValidationResult {
     sources: IValidationSource[];
     duration: number;
-    warings: IWarning[];
+    warnings: IWarning[];
 }
 
 export interface IValidationErrorResult {
@@ -73,11 +76,11 @@ export class Compiler {
             this.process = this._execute(cmd, (err:any, stdout: any, stderr: any) => {
                 if (!!err) {
                     this.process = null;
-                    if (mode !== CompilerMode.validate) {
+                    if (mode !== CompilerMode.validate || !stdout) {
                         reject(stderr);
                         return;
                     }
-                    resolve(stdout.toString());
+                    resolve(stdout);
                     return;
                 }
                 resolve(stdout.toString());
@@ -87,7 +90,7 @@ export class Compiler {
     }
 
     async validate(sheetPath: string): Promise<ValidationResult> {
-        const str: string = await this.compile(sheetPath, CompilerMode.validate);
+        const str = await this.compile(sheetPath, CompilerMode.validate);
         const obj = JSON.parse(str);
         return new ValidationResult(obj);
     }

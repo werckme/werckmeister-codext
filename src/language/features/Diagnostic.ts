@@ -4,19 +4,25 @@ import { findDocument } from "../../com/Tools";
 import { WMDiagnosticCollectionName } from "../../extension";
 
 const FallbackCharactersRange = 5;
+enum DiagnosticType { waning, error };
+type DiagnosticMessage = {sourceFile: string, message: string, positionBegin: number, type: DiagnosticType};
 
-
-async function createError(error: IValidationErrorResult): Promise<vscode.Diagnostic|null> {
-    const document = await findDocument(error.sourceFile);
+async function createDiagnostic(message: DiagnosticMessage): Promise<vscode.Diagnostic|null> {
+    const document = await findDocument(message.sourceFile);
     if (!document) {
         return null;
     }
-    const beginPosition = document.positionAt(error.positionBegin);
+    const positon = message.positionBegin;
+    if (positon === undefined) {
+        return null;
+    }
+    const beginPosition = document.positionAt(positon);
     let range = document.getWordRangeAtPosition(beginPosition);
     if (!range) {
         range = new vscode.Range(beginPosition, beginPosition.translate(0, FallbackCharactersRange));
     }
-    const result = new vscode.Diagnostic(range, error.errorMessage, vscode.DiagnosticSeverity.Error);
+    const severity = message.type === DiagnosticType.error ? vscode.DiagnosticSeverity.Error : vscode.DiagnosticSeverity.Warning;
+    const result = new vscode.Diagnostic(range, message.message, severity);
     return result;
 }
 
@@ -36,20 +42,42 @@ export class Diagnostic {
     }
 
     private async updateDiagnostics(diagnosticMap: Map<string, vscode.Diagnostic[]>, validation: ValidationResult): Promise<void> {
-        if (!validation.hasErrors || !validation.errorResult.sourceFile) {
-            return;
+
+        const messages: DiagnosticMessage[] = [];
+        
+        if (validation.hasErrors && !!validation.errorResult.sourceFile) {
+            messages.push({
+                sourceFile: validation.errorResult.sourceFile,
+                message: validation.errorResult.errorMessage,
+                positionBegin: validation.errorResult.positionBegin,
+                type: DiagnosticType.error
+            });
         }
-        const error = validation.errorResult;
-        let canonicalFile = vscode.Uri.file(validation.errorResult.sourceFile).toString();
-        let diagnostics = diagnosticMap.get(canonicalFile);
-        if (!diagnostics) { 
-            diagnostics = []; 
+
+        if (!validation.hasErrors && validation.validationResult.warnings) {
+            for (var waning of validation.validationResult.warnings) {
+                messages.push({
+                    sourceFile: waning.sourceFile,
+                    message: waning.message,
+                    positionBegin: waning.positionBegin,
+                    type: DiagnosticType.waning
+                });
+            }
         }
-        const diagnose = await createError(error);
-        if (!diagnose) {
-            return;
+
+        for (const message of messages) {
+            let canonicalFile = vscode.Uri.file(message.sourceFile).toString();
+            let diagnostics = diagnosticMap.get(canonicalFile);
+            if (!diagnostics) { 
+                diagnostics = []; 
+            }
+            const diagnose = await createDiagnostic(message);
+            if (!diagnose) {
+                return;
+            }
+            diagnostics.push(diagnose);
+            diagnosticMap.set(canonicalFile, diagnostics);
         }
-        diagnostics.push(diagnose);
-        diagnosticMap.set(canonicalFile, diagnostics);
+        
     }
 }

@@ -30,15 +30,7 @@ class Play extends ACommand_1.ACommand {
         player.play(sheetPath)
             .then(() => { })
             .catch((ex) => {
-            vscode.window.showErrorMessage(`Werckmeister has dectected an error`, "show")
-                .then((item) => {
-                if (!item) {
-                    return;
-                }
-                if (item === 'show') {
-                    vscode.commands.executeCommand(extension_1.WMCommandPlayTerminal);
-                }
-            });
+            vscode.window.showErrorMessage(`failed to execute werckmeister: ${ex}`);
         });
         EditorEventDecorator_1.getEditorEventDecorator();
     }
@@ -53,12 +45,24 @@ class Play extends ACommand_1.ACommand {
                 vscode.window.showErrorMessage("no sheet file to play");
                 return;
             }
-            const diagnose = yield Language_1.getLanguage().features.diagnostic.update(sheetpath);
-            if (diagnose.hasErrors) {
-                vscode.window.showErrorMessage(`Werckmeister: ${diagnose.errorResult.errorMessage}`);
-                return;
+            try {
+                const diagnose = yield Language_1.getLanguage().features.diagnostic.update(sheetpath);
+                if (diagnose.hasErrors) {
+                    const sourcefile = diagnose.errorResult.sourceFile || "unkown location";
+                    vscode.window.showErrorMessage(` ${sourcefile}: ${diagnose.errorResult.errorMessage}`, 'Ok');
+                    return;
+                }
+                this.startPlayer(sheetpath);
             }
-            this.startPlayer(sheetpath);
+            catch (ex) {
+                vscode.window.showErrorMessage(`Failed to execute Werckmeister. 
+Make sure that the Werckmeister path was set correctly.
+Exception
+${ex}
+`, "Help").then(() => {
+                    vscode.env.openExternal(vscode.Uri.parse(extension_1.WMExternalHelpInstallWerckmeisterExtension));
+                });
+            }
         });
     }
 }

@@ -127,9 +127,9 @@ class Player {
         if (this.state === val) {
             return;
         }
-        console.log(PlayerState[val]);
         this._state = val;
         if (this._state === PlayerState.Stopped) {
+            this.begin = 0;
             this.reset();
         }
         this.playerMessage.emit(exports.OnPlayerStateChanged, this._state);

@@ -18,12 +18,6 @@ exports.isSamePath = isSamePath;
 function findDocument(filePath) {
     return __awaiter(this, void 0, void 0, function* () {
         return vscode.workspace.openTextDocument(vscode.Uri.file(filePath));
-        // return vscode
-        //     .workspace
-        //     .textDocuments
-        //     .filter(x => isSamePath(x.fileName, filePath))
-        //     [0]
-        // ;
     });
 }
 exports.findDocument = findDocument;

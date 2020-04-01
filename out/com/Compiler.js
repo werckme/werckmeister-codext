@@ -63,11 +63,11 @@ class Compiler {
                 this.process = this._execute(cmd, (err, stdout, stderr) => {
                     if (!!err) {
                         this.process = null;
-                        if (mode !== CompilerMode.validate) {
+                        if (mode !== CompilerMode.validate || !stdout) {
                             reject(stderr);
                             return;
                         }
-                        resolve(stdout.toString());
+                        resolve(stdout);
                         return;
                     }
                     resolve(stdout.toString());

@@ -10,6 +10,7 @@ import { ShowPianoView } from './commands/ShowPianoView';
 import { Pause } from './commands/Pause';
 import { ShowTransportView } from './commands/ShowTransportView';
 import { getSheetHistory } from './com/SheetHistory';
+import { PlayFromPosition } from './commands/PlayFromPosition';
 
 function excuteCommand(type: (new (context: vscode.ExtensionContext) => ACommand), context: vscode.ExtensionContext): void {
 	let cmd = new type(context);
@@ -18,25 +19,21 @@ function excuteCommand(type: (new (context: vscode.ExtensionContext) => ACommand
 }
 const _ns = "extension.werckmeister";
 export const WMCommandPlay = `${_ns}.play`;
-export const WMCommandPlayTerminal = `${_ns}.terminal.play`;
 export const WMCommandStop = `${_ns}.stop`;
 export const WMCommandPause = `${_ns}.pause`;
+export const WMPlayFromPosition = `${_ns}.playFromPosition`;
 export const WMCommandOpenSheeView = `${_ns}.sheetview`;
 export const WMCommandOpenPianoView = `${_ns}.pianoview`;
 export const WMCommandOpenTransportView = `${_ns}.transportview`;
 export const WMDiagnosticCollectionName = "werckmeister";
-
+export const WMExternalHelpInstallWerckmeisterExtension = "https://werckme.github.io/code-extension";
 let diagnosticCollection: vscode.DiagnosticCollection;
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 	
-	let disposable = vscode.commands.registerCommand(WMCommandPlayTerminal, excuteCommand.bind(null, PlayTerminal, context));
-	context.subscriptions.push(disposable);
-
-	
-	disposable = vscode.commands.registerCommand(WMCommandPlay, excuteCommand.bind(null, Play, context));
+	let disposable = vscode.commands.registerCommand(WMCommandPlay, excuteCommand.bind(null, Play, context));
 	context.subscriptions.push(disposable);
 
 	disposable = vscode.commands.registerCommand(WMCommandStop, excuteCommand.bind(null, Stop, context));
@@ -52,6 +49,9 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);	
 	
 	disposable = vscode.commands.registerCommand(WMCommandOpenTransportView, excuteCommand.bind(null, ShowTransportView, context));
+	context.subscriptions.push(disposable);		
+
+	disposable = vscode.commands.registerCommand(WMPlayFromPosition, excuteCommand.bind(null, PlayFromPosition, context));
 	context.subscriptions.push(disposable);		
 
 	diagnosticCollection = vscode.languages.createDiagnosticCollection(WMDiagnosticCollectionName);

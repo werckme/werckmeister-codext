@@ -15,6 +15,9 @@
         "onCommand:extension.werckmeister.playFromPosition",
         "onCommand:extension.werckmeister.stop",
         "onCommand:extension.werckmeister.pause",
+        "onCommand:extension.werckmeister.sheetview",
+        "onCommand:extension.werckmeister.pianoview",
+        "onCommand:extension.werckmeister.transportview",
         "onLanguage:werckmeister"
     ],
     "main": "./out/extension.js",
@@ -30,7 +33,7 @@
             },
             {
                 "command": "extension.werckmeister.playFromPosition",
-                "title": "Werckmeister: Play At Position"
+                "title": "Werckmeister: Start Playback At Position"
             },
             {
                 "command": "extension.werckmeister.stop",
@@ -55,6 +58,14 @@
                     "light": "./resources/monitor_light.svg",
                     "dark": "./resources/monitor_dark.svg"
                 }
+            },
+            {
+                "command": "extension.werckmeister.pianoview",
+                "title": "Werckmeister: PianoView"
+            },
+            {
+                "command": "extension.werckmeister.transportview",
+                "title": "Werckmeister: Show Transport"
             }
         ],
         "menus": {
@@ -84,14 +95,13 @@
                     "command": "extension.werckmeister.play"
                 },
                 {
-                    "when": "resourceExtname == .sheet",
-                    "command": "extension.werckmeister.playFromPosition"
-                },
-                {
                     "command": "extension.werckmeister.stop"
                 },
                 {
                     "command": "extension.werckmeister.pause"
+                },
+                {
+                    "command": "extension.werckmeister.transportview"
                 }
             ]
         },
