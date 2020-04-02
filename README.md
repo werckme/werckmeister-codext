@@ -9,11 +9,15 @@ This extension provides support for the [Werckmeister](https://werckme.github.io
 ## Features
 
 * MIDI Playback from source
-* Syntax highlighting
 * Playback visualization
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/playbackvis.gif">
+* Syntax highlighting
 * Error Highlighting
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/errorvis.gif">
 * Warning Highlighting
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/warningvis.gif">
 * Start playback at random position
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/startfrompos.gif">
 
 ## Prerequisites
 
@@ -25,3 +29,5 @@ With a default Werckmeister installation, the Werckmeister compiler should be ac
 If Visual Studio Code is not able to execute the Werckmeister compiler you are able set the installation path via the extension setup:
 
 *Preferences -> Settings -> Extensions -> Werckmeister Binary Directory*
+
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/pathsetup.png">
