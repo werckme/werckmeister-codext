@@ -122,7 +122,7 @@
                 "werckmeister.werckmeisterBinaryDirectory": {
                     "type": "string",
                     "default": null,
-                    "description": "Specifies the folder path containing the executables \"sheetp\" and \"sheetc\"."
+                    "description": "Specifiy the folder path where the executables \"sheetp\" and \"sheetc\" are located."
                 }
             }
         }
