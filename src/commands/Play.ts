@@ -4,14 +4,41 @@ import { getPlayer, Player } from '../com/Player';
 import * as path from 'path';
 import { getEditorEventDecorator } from "../com/EditorEventDecorator";
 import { getSheetHistory } from "../com/SheetHistory";
-import { WMExternalHelpInstallWerckmeisterExtension } from "../extension";
+import { WMExternalHelpInstallWerckmeisterExtension, WMExternalWerckmeisterDownload } from "../extension";
 import { getLanguage } from "../language/Language";
+import { VersionMismatchException } from "../com/Compiler";
 
 export function isSheetFile(strPath:string): boolean {
     if (path.extname(strPath) === '.sheet') {
         return true;
     }
     return false;
+}
+
+function showCompilerError(ex: Error) 
+{
+    const action = "Help";
+    vscode.window.showErrorMessage(`Failed to execute Werckmeister. 
+    Make sure that the Werckmeister path was set correctly.
+    ${ex}
+    `, action).then((val)=>{
+        if (val !== action) {
+            return;
+        }
+        vscode.env.openExternal(vscode.Uri.parse(WMExternalHelpInstallWerckmeisterExtension));
+    });
+}
+
+function showVersionMismatchError(ex: VersionMismatchException) 
+{
+    const action = "Get Latest Version";
+    vscode.window.showErrorMessage(`Oh Weh! Failed to execute Werckmeister. The min. required Werckmeister version is ${ex.minimumVersion}.
+You are using version ${ex.currentVersion}.`, action).then((val)=>{
+        if (val !== action) {
+            return;
+        }
+        vscode.env.openExternal(vscode.Uri.parse(WMExternalWerckmeisterDownload));
+    });
 }
 
 export class Play extends ACommand {
@@ -45,14 +72,14 @@ export class Play extends ACommand {
                 return;
             }
             this.startPlayer(sheetpath);
-        } catch (ex) {
-            vscode.window.showErrorMessage(`Failed to execute Werckmeister. 
-Make sure that the Werckmeister path was set correctly.
-Exception
-${ex}
-`, "Help").then(()=>{
-    vscode.env.openExternal(vscode.Uri.parse(WMExternalHelpInstallWerckmeisterExtension));
-});
+        } 
+        catch (ex) {
+            if (ex instanceof VersionMismatchException) {
+                showVersionMismatchError(ex as VersionMismatchException);
+            } else {
+                showCompilerError(ex);
+            }
+           
         }
     }
 }

@@ -17,6 +17,7 @@ const EditorEventDecorator_1 = require("../com/EditorEventDecorator");
 const SheetHistory_1 = require("../com/SheetHistory");
 const extension_1 = require("../extension");
 const Language_1 = require("../language/Language");
+const Compiler_1 = require("../com/Compiler");
 function isSheetFile(strPath) {
     if (path.extname(strPath) === '.sheet') {
         return true;
@@ -24,6 +25,28 @@ function isSheetFile(strPath) {
     return false;
 }
 exports.isSheetFile = isSheetFile;
+function showCompilerError(ex) {
+    const action = "Help";
+    vscode.window.showErrorMessage(`Failed to execute Werckmeister. 
+    Make sure that the Werckmeister path was set correctly.
+    ${ex}
+    `, action).then((val) => {
+        if (val !== action) {
+            return;
+        }
+        vscode.env.openExternal(vscode.Uri.parse(extension_1.WMExternalHelpInstallWerckmeisterExtension));
+    });
+}
+function showVersionMismatchError(ex) {
+    const action = "Get Latest Version";
+    vscode.window.showErrorMessage(`Oh Weh! Failed to execute Werckmeister. The min. required Werckmeister version is ${ex.minimumVersion}.
+You are using version ${ex.currentVersion}.`, action).then((val) => {
+        if (val !== action) {
+            return;
+        }
+        vscode.env.openExternal(vscode.Uri.parse(extension_1.WMExternalWerckmeisterDownload));
+    });
+}
 class Play extends ACommand_1.ACommand {
     startPlayer(sheetPath) {
         let player = Player_1.getPlayer();
@@ -55,13 +78,12 @@ class Play extends ACommand_1.ACommand {
                 this.startPlayer(sheetpath);
             }
             catch (ex) {
-                vscode.window.showErrorMessage(`Failed to execute Werckmeister. 
-Make sure that the Werckmeister path was set correctly.
-Exception
-${ex}
-`, "Help").then(() => {
-                    vscode.env.openExternal(vscode.Uri.parse(extension_1.WMExternalHelpInstallWerckmeisterExtension));
-                });
+                if (ex instanceof Compiler_1.VersionMismatchException) {
+                    showVersionMismatchError(ex);
+                }
+                else {
+                    showCompilerError(ex);
+                }
             }
         });
     }

@@ -25,6 +25,8 @@ exports.WMCommandOpenPianoView = `${_ns}.pianoview`;
 exports.WMCommandOpenTransportView = `${_ns}.transportview`;
 exports.WMDiagnosticCollectionName = "werckmeister";
 exports.WMExternalHelpInstallWerckmeisterExtension = "https://werckme.github.io/code-extension";
+exports.WMExternalWerckmeisterDownload = "https://werckme.github.io/getting-started";
+exports.WMMinimumWerckmeisterCompilerVersion = "0.1.53";
 let diagnosticCollection;
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed

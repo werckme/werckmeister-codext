@@ -27,6 +27,8 @@ export const WMCommandOpenPianoView = `${_ns}.pianoview`;
 export const WMCommandOpenTransportView = `${_ns}.transportview`;
 export const WMDiagnosticCollectionName = "werckmeister";
 export const WMExternalHelpInstallWerckmeisterExtension = "https://werckme.github.io/code-extension";
+export const WMExternalWerckmeisterDownload = "https://werckme.github.io/getting-started";
+export const WMMinimumWerckmeisterCompilerVersion = "0.1.53";
 let diagnosticCollection: vscode.DiagnosticCollection;
 
 // this method is called when your extension is activated

@@ -1,9 +1,9 @@
 /**
  * executes the werckmeister compiler: sheetc
  */
-
 import { exec, ChildProcess, ExecException } from 'child_process';
 import { IsWindows, toWMBINPath } from './Player';
+import { WMMinimumWerckmeisterCompilerVersion } from '../extension';
 
 export const CompilerExecutable = IsWindows ? 'sheetc.exe' : 'sheetc';
 
@@ -13,8 +13,11 @@ export enum CompilerMode {
     validate = "validate"
 }
 
+let _lastVersionCheckSucceed: boolean = false;
+
 export class Params {
-    constructor(public sheetPath: string, public mode:CompilerMode = CompilerMode.normal) {
+    getVersion: boolean = false;
+    constructor(public sheetPath: string = "", public mode:CompilerMode = CompilerMode.normal) {
     }
 };
 
@@ -43,6 +46,17 @@ export interface IValidationErrorResult {
     errorMessage: string;
 }
 
+export class VersionMismatchException extends Error {
+    constructor(public currentVersion: string, public minimumVersion: string = WMMinimumWerckmeisterCompilerVersion) {
+        super(`minimum required Werckmeister version is ${minimumVersion}`);
+    }
+}
+
+export function werckmeisterVersionToNumber(version: string) {
+    version = version.replace(/\./g, "");
+    return Number.parseInt(version);
+}
+
 export class ValidationResult {
     constructor(public source: IValidationResult|IValidationErrorResult) {}
     get hasErrors(): boolean {
@@ -65,18 +79,40 @@ export class Compiler {
         return toWMBINPath(CompilerExecutable);
     }
     
+    async getVersion(): Promise<string> {
+       const params = new Params();
+       params.getVersion = true;
+       let version = await this.executeCompiler(params);
+       version = version.split("@")[0];
+       return version;
+    }
+
+    async checkVersion() {
+        if (_lastVersionCheckSucceed) {
+            return;
+        }
+        const strVersion:string = await this.getVersion();
+        const version:number = werckmeisterVersionToNumber(strVersion);
+        const minVersion:number = werckmeisterVersionToNumber(WMMinimumWerckmeisterCompilerVersion);
+        
+        if (version >= minVersion) {
+            _lastVersionCheckSucceed = true;
+            return;
+        }
+        throw new VersionMismatchException(strVersion);
+    }
+
     private _execute(cmd:string, callback: (err:any, stdout: any, stderr: any)=>void): ChildProcess {
         return exec(cmd, callback);
     }
 
-    async compile(sheetPath: string, mode: CompilerMode = CompilerMode.normal): Promise<string> {
-        const params = new Params(sheetPath, mode);
+    protected async executeCompiler(params: Params): Promise<string>  {
         return new Promise((resolve, reject)=>{
             let cmd = `${this.wmCompilerPath} ${this.paramsToString(params)}`;
             this.process = this._execute(cmd, (err:any, stdout: any, stderr: any) => {
                 if (!!err) {
                     this.process = null;
-                    if (mode !== CompilerMode.validate || !stdout) {
+                    if (params.mode !== CompilerMode.validate || !stdout) {
                         reject(stderr);
                         return;
                     }
@@ -89,6 +125,12 @@ export class Compiler {
         });
     }
 
+    async compile(sheetPath: string, mode: CompilerMode = CompilerMode.normal): Promise<string> {
+        await this.checkVersion();
+        const params = new Params(sheetPath, mode);
+        return this.executeCompiler(params);
+    }
+
     async validate(sheetPath: string): Promise<ValidationResult> {
         const str = await this.compile(sheetPath, CompilerMode.validate);
         const obj = JSON.parse(str);
@@ -97,6 +139,9 @@ export class Compiler {
 
 
     private paramsToString(params: Params) {
+        if (params.getVersion) {
+            return "--version";
+        }
         if (!params.sheetPath) {
             throw new Error('missing sheet path');
         }
