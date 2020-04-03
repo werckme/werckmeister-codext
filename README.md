@@ -14,16 +14,16 @@ This extension provides support for the [Werckmeister](https://werckme.github.io
 * Error & Warning highlighting
 * Start playback at random position
 
-**MIDI Playback from source**
+**Playback visualization**
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/playbackvis.gif">
 
-**Playback visualization**
+**Error highlighting**
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/errorvis.gif">
 
-**Error highlighting**
+**Warning highlighting**
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/warningvis.gif">
 
-**Warning highlighting**
+**Start playback at random position**
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/startfrompos.gif">
 
 
