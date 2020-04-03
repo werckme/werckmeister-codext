@@ -10,14 +10,22 @@ This extension provides support for the [Werckmeister](https://werckme.github.io
 
 * MIDI Playback from source
 * Playback visualization
-<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/playbackvis.gif">
 * Syntax highlighting
-* Error Highlighting
-<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/errorvis.gif">
-* Warning Highlighting
-<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/warningvis.gif">
+* Error & Warning highlighting
 * Start playback at random position
+
+**MIDI Playback from source**
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/playbackvis.gif">
+
+**Playback visualization**
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/errorvis.gif">
+
+**Error highlighting**
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/warningvis.gif">
+
+**Warning highlighting**
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/startfrompos.gif">
+
 
 ## Prerequisites
 
