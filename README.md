@@ -1,5 +1,3 @@
-<img src="https://raw.githubusercontent.com/SambaGodschynski/werckmeister/master/assets/Logo_med.png" style="display: block; margin: autos; height: 120px; float: right"><br><br><br>
-
 # Werckmeister
 
 This extension provides support for the [Werckmeister](https://werckme.github.io) sheet music compiler.

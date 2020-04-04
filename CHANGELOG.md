@@ -1,9 +1,9 @@
 # Change Log
 
-All notable changes to the "fck" extension will be documented in this file.
+## Version 0.1.0
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
-## [Unreleased]
-
-- Initial release
+- MIDI Playback from source
+- Playback visualization
+- Syntax highlighting
+- Error & Warning highlighting
+- Start playback at random position
