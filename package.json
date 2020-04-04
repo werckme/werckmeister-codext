@@ -47,14 +47,6 @@
                     "light": "./resources/pause_light.svg",
                     "dark": "./resources/pause_dark.svg"
                 }
-            },
-            {
-                "command": "extension.werckmeister.sheetview",
-                "title": "Werckmeister: Sheet Monitor",
-                "icon": {
-                    "light": "./resources/monitor_light.svg",
-                    "dark": "./resources/monitor_dark.svg"
-                }
             }
         ],
         "menus": {
@@ -66,14 +58,17 @@
             ],
             "editor/title": [
                 {
+                    "when": "resourceExtname == .sheet",
                     "command": "extension.werckmeister.play",
                     "group": "navigation"
                 },
                 {
+                    "when": "resourceExtname == .sheet",
                     "command": "extension.werckmeister.pause",
                     "group": "navigation"
                 },
                 {
+                    "when": "resourceExtname == .sheet",
                     "command": "extension.werckmeister.stop",
                     "group": "navigation"
                 }
