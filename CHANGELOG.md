@@ -1,9 +1,15 @@
 # Change Log
 
-All notable changes to the "fck" extension will be documented in this file.
+## Version 0.1.1
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+### Bugfixes
 
-## [Unreleased]
+ - [stop dosen't work on windows](https://github.com/werckme/werckmeister-codext/issues/6)
 
-- Initial release
+## Version 0.1.0
+
+- MIDI Playback from source
+- Playback visualization
+- Syntax highlighting
+- Error & Warning highlighting
+- Start playback at random position

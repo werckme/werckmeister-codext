@@ -8,7 +8,7 @@ import * as EventEmitter from 'events';
 import { ISheetInfo, IWarning } from './SheetInfo';
 import * as vscode from 'vscode';
 import * as path from 'path';
-
+import * as _ from "lodash";
 
 const freeUdpPort = require('udp-free-port');
 export const IsWindows:boolean = process.platform === 'win32';
@@ -101,12 +101,27 @@ export class Player {
     begin: number = 0;
     private _sheetTime: number = 0;
     private lastUpdateTimestamp = 0;
+
+    get inTransition(): boolean {
+        return this.state === PlayerState.StartPlaying
+            || this.state === PlayerState.Stopping
+            || this.state === PlayerState.Pausing;
+    }
+
+    get isStateChangeLocked(): boolean {
+        return this.inTransition;
+    }
+
     get wmPlayerPath(): string {
         return toWMBINPath(PlayerExecutable);
     }
 
     get isPlaying(): boolean {
         return !!this.process;
+    }
+
+    get isStopped(): boolean {
+        return this.state === PlayerState.Stopped;
     }
 
     get sheetTime(): number {
@@ -127,9 +142,11 @@ export class Player {
     private reset() {
         this.currentFile = null;
         this.sheetTime = 0;
+        this._pid = 0;
         this.lastUpdateTimestamp = 0;
     }
     set state(val: PlayerState) {
+        console.log(`${PlayerState[this.state]}->${PlayerState[val]}`, this._pid);
         if (this.state === val) {
             return;
         }
@@ -137,6 +154,9 @@ export class Player {
         if (this._state === PlayerState.Stopped) {
             this.begin = 0;
             this.reset();
+        }
+        if (this._state === PlayerState.Paused) {
+            this._pid = 0;
         }
         this.playerMessage.emit(OnPlayerStateChanged, this._state);
     }
@@ -224,35 +244,54 @@ export class Player {
     }
 
     async play(sheetPath: string): Promise<void> {
+        if (this.isPlaying || this.isStateChangeLocked) {
+            return;
+        }
+        const config = new Config();
+        if (this.state === PlayerState.Paused) {
+            config.begin = this.sheetTime;
+        } else {
+            config.begin = this.begin;
+        }
+        this.state = PlayerState.StartPlaying;
         this.currentFile = sheetPath;
         await this.updateDocumentInfo();
         this.notifyDocumentWarningsIfAny();
-        return this._startPlayer(sheetPath);
+        return this._startPlayer(sheetPath, config);
     }
 
-    pause(): Promise<void> {
+    async pause(): Promise<void> {
+        if (this.isStateChangeLocked) {
+            return;
+        }
         this.state = PlayerState.Pausing;
-        return this.stop();
+        return new Promise((resolve, reject) => {
+            if (!this.isPlaying) {
+                resolve();
+                return;
+            }
+            this.stopUdpListener();
+            killProcess(this.process as ChildProcess,  this._pid);
+            let waitUntilEnd = () => {
+                if (!this.isPlaying) {
+                    resolve();
+                    this.state = PlayerState.Paused;
+                    return;
+                }
+                setTimeout(waitUntilEnd, 100);
+            }
+            waitUntilEnd();
+        });
     }
 
-    private async _startPlayer(sheetPath: string): Promise<void> {
+    private async _startPlayer(sheetPath: string, config: Config): Promise<void> {
         return new Promise(async (resolve, reject) => {
-            if (this.isPlaying) {
-                await this.stop(); // restart
-            }
             const nextFreePort = await getFreeUdpPort();
-            const config = new Config();
             config.funkfeuer = true;
             config.watch = true;
             config.port = nextFreePort;
             config.sheetPath = sheetPath;
-            if (this.state === PlayerState.Paused) {
-                config.begin = this.sheetTime;
-            } else {
-                config.begin = this.begin;
-            }
             let cmd = `${this.wmPlayerPath} ${this.configToString(config)}`;
-            this.state = PlayerState.StartPlaying;
             this.process = this._execute(cmd, (err:any, stdout: any, stderr: any) => {
                 if (!!err) {
                     reject(stderr);
@@ -273,25 +312,18 @@ export class Player {
         });
     }
 
-    stop(): Promise<void> {
+    async stop(): Promise<void> {
+        if (this.isStopped || this.isStateChangeLocked) {
+            return;
+        }
+        this.state = PlayerState.Stopping;
         return new Promise((resolve, reject) => {
-            if (this.state === PlayerState.Paused) {
-                this.state = PlayerState.Stopped;
-            }
-            if (!this.isPlaying) {
-                resolve();
-                return;
-            }
             this.stopUdpListener();
-            if (this.state !== PlayerState.Pausing) {
-                this.state = PlayerState.Stopping;
-            }
             killProcess(this.process as ChildProcess,  this._pid);
-            this._pid = 0;
             let waitUntilEnd = () => {
-                if (!this.isPlaying) {
+                if (!this.isStopped) {
                     resolve();
-                    this.state = this.state === PlayerState.Stopping ? PlayerState.Stopped : PlayerState.Paused;
+                    this.state = PlayerState.Stopped;
                     return;
                 }
                 setTimeout(waitUntilEnd, 100);
