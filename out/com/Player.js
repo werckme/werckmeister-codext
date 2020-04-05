@@ -100,11 +100,22 @@ class Player {
         this._sheetTime = 0;
         this.lastUpdateTimestamp = 0;
     }
+    get inTransition() {
+        return this.state === PlayerState.StartPlaying
+            || this.state === PlayerState.Stopping
+            || this.state === PlayerState.Pausing;
+    }
+    get isStateChangeLocked() {
+        return this.inTransition;
+    }
     get wmPlayerPath() {
         return toWMBINPath(exports.PlayerExecutable);
     }
     get isPlaying() {
         return !!this.process;
+    }
+    get isStopped() {
+        return this.state === PlayerState.Stopped;
     }
     get sheetTime() {
         return this._sheetTime;
@@ -121,9 +132,11 @@ class Player {
     reset() {
         this.currentFile = null;
         this.sheetTime = 0;
+        this._pid = 0;
         this.lastUpdateTimestamp = 0;
     }
     set state(val) {
+        console.log(`${PlayerState[this.state]}->${PlayerState[val]}`, this._pid);
         if (this.state === val) {
             return;
         }
@@ -131,6 +144,9 @@ class Player {
         if (this._state === PlayerState.Stopped) {
             this.begin = 0;
             this.reset();
+        }
+        if (this._state === PlayerState.Paused) {
+            this._pid = 0;
         }
         this.playerMessage.emit(exports.OnPlayerStateChanged, this._state);
     }
@@ -213,36 +229,57 @@ class Player {
     }
     play(sheetPath) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (this.isPlaying || this.isStateChangeLocked) {
+                return;
+            }
+            const config = new Config();
+            if (this.state === PlayerState.Paused) {
+                config.begin = this.sheetTime;
+            }
+            else {
+                config.begin = this.begin;
+            }
+            this.state = PlayerState.StartPlaying;
             this.currentFile = sheetPath;
             yield this.updateDocumentInfo();
             this.notifyDocumentWarningsIfAny();
-            return this._startPlayer(sheetPath);
+            return this._startPlayer(sheetPath, config);
         });
     }
     pause() {
-        this.state = PlayerState.Pausing;
-        return this.stop();
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.isStateChangeLocked) {
+                return;
+            }
+            this.state = PlayerState.Pausing;
+            return new Promise((resolve, reject) => {
+                if (!this.isPlaying) {
+                    resolve();
+                    return;
+                }
+                this.stopUdpListener();
+                killProcess(this.process, this._pid);
+                let waitUntilEnd = () => {
+                    if (!this.isPlaying) {
+                        resolve();
+                        this.state = PlayerState.Paused;
+                        return;
+                    }
+                    setTimeout(waitUntilEnd, 100);
+                };
+                waitUntilEnd();
+            });
+        });
     }
-    _startPlayer(sheetPath) {
+    _startPlayer(sheetPath, config) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-                if (this.isPlaying) {
-                    yield this.stop(); // restart
-                }
                 const nextFreePort = yield getFreeUdpPort();
-                const config = new Config();
                 config.funkfeuer = true;
                 config.watch = true;
                 config.port = nextFreePort;
                 config.sheetPath = sheetPath;
-                if (this.state === PlayerState.Paused) {
-                    config.begin = this.sheetTime;
-                }
-                else {
-                    config.begin = this.begin;
-                }
                 let cmd = `${this.wmPlayerPath} ${this.configToString(config)}`;
-                this.state = PlayerState.StartPlaying;
                 this.process = this._execute(cmd, (err, stdout, stderr) => {
                     if (!!err) {
                         reject(stderr);
@@ -264,29 +301,24 @@ class Player {
         });
     }
     stop() {
-        return new Promise((resolve, reject) => {
-            if (this.state === PlayerState.Paused) {
-                this.state = PlayerState.Stopped;
-            }
-            if (!this.isPlaying) {
-                resolve();
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.isStopped || this.isStateChangeLocked) {
                 return;
             }
-            this.stopUdpListener();
-            if (this.state !== PlayerState.Pausing) {
-                this.state = PlayerState.Stopping;
-            }
-            killProcess(this.process, this._pid);
-            this._pid = 0;
-            let waitUntilEnd = () => {
-                if (!this.isPlaying) {
-                    resolve();
-                    this.state = this.state === PlayerState.Stopping ? PlayerState.Stopped : PlayerState.Paused;
-                    return;
-                }
-                setTimeout(waitUntilEnd, 100);
-            };
-            waitUntilEnd();
+            this.state = PlayerState.Stopping;
+            return new Promise((resolve, reject) => {
+                this.stopUdpListener();
+                killProcess(this.process, this._pid);
+                let waitUntilEnd = () => {
+                    if (!this.isStopped) {
+                        resolve();
+                        this.state = PlayerState.Stopped;
+                        return;
+                    }
+                    setTimeout(waitUntilEnd, 100);
+                };
+                waitUntilEnd();
+            });
         });
     }
     notifyDocumentWarningsIfAny() {
