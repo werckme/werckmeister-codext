@@ -11,11 +11,12 @@ import { Pause } from './commands/Pause';
 import { ShowTransportView } from './commands/ShowTransportView';
 import { getSheetHistory } from './com/SheetHistory';
 import { PlayFromPosition } from './commands/PlayFromPosition';
+import {LensProvider} from './language/features/LensProvider';
 
-function excuteCommand(type: (new (context: vscode.ExtensionContext) => ACommand), context: vscode.ExtensionContext): void {
+function excuteCommand(type: (new (context: vscode.ExtensionContext) => ACommand), context: vscode.ExtensionContext, ...args:[]): void {
 	let cmd = new type(context);
+	cmd.args = args;
 	cmd.execute();
-
 }
 const _ns = "extension.werckmeister";
 export const WMCommandPlay = `${_ns}.play`;
@@ -26,6 +27,7 @@ export const WMCommandOpenSheeView = `${_ns}.sheetview`;
 export const WMCommandOpenPianoView = `${_ns}.pianoview`;
 export const WMCommandOpenTransportView = `${_ns}.transportview`;
 export const WMDiagnosticCollectionName = "werckmeister";
+export const WMMode = "werckmeister";
 export const WMExternalHelpInstallWerckmeisterExtension = "https://werckme.github.io/code-extension";
 export const WMExternalWerckmeisterDownload = "https://werckme.github.io/getting-started";
 export const WMMinimumWerckmeisterCompilerVersion = "0.1.53";
@@ -58,6 +60,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 	diagnosticCollection = vscode.languages.createDiagnosticCollection(WMDiagnosticCollectionName);
 	context.subscriptions.push(diagnosticCollection);
+
+	context.subscriptions.push(vscode.languages.registerCodeLensProvider(WMMode, new LensProvider()));
 
 	getSheetHistory(); // create singleton
 }

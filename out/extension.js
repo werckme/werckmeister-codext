@@ -11,8 +11,10 @@ const Pause_1 = require("./commands/Pause");
 const ShowTransportView_1 = require("./commands/ShowTransportView");
 const SheetHistory_1 = require("./com/SheetHistory");
 const PlayFromPosition_1 = require("./commands/PlayFromPosition");
-function excuteCommand(type, context) {
+const LensProvider_1 = require("./language/features/LensProvider");
+function excuteCommand(type, context, ...args) {
     let cmd = new type(context);
+    cmd.args = args;
     cmd.execute();
 }
 const _ns = "extension.werckmeister";
@@ -24,6 +26,7 @@ exports.WMCommandOpenSheeView = `${_ns}.sheetview`;
 exports.WMCommandOpenPianoView = `${_ns}.pianoview`;
 exports.WMCommandOpenTransportView = `${_ns}.transportview`;
 exports.WMDiagnosticCollectionName = "werckmeister";
+exports.WMMode = "werckmeister";
 exports.WMExternalHelpInstallWerckmeisterExtension = "https://werckme.github.io/code-extension";
 exports.WMExternalWerckmeisterDownload = "https://werckme.github.io/getting-started";
 exports.WMMinimumWerckmeisterCompilerVersion = "0.1.53";
@@ -47,6 +50,7 @@ function activate(context) {
     context.subscriptions.push(disposable);
     diagnosticCollection = vscode.languages.createDiagnosticCollection(exports.WMDiagnosticCollectionName);
     context.subscriptions.push(diagnosticCollection);
+    context.subscriptions.push(vscode.languages.registerCodeLensProvider(exports.WMMode, new LensProvider_1.LensProvider()));
     SheetHistory_1.getSheetHistory(); // create singleton
 }
 exports.activate = activate;

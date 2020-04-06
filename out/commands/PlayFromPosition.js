@@ -14,10 +14,17 @@ const Play_1 = require("./Play");
 const Player_1 = require("../com/Player");
 let _lastPosition = 0;
 class PlayFromPosition extends Play_1.Play {
-    execute() {
-        const _super = Object.create(null, {
-            execute: { get: () => super.execute }
-        });
+    get startPositionArg() {
+        if (!this.args || this.args.length === 0) {
+            return undefined;
+        }
+        const quarters = Number.parseFloat(this.args[0]);
+        if (Number.isNaN(quarters)) {
+            return undefined;
+        }
+        return quarters;
+    }
+    getPositionFromInput() {
         return __awaiter(this, void 0, void 0, function* () {
             const input = yield vscode.window.showInputBox({ value: _lastPosition.toString(), prompt: "start position in quarters" });
             if (input === undefined) {
@@ -25,6 +32,21 @@ class PlayFromPosition extends Play_1.Play {
             }
             const quarters = Number.parseFloat(input);
             if (Number.isNaN(quarters)) {
+                return undefined;
+            }
+            return quarters;
+        });
+    }
+    execute() {
+        const _super = Object.create(null, {
+            execute: { get: () => super.execute }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            let quarters = this.startPositionArg;
+            if (quarters === undefined) {
+                quarters = yield this.getPositionFromInput();
+            }
+            if (quarters === undefined) {
                 return;
             }
             _lastPosition = quarters;

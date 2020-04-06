@@ -10,7 +10,8 @@ export const CompilerExecutable = IsWindows ? 'sheetc.exe' : 'sheetc';
 export enum CompilerMode {
     normal = "normal",
     json = "json",
-    validate = "validate"
+    validate = "validate",
+    analyze = "analyze"
 }
 
 let _lastVersionCheckSucceed: boolean = false;
@@ -33,10 +34,19 @@ export interface IWarning {
     sourceFile: string;
 }
 
+export interface IBarEvent {
+    sourceId: number;
+    positionBegin: number;
+    quarterPosition: number;
+    barCount: number;
+    barLength: number;
+}
+
 export interface IValidationResult {
     sources: IValidationSource[];
     duration: number;
     warnings: IWarning[];
+    barEvents: IBarEvent[];
 }
 
 export interface IValidationErrorResult {
@@ -68,6 +78,15 @@ export class ValidationResult {
 
     get errorResult(): IValidationErrorResult {
         return this.source as IValidationErrorResult;
+    }
+}
+
+export class AnalyzeResult extends ValidationResult {
+    constructor(public source: IValidationResult|IValidationErrorResult) {
+        super(source);
+    }
+    get barEvents(): IBarEvent[] {
+        return this.validationResult.barEvents;
     }
 }
 
@@ -135,6 +154,12 @@ export class Compiler {
         const str = await this.compile(sheetPath, CompilerMode.validate);
         const obj = JSON.parse(str);
         return new ValidationResult(obj);
+    }
+
+    async analyze(sheetPath: string): Promise<AnalyzeResult> {
+        const str = await this.compile(sheetPath, CompilerMode.analyze);
+        const obj = JSON.parse(str);
+        return new AnalyzeResult(obj);
     }
 
 

@@ -21,6 +21,7 @@ var CompilerMode;
     CompilerMode["normal"] = "normal";
     CompilerMode["json"] = "json";
     CompilerMode["validate"] = "validate";
+    CompilerMode["analyze"] = "analyze";
 })(CompilerMode = exports.CompilerMode || (exports.CompilerMode = {}));
 let _lastVersionCheckSucceed = false;
 class Params {
@@ -60,6 +61,16 @@ class ValidationResult {
     }
 }
 exports.ValidationResult = ValidationResult;
+class AnalyzeResult extends ValidationResult {
+    constructor(source) {
+        super(source);
+        this.source = source;
+    }
+    get barEvents() {
+        return this.validationResult.barEvents;
+    }
+}
+exports.AnalyzeResult = AnalyzeResult;
 class Compiler {
     constructor() {
         this._pid = 0;
@@ -127,6 +138,13 @@ class Compiler {
             const str = yield this.compile(sheetPath, CompilerMode.validate);
             const obj = JSON.parse(str);
             return new ValidationResult(obj);
+        });
+    }
+    analyze(sheetPath) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const str = yield this.compile(sheetPath, CompilerMode.analyze);
+            const obj = JSON.parse(str);
+            return new AnalyzeResult(obj);
         });
     }
     paramsToString(params) {
