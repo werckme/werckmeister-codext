@@ -14,11 +14,11 @@ const Compiler_1 = require("../../com/Compiler");
 const Play_1 = require("../../commands/Play");
 const Tools_1 = require("../../com/Tools");
 const extension_1 = require("../../extension");
-class BarposCommand {
+class PlayFromHereCommand {
     constructor(quarterPos) {
         this.title = "";
         this.command = "";
-        this.title = quarterPos.toString();
+        this.title = `▶ ${quarterPos.toFixed(1)}`;
         this.command = extension_1.WMPlayFromPosition;
         this.arguments = [quarterPos.toString()];
         this.tooltip = "playback from here";
@@ -28,14 +28,14 @@ function findSourceId(document, analyzeResult) {
     return analyzeResult.validationResult.sources
         .filter(x => Tools_1.isSamePath(x.path, document.fileName))[0].sourceId;
 }
-function getBarPosLenses(document, sourceId, analyzeResult) {
+function getPlayFromHereLenses(document, sourceId, analyzeResult) {
     const result = [];
     let currentLine = -1;
-    for (const barPos of analyzeResult.barEvents) {
-        if (barPos.sourceId !== sourceId) {
+    for (const analyzerEvent of analyzeResult.analyzerEvents) {
+        if (analyzerEvent.sourceId !== sourceId) {
             continue;
         }
-        const docPos = document.positionAt(barPos.positionBegin);
+        const docPos = document.positionAt(analyzerEvent.positionBegin);
         if (docPos.line === currentLine) {
             // just one per line
             continue;
@@ -46,8 +46,8 @@ function getBarPosLenses(document, sourceId, analyzeResult) {
             continue;
         }
         // get the previous bar
-        const quarterPos = Math.max(barPos.quarterPosition - barPos.barLength, 0);
-        var lens = new vscode.CodeLens(range, new BarposCommand(quarterPos));
+        const quarterPos = Math.max(analyzerEvent.quarterPosition, 0);
+        var lens = new vscode.CodeLens(range, new PlayFromHereCommand(quarterPos));
         result.push(lens);
     }
     return result;
@@ -66,7 +66,7 @@ class LensProvider {
                 return;
             }
             const sourceId = findSourceId(document, analyzeResult);
-            const lenses = getBarPosLenses(document, sourceId, analyzeResult);
+            const lenses = getPlayFromHereLenses(document, sourceId, analyzeResult);
             resolve(lenses);
         }));
     }

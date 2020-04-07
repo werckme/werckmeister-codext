@@ -69,6 +69,9 @@ class AnalyzeResult extends ValidationResult {
     get barEvents() {
         return this.validationResult.barEvents;
     }
+    get analyzerEvents() {
+        return this.validationResult.analyzerEvents;
+    }
 }
 exports.AnalyzeResult = AnalyzeResult;
 class Compiler {

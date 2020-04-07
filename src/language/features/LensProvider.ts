@@ -4,13 +4,13 @@ import { isSheetFile } from "../../commands/Play";
 import { isSamePath } from "../../com/Tools";
 import { WMPlayFromPosition } from "../../extension";
 
-class BarposCommand implements vscode.Command {
+class PlayFromHereCommand implements vscode.Command {
     title: string = "";
     command: string = "";
     tooltip?: string | undefined;
     arguments?: any[] | undefined;
     constructor(quarterPos: number) {
-        this.title = quarterPos.toString();
+        this.title = `▶ ${quarterPos.toFixed(1)}`;
         this.command = WMPlayFromPosition;
         this.arguments = [quarterPos.toString()];
         this.tooltip = "playback from here";
@@ -23,14 +23,14 @@ function findSourceId (document: vscode.TextDocument, analyzeResult: AnalyzeResu
         [0].sourceId;
 }
 
-function getBarPosLenses(document: vscode.TextDocument, sourceId: number, analyzeResult: AnalyzeResult): vscode.CodeLens[] {
+function getPlayFromHereLenses(document: vscode.TextDocument, sourceId: number, analyzeResult: AnalyzeResult): vscode.CodeLens[] {
     const result: vscode.CodeLens[] = [];
     let currentLine = -1;
-    for (const barPos of analyzeResult.barEvents) {
-        if (barPos.sourceId !== sourceId) {
+    for (const analyzerEvent of analyzeResult.analyzerEvents) {
+        if (analyzerEvent.sourceId !== sourceId) {
             continue;
         }
-        const docPos = document.positionAt(barPos.positionBegin);
+        const docPos = document.positionAt(analyzerEvent.positionBegin);
         if (docPos.line === currentLine) {
             // just one per line
             continue;
@@ -41,8 +41,8 @@ function getBarPosLenses(document: vscode.TextDocument, sourceId: number, analyz
             continue;
         }
         // get the previous bar
-        const quarterPos = Math.max(barPos.quarterPosition - barPos.barLength, 0);
-        var lens = new vscode.CodeLens(range, new BarposCommand(quarterPos));
+        const quarterPos = Math.max(analyzerEvent.quarterPosition, 0);
+        var lens = new vscode.CodeLens(range, new PlayFromHereCommand(quarterPos));
         result.push(lens);
     }
     return result;
@@ -64,7 +64,7 @@ export class LensProvider implements vscode.CodeLensProvider {
                 return;
             }
             const sourceId = findSourceId(document, analyzeResult);
-            const lenses = getBarPosLenses(document, sourceId, analyzeResult);
+            const lenses = getPlayFromHereLenses(document, sourceId, analyzeResult);
             resolve(lenses);
         });
     }

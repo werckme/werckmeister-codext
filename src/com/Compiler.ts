@@ -4,6 +4,7 @@
 import { exec, ChildProcess, ExecException } from 'child_process';
 import { IsWindows, toWMBINPath } from './Player';
 import { WMMinimumWerckmeisterCompilerVersion } from '../extension';
+import { type } from 'os';
 
 export const CompilerExecutable = IsWindows ? 'sheetc.exe' : 'sheetc';
 
@@ -34,12 +35,20 @@ export interface IWarning {
     sourceFile: string;
 }
 
-export interface IBarEvent {
-    sourceId: number;
-    positionBegin: number;
-    quarterPosition: number;
+export type TextPosition = number;
+export type Quarters = number;
+export type SourceId = number;
+
+export interface IAnylzerEvent {
+    sourceId: SourceId;
+    positionBegin: TextPosition;
+    quarterPosition: Quarters;
+    duration: Quarters;
+}
+
+export interface IBarEvent extends IAnylzerEvent {
     barCount: number;
-    barLength: number;
+    barLength: Quarters;
 }
 
 export interface IValidationResult {
@@ -47,6 +56,7 @@ export interface IValidationResult {
     duration: number;
     warnings: IWarning[];
     barEvents: IBarEvent[];
+    analyzerEvents: IAnylzerEvent[];
 }
 
 export interface IValidationErrorResult {
@@ -87,6 +97,10 @@ export class AnalyzeResult extends ValidationResult {
     }
     get barEvents(): IBarEvent[] {
         return this.validationResult.barEvents;
+    }
+
+    get analyzerEvents(): IAnylzerEvent[] {
+        return this.validationResult.analyzerEvents;
     }
 }
 
