@@ -1,5 +1,12 @@
 # Change Log
 
+## Version 0.1.2
+
+### Bugfixes
+
+ - [playback highlighting doesn't start](https://github.com/werckme/werckmeister-codext/issues/9)
+ - [player fails to execute if warning is missing its source file](https://github.com/werckme/werckmeister-codext/issues/10)
+
 ## Version 0.1.1
 
 ### Bugfixes
