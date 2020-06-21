@@ -44,13 +44,13 @@ You are using version ${ex.currentVersion}.`, action).then((val)=>{
 export class Play extends ACommand {
 
     startPlayer(sheetPath:string) {
+        getEditorEventDecorator(); // initiate singleton, do it before start playback
         let player:Player = getPlayer();
         player.play(sheetPath) 
         .then(()=>{})
         .catch((ex)=>{
             vscode.window.showErrorMessage(`failed to execute werckmeister: ${ex}`)
         });
-        getEditorEventDecorator();
     }
 
     async execute(): Promise<void> {
@@ -62,7 +62,7 @@ export class Play extends ACommand {
         if (!sheetpath) {
             vscode.window.showErrorMessage("no sheet file to play");
             return;
-        }
+        }getEditorEventDecorator();
         
         try {
             const diagnose = await getLanguage().features.diagnostic.update(sheetpath);

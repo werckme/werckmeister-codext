@@ -56,6 +56,9 @@ export class Diagnostic {
 
         if (!validation.hasErrors && validation.validationResult.warnings) {
             for (var waning of validation.validationResult.warnings) {
+                if (!waning.sourceFile) {
+                    continue;
+                }
                 messages.push({
                     sourceFile: waning.sourceFile,
                     message: waning.message,

@@ -239,10 +239,10 @@ class Player {
             else {
                 config.begin = this.begin;
             }
-            this.state = PlayerState.StartPlaying;
             this.currentFile = sheetPath;
             yield this.updateDocumentInfo();
             this.notifyDocumentWarningsIfAny();
+            this.state = PlayerState.StartPlaying;
             return this._startPlayer(sheetPath, config);
         });
     }
