@@ -4,6 +4,8 @@ tsconfig.json
 dist
 *.vsix
 
+./out/*
+
 ### VisualStudioCode ###
 .vscode/*
 !.vscode/settings.json

@@ -304,7 +304,7 @@ export class Player {
                 resolve();
                 this.stopUdpListener();
                 this.process = null;
-                if (this.state === PlayerState.Playing) {
+                if (this.state === PlayerState.Playing || this.state === PlayerState.StartPlaying) {
                     this.state = PlayerState.Stopped;
                 }
             });
