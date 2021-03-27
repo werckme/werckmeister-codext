@@ -1,5 +1,13 @@
 # Change Log
 
+## Version 0.1.31
+* Changelog updated
+
+## Version 0.1.3
+### Bugfixes
+
+- [player got into a state where it was'nt possible to start playback](https://github.com/werckme/werckmeister-codext/issues/13)
+- some error messages got no information 
 ## Version 0.1.1
 
 ### Bugfixes

@@ -294,7 +294,10 @@ export class Player {
             let cmd = `${this.wmPlayerPath} ${this.configToString(config)}`;
             this.process = this._execute(cmd, (err:any, stdout: any, stderr: any) => {
                 if (!!err) {
-                    reject(stderr);
+                    // due to a bug in the player it may happen that a part of
+                    // the error message is written to stdout
+                    const errorMessage = `${stderr} ${stdout}`;
+                    reject(errorMessage);
                     this.process = null;
                     this.currentFile = null;
                     this.stopUdpListener();
