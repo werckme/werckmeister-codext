@@ -62,8 +62,9 @@ export function activate(context: vscode.ExtensionContext) {
 				return getLanguage().features.autoComplete.complete(document, position, token, context);
 			},
 		
-	}, ...['/']);
+	}, ...['/', '_', '=', '"']);
 	context.subscriptions.push(disposable);		
+	
 	diagnosticCollection = vscode.languages.createDiagnosticCollection(WMDiagnosticCollectionName);
 	context.subscriptions.push(diagnosticCollection);
 
