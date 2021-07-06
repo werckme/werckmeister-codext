@@ -19,7 +19,6 @@ export class SourceDocument implements ISourceDocument {
     }
     public async getAbsolutePath(): Promise<string> {
         const file = this.document.uri.fsPath;
-        console.log("DOC PATH", file)
         return file;
     }
 }
