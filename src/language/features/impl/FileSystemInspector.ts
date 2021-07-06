@@ -4,7 +4,6 @@ import * as fs from 'fs';
 
 export class FileSystemInspector implements IFileSystemInspector {
     public async ls(dir: Path): Promise<FileInfo[]> {
-        console.log("DIR", dir)
         if (!fs.existsSync(dir)) {
             return [];
         }

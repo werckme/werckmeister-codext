@@ -1,7 +1,8 @@
-import { ISuggestion, LanguageFeatures } from "@werckmeister/language-features";
+import { ISuggestion, LanguageFeatures, IPathSuggestion } from "@werckmeister/language-features";
 import * as vscode from 'vscode';
 import { ActiveSourceDocument } from "./impl/SourceDocument";
 import "regenerator-runtime/runtime";
+import { ICommandSuggestion } from "@werckmeister/language-features/features/autocomplete/ICommandSuggestion";
 
 export class AutoComplete {
     constructor(private languageFeatures: LanguageFeatures) {
@@ -9,7 +10,18 @@ export class AutoComplete {
     }
     
     private createItem(suggestion: ISuggestion): vscode.CompletionItem {
-        return new vscode.CompletionItem(suggestion.text);
+        const item = new vscode.CompletionItem(suggestion.displayText);
+        item.insertText = suggestion.text;
+        item.kind = vscode.CompletionItemKind.Value;
+        if ((suggestion as IPathSuggestion).file) {
+            const pathSuggestion = suggestion as IPathSuggestion;
+            item.kind = pathSuggestion.file.isDirectory ? vscode.CompletionItemKind.Folder : vscode.CompletionItemKind.File;
+        }
+        if ((suggestion as ICommandSuggestion).command) {
+            const commandSuggestion = suggestion as ICommandSuggestion;
+            item.kind = commandSuggestion.parameter === null ? vscode.CompletionItemKind.Variable : vscode.CompletionItemKind.Value; 
+        }
+        return item;
     }
     public async complete(document: vscode.TextDocument, position: vscode.Position, 
         token: vscode.CancellationToken, context: vscode.CompletionContext): Promise<vscode.CompletionItem[]> {
