@@ -9,9 +9,13 @@ export class AutoComplete {
 
     }
     
-    private createItem(suggestion: ISuggestion): vscode.CompletionItem {
+    private createItem(suggestion: ISuggestion, index: number): vscode.CompletionItem {
         const item = new vscode.CompletionItem(suggestion.displayText);
+        const OrderOffsetToCompensateLexicographicOrdering = 10000000;
         item.insertText = suggestion.text;
+        item.filterText = suggestion.text;
+
+        item.sortText = (index + OrderOffsetToCompensateLexicographicOrdering).toString();
         item.kind = vscode.CompletionItemKind.Value;
         if ((suggestion as IPathSuggestion).file) {
             const pathSuggestion = suggestion as IPathSuggestion;
@@ -28,7 +32,8 @@ export class AutoComplete {
             const doc = new ActiveSourceDocument(document, position);
             try {
                 const suggestions = await this.languageFeatures.autoComplete(doc);
-                return suggestions.map(suggestion => this.createItem(suggestion));
+                const items = suggestions.map((suggestion, index) => this.createItem(suggestion, index));
+                return items;
             } catch(ex) {
                 console.error("werckmeister suggestions error", ex);
                 return [];

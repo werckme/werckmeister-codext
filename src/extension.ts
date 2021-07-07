@@ -57,9 +57,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);		
 	
 	disposable = vscode.languages.registerCompletionItemProvider({ scheme: 'file', language: 'werckmeister' }, {
-		provideCompletionItems: (document: vscode.TextDocument, position: vscode.Position, 
+		provideCompletionItems: async (document: vscode.TextDocument, position: vscode.Position, 
 			token: vscode.CancellationToken, context: vscode.CompletionContext) => {
-				return getLanguage().features.autoComplete.complete(document, position, token, context);
+				const items = await getLanguage().features.autoComplete.complete(document, position, token, context);
+				return items;
 			},
 		
 	}, ...['/', '_', '=', '"']);
