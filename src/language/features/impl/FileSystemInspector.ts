@@ -3,6 +3,9 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 export class FileSystemInspector implements IFileSystemInspector {
+    public async resolve(basePath: Path, path_: Path): Promise<Path> {
+        return path.resolve(basePath, path_);
+    }
     public async ls(dir: Path): Promise<FileInfo[]> {
         if (!fs.existsSync(dir)) {
             return [];
