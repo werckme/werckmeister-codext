@@ -42,9 +42,7 @@ export class Diagnostic {
     }
 
     private async updateDiagnostics(diagnosticMap: Map<string, vscode.Diagnostic[]>, validation: ValidationResult): Promise<void> {
-
         const messages: DiagnosticMessage[] = [];
-        
         if (validation.hasErrors && !!validation.errorResult.sourceFile) {
             messages.push({
                 sourceFile: validation.errorResult.sourceFile,
@@ -53,7 +51,6 @@ export class Diagnostic {
                 type: DiagnosticType.error
             });
         }
-
         if (!validation.hasErrors && validation.validationResult.warnings) {
             for (var waning of validation.validationResult.warnings) {
                 if (!waning.sourceFile) {
@@ -67,7 +64,6 @@ export class Diagnostic {
                 });
             }
         }
-
         for (const message of messages) {
             let canonicalFile = vscode.Uri.file(message.sourceFile).toString();
             let diagnostics = diagnosticMap.get(canonicalFile);
@@ -81,6 +77,5 @@ export class Diagnostic {
             diagnostics.push(diagnose);
             diagnosticMap.set(canonicalFile, diagnostics);
         }
-        
     }
 }

@@ -1,4 +1,6 @@
 # Change Log
+## Version 0.1.4
+ - [stop dosen't work on ubuntu](https://github.com/werckme/werckmeister-codext/issues/16)
 
 ## Version 0.1.31
 * Changelog updated
