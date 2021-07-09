@@ -9,8 +9,8 @@ This extension provides support for the [Werckmeister](https://werckme.github.io
 * MIDI Playback from source
 * Playback visualization
 * Syntax highlighting
+* Autocompletion
 * Error & Warning highlighting
-* Start playback at random position
 
 **Playback visualization**
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/playbackvis.gif">
