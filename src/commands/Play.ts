@@ -62,8 +62,9 @@ export class Play extends ACommand {
         if (!sheetpath) {
             vscode.window.showErrorMessage("no sheet file to play");
             return;
-        }getEditorEventDecorator();
-        
+        }
+
+        getEditorEventDecorator();
         try {
             const diagnose = await getLanguage().features.diagnostic.update(sheetpath);
             if (diagnose.hasErrors) {
@@ -77,7 +78,7 @@ export class Play extends ACommand {
             if (ex instanceof VersionMismatchException) {
                 showVersionMismatchError(ex as VersionMismatchException);
             } else {
-                showCompilerError(ex);
+                showCompilerError(ex as Error);
             }
            
         }

@@ -5,7 +5,7 @@
     "description": "Werckmeister for VS Code",
     "icon": "resources/Logo.png",
     "repository": "https://github.com/werckme/werckmeister-codext",
-    "version": "0.1.50",
+    "version": "0.1.51",
     "engines": {
         "vscode": "^1.38.0"
     },
@@ -17,6 +17,7 @@
         "onCommand:extension.werckmeister.playFromPosition",
         "onCommand:extension.werckmeister.stop",
         "onCommand:extension.werckmeister.pause",
+        "onCommand:extension.werckmeister.debugger",
         "onLanguage:werckmeister"
     ],
     "main": "./dist/extension.js",
@@ -49,6 +50,10 @@
                     "light": "./resources/pause_light.svg",
                     "dark": "./resources/pause_dark.svg"
                 }
+            },
+            {
+                "command": "extension.werckmeister.debugger",
+                "title": "Werckmeister: Open Debugger"
             }
         ],
         "menus": {
@@ -125,7 +130,7 @@
         }
     },
     "scripts": {
-        "compile": "tsc -p ./",
+        "compile": "tsc -p ./ && npm run build-webviewapp",
         "watch": "tsc -watch -p ./",
         "pretest": "npm run compile",
         "test": "node ./out/test/runTest.js",
@@ -159,6 +164,7 @@
     "dependencies": {
         "@types/lodash": "^4.14.144",
         "@werckmeister/language-features": "1.0.0-33",
+        "@werckmeister/midi-debugger": "^1.1.10-dev-3",
         "ace-builds": "^1.4.6",
         "antd": "^3.24.2",
         "lodash": "^4.17.15",

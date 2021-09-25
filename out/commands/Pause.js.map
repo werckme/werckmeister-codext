@@ -1,0 +1,1 @@
+{"version":3,"file":"Pause.js","sourceRoot":"","sources":["../../src/commands/Pause.ts"],"names":[],"mappings":";;;;;;;;;;;AAAA,yCAAsC;AAEtC,0CAAkD;AAGlD,MAAa,KAAM,SAAQ,mBAAQ;IAEzB,OAAO;;YACT,MAAM,MAAM,GAAU,kBAAS,EAAE,CAAC;YAClC,IAAI,CAAC,MAAM,CAAC,SAAS,EAAE;gBACnB,OAAO;aACV;YACD,MAAM,CAAC,KAAK,EAAE,CAAC;QACnB,CAAC;KAAA;CACJ;AATD,sBASC"}
