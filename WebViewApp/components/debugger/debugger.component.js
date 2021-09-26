@@ -15,7 +15,9 @@ export class DebuggerComponent extends BaseComponent {
             playerState: "",
             duration: 0,
             dbg: "",
-            midiData: null
+            midiData: null,
+            sheetPath: "",
+            sheetName: ""
         }
        
         window.addEventListener('message', event => { // get vscode message
@@ -40,7 +42,9 @@ export class DebuggerComponent extends BaseComponent {
         }
         if(message.compiled) {
             const compileResult = message.compiled;
-            this.setState({midiData: compileResult.midi.midiData});
+            this.setState({midiData: compileResult.midi.midiData, 
+                sheetPath: message.sheetPath,
+                sheetName: message.sheetName});
         }
     }
 
@@ -64,6 +68,7 @@ export class DebuggerComponent extends BaseComponent {
                     playerState={this.state.playerState} 
                     position={this.state.sheetTime}>
                 </TransportComponent>
+                <h2> {this.state.sheetName} </h2>
                 <MidiViewComponent midiData={this.state.midiData}></MidiViewComponent>
             </div>
         );

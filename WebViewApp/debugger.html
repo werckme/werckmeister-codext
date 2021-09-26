@@ -7,10 +7,36 @@
       <style>
           #debugger-view {
               color: black;
+              position: relative;
+              top: 43px;
           }
           #debugger-view .chkbx-grp {
               background: none;
+              top: 100px; 
+
           }
+          #debugger-view .chkbx-grp > div {
+            clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 49%, calc(100% - 8px) 100%, 0 100%);
+          }
+          .ccontainer {
+            z-index: 20;
+            background: black;
+            position: fixed;
+            top: 0;
+            width: 339px !important;
+            font-weight: lighter;
+            font-family: monospace;
+            box-shadow: black 5px 6px 12px 0px;
+          }
+          h2 {
+            position: relative;
+            top: 42px;
+            text-align: right;
+          }
+          .ccontainer input {
+              background: black;
+          }
+
       </style>
       <div id="debugger-main-component"></div>
       <div id="debugger-view"></div>

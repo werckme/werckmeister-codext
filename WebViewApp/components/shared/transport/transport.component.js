@@ -58,6 +58,7 @@ export class TransportComponent extends BaseComponent {
                             "play stop display range-to";
                         width: 288px;
                         font-weight: lighter;
+                        font-family: monospace;
                     }
                     .btn-play, .btn-paused {
                         grid-area: play;

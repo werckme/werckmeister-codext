@@ -29,6 +29,12 @@ export class Debugger extends AWebView {
 		this.viewReady = new Promise(resolve => {
 			this.onViewReady = resolve;
 		});
+		if (vscode.window.activeTextEditor) {
+			const currentDocumentPath = vscode.window.activeTextEditor.document.fileName;
+			this.viewReady.then(() => {
+				this.compileAndUpdate(currentDocumentPath);
+			})
+		}
 	}
 
 	startTitleUpdater() {
@@ -65,28 +71,38 @@ export class Debugger extends AWebView {
 		return compileResult;
 	}
 
-	private async sendCompileResult(compileResult: any) {
+	private async sendCompileResult(sheetPath: string, compileResult: any) {
 		if (!this.currentPanel) {
 			return;
 		}
-		this.currentPanel.webview.postMessage({compiled: compileResult});
+		const sheetName = path.basename(sheetPath);
+		this.currentPanel.webview.postMessage({compiled: compileResult, sheetPath, sheetName});
 	}
 
-	async onPlayerStateChanged(state: PlayerState) {
+
+	async compileAndUpdate(sheetPath: string) {
+		if (!sheetPath) {
+			return;
+		}
+		const fileExt = path.extname(sheetPath);
+		if (fileExt !== '.sheet') {
+			return;
+		}
+		const compileResult = await this.compile(sheetPath);
+		this.sendCompileResult(sheetPath, compileResult);
+	}
+
+	onPlayerStateChanged(state: PlayerState) {
 		this.currentPanel!.webview.postMessage({
 			playerState: {newState: PlayerState[state]}
 		});
 		if (state===PlayerState.Playing) {
 			this.updateSheetSourceMapAndSend();
-			this.startTitleUpdater();
 			const player = getPlayer();
-			const compileResult = await this.compile(player.currentFile!);
-			this.sendCompileResult(compileResult);
-			
+			this.compileAndUpdate(player.currentFile!);
 		}
 		if (state===PlayerState.Stopped) {
 			this.currentPanel!.title = ViewTitle;
-			this.stopTitleUpdater();
 		}
 	}
 
