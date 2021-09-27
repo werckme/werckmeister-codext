@@ -123,7 +123,7 @@ export class TransportComponent extends BaseComponent {
                         onChange={this.onBeginChanged.bind(this)} 
                         disabled={this.props.playerState === PlayerState.Playing}
                         min="0"/>
-	                <input className="range-to" type="number" value={this.props.sheetDuration.toFixed(0)} disabled/>
+	                <input className="range-to" type="number" value={this.props.sheetDuration.toFixed(0) / this.props.ppq || 1 } disabled/>
                 </div>
                 {this.props.playerState}
             </div>

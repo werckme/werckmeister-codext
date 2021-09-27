@@ -12,7 +12,7 @@ import { ShowTransportView } from './commands/ShowTransportView';
 import { getSheetHistory } from './com/SheetHistory';
 import { PlayFromPosition } from './commands/PlayFromPosition';
 import { getLanguage } from './language/Language';
-import { ShowDebugger } from './commands/ShowDebugger';
+import { ShowInspector } from './commands/ShowInspector';
 
 function excuteCommand(type: (new (context: vscode.ExtensionContext) => ACommand), context: vscode.ExtensionContext): void {
 	let cmd = new type(context);
@@ -26,7 +26,7 @@ export const WMPlayFromPosition = `${_ns}.playFromPosition`;
 export const WMCommandOpenSheeView = `${_ns}.sheetview`;
 export const WMCommandOpenPianoView = `${_ns}.pianoview`;
 export const WMCommandOpenTransportView = `${_ns}.transportview`;
-export const WMCommandOpenDebugger = `${_ns}.debugger`;
+export const WMCommandOpenDebugger = `${_ns}.inspector`;
 export const WMDiagnosticCollectionName = "werckmeister";
 export const WMExternalHelpInstallWerckmeisterExtension = "https://werckme.github.io/code-extension";
 export const WMExternalWerckmeisterDownload = "https://werckme.github.io/getting-started";
@@ -55,7 +55,7 @@ export function activate(context: vscode.ExtensionContext) {
 	disposable = vscode.commands.registerCommand(WMCommandOpenTransportView, excuteCommand.bind(null, ShowTransportView, context));
 	context.subscriptions.push(disposable);	
 	
-	disposable = vscode.commands.registerCommand(WMCommandOpenDebugger, excuteCommand.bind(null, ShowDebugger, context));
+	disposable = vscode.commands.registerCommand(WMCommandOpenDebugger, excuteCommand.bind(null, ShowInspector, context));
 	context.subscriptions.push(disposable);	
 
 	disposable = vscode.commands.registerCommand(WMPlayFromPosition, excuteCommand.bind(null, PlayFromPosition, context));

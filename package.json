@@ -17,7 +17,7 @@
         "onCommand:extension.werckmeister.playFromPosition",
         "onCommand:extension.werckmeister.stop",
         "onCommand:extension.werckmeister.pause",
-        "onCommand:extension.werckmeister.debugger",
+        "onCommand:extension.werckmeister.inspector",
         "onLanguage:werckmeister"
     ],
     "main": "./dist/extension.js",
@@ -52,8 +52,8 @@
                 }
             },
             {
-                "command": "extension.werckmeister.debugger",
-                "title": "Werckmeister: Open Debugger"
+                "command": "extension.werckmeister.inspector",
+                "title": "Werckmeister: Open Inspector"
             }
         ],
         "menus": {
@@ -164,7 +164,7 @@
     "dependencies": {
         "@types/lodash": "^4.14.144",
         "@werckmeister/language-features": "1.0.0-33",
-        "@werckmeister/midi-debugger": "^1.1.10-dev-4",
+        "@werckmeister/midi-debugger": "^1.1.10-dev-6",
         "ace-builds": "^1.4.6",
         "antd": "^3.24.2",
         "lodash": "^4.17.15",

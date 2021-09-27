@@ -23,6 +23,9 @@ export class MidiViewComponent extends React.Component {
             return;
         }
         this.updateMidiView();
+        if (this.props.onMidiFile) {
+            this.props.onMidiFile(this.dbgMidi.midifile);
+        }
     }
 
     updateMidiView() {
