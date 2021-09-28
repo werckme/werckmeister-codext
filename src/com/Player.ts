@@ -124,6 +124,10 @@ export class Player {
         return this.state === PlayerState.Stopped;
     }
 
+    get isPaused(): boolean {
+        return this.state === PlayerState.Paused;
+    }
+
     get sheetTime(): number {
         return this._sheetTime;
     }
@@ -333,11 +337,15 @@ export class Player {
         if (this.isStopped || this.isStateChangeLocked) {
             return;
         }
+        if (this.isPaused) {
+            this.state = PlayerState.Stopped;
+            return;
+        }
         this.state = PlayerState.Stopping;
         return new Promise((resolve, reject) => {
             this.stopUdpListener();
             killProcess(this.process as ChildProcess,  this._pid);
-            let waitUntilEnd = () => {
+            let waitUntilEnd = () => { // will be stopped after _startPlayer process exits
                 if (!this.isStopped) {
                     resolve();
                     this.state = PlayerState.Stopped;

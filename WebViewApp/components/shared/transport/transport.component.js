@@ -119,13 +119,14 @@ export class TransportComponent extends BaseComponent {
                         <span>{ _.padStart(position.toFixed(2), 2+4, "0") }</span>
                     </div>
                     <input className="range-from" type="number" 
-                        value={this.state.begin} 
+                        value={this.state.begin}
+                        title="Begin Time (qtrs)"
                         onChange={this.onBeginChanged.bind(this)} 
                         disabled={this.props.playerState === PlayerState.Playing}
                         min="0"/>
-	                <input className="range-to" type="number" value={this.props.sheetDuration.toFixed(0) / this.props.ppq || 1 } disabled/>
+	                <input title="End Time (qtrs)" className="range-to" type="number" value={this.props.sheetDuration.toFixed(0) / this.props.ppq || 1 } disabled/>
+                    <span className="transport-state">{this.props.playerState || 'Stopped'}</span>
                 </div>
-                {this.props.playerState}
             </div>
         );
     }

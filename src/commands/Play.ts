@@ -54,6 +54,7 @@ export class Play extends ACommand {
     }
 
     async execute(): Promise<void> {
+        console.log("WM COMMAND: PLAY");
         const history = getSheetHistory();
         let sheetpath = history.currentFile;
         if (!sheetpath) {

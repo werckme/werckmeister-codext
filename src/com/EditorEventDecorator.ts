@@ -30,12 +30,21 @@ export class EditorEventDecorator {
 
 	onPlayerStateChanged(state: PlayerState) {
         if (state===PlayerState.Stopped) {
-            vscode.window.activeTextEditor!.setDecorations(EventDecorationType, []);
+            this.removeDecorationsOnAllSheetEditors();
         }
         if (state===PlayerState.StartPlaying) {
             this.updateSheetInfo();
         }
 	}
+
+    removeDecorationsOnAllSheetEditors() {
+        for (let visibleEditor of vscode.window.visibleTextEditors) {
+            const pathExt = path.extname(visibleEditor.document.fileName);
+            if (pathExt === '.sheet' || pathExt === '.template') {
+                visibleEditor.setDecorations(EventDecorationType, []);
+            }
+        }
+    }
 
     getSourceInfo(id:number): ISourceInfo|undefined {
         return this.sources.get(id);

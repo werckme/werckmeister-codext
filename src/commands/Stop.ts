@@ -3,10 +3,10 @@ import * as vscode from 'vscode';
 import { basename } from 'path';
 
 import { getPlayer, Player } from '../com/Player';
-import { getEditorEventDecorator } from "../com/EditorEventDecorator";
 
 export class Stop extends ACommand {
     async execute(): Promise<void> {
+        console.log("WM COMMAND: STOP");
         let player:Player = getPlayer();
         player.stop()
             .then(()=>{})

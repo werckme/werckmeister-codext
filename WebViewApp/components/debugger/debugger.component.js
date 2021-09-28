@@ -4,6 +4,18 @@ import { TransportComponent } from "../shared/transport/transport.component";
 import { BaseComponent } from "../shared/base/base.component";
 import { MidiViewComponent } from "./midiview.component";
 
+const MsgMissingMidiData = <div>
+    No MIDI data available. You have two options to fix this: 
+    <ol>
+        <li>
+            Trigger a view update by saving a ".sheet" file.
+        </li>
+        <li>
+            Start the playback of a ".sheet" file
+        </li>
+    </ol>
+</div>;
+
 export class DebuggerComponent extends BaseComponent {
     constructor(props) {
         super(props);
@@ -20,7 +32,7 @@ export class DebuggerComponent extends BaseComponent {
             sheetName: "",
             ppq: 0
         }
-       
+        this.compileResult = null;
         window.addEventListener('message', event => { // get vscode message
             const message = event.data;
             this.handleMessage(message);
@@ -42,8 +54,8 @@ export class DebuggerComponent extends BaseComponent {
             this.updateDuration(message.duration);
         }
         if(message.compiled) {
-            const compileResult = message.compiled;
-            this.setState({midiData: compileResult.midi.midiData, 
+            this.compileResult = message.compiled;
+            this.setState({midiData: this.compileResult.midi.midiData, 
                 sheetPath: message.sheetPath,
                 sheetName: message.sheetName});
         }
@@ -64,11 +76,13 @@ export class DebuggerComponent extends BaseComponent {
     onMidiFile(midifile) {
         if (midifile) {
             const ppq = midifile.header.getTicksPerBeat();
+            this.setState({duration: this.compileResult.midi.duration});
             this.setState({ppq});
         }
     }
 
     render() {
+        const message = !this.state.midiData ? <div className="error-message">{MsgMissingMidiData}</div> : <span></span>;
         return (
             <div>
                 <TransportComponent 
@@ -78,7 +92,8 @@ export class DebuggerComponent extends BaseComponent {
                     ppq={this.state.ppq}>
                 </TransportComponent>
                 <h2> {this.state.sheetName} </h2>
-                <MidiViewComponent midiData={this.state.midiData} onMidiFile={(x) => this.onMidiFile(x)}></MidiViewComponent>
+                {message}
+                <MidiViewComponent midiData={this.state.midiData} onMidiFile={(x) => this.onMidiFile(x)}></MidiViewComponent> 
             </div>
         );
     }

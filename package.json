@@ -94,6 +94,10 @@
                 },
                 {
                     "command": "extension.werckmeister.pause"
+                },
+                {
+                    "when": "resourceExtname == .sheet",
+                    "command": "extension.werckmeister.inspector"
                 }
             ]
         },
