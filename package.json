@@ -5,7 +5,7 @@
     "description": "Werckmeister for VS Code",
     "icon": "resources/Logo.png",
     "repository": "https://github.com/werckme/werckmeister-codext",
-    "version": "0.1.60",
+    "version": "1.2.3",
     "engines": {
         "vscode": "^1.38.0"
     },
@@ -58,7 +58,6 @@
                     "light": "./resources/werckmeister_light.svg",
                     "dark": "./resources/werckmeister_dark.svg"
                 }
-                
             }
         ],
         "menus": {
