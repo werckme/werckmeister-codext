@@ -5,7 +5,7 @@
     "description": "Werckmeister for VS Code",
     "icon": "resources/Logo.png",
     "repository": "https://github.com/werckme/werckmeister-codext",
-    "version": "0.1.51",
+    "version": "0.1.60",
     "engines": {
         "vscode": "^1.38.0"
     },
@@ -53,7 +53,12 @@
             },
             {
                 "command": "extension.werckmeister.inspector",
-                "title": "Werckmeister: Open Inspector"
+                "title": "Werckmeister: Open Inspector",
+                "icon": {
+                    "light": "./resources/werckmeister_light.svg",
+                    "dark": "./resources/werckmeister_dark.svg"
+                }
+                
             }
         ],
         "menus": {
@@ -77,6 +82,11 @@
                 {
                     "when": "resourceExtname == .sheet",
                     "command": "extension.werckmeister.stop",
+                    "group": "navigation"
+                },
+                {
+                    "when": "resourceExtname == .sheet",
+                    "command": "extension.werckmeister.inspector",
                     "group": "navigation"
                 }
             ],
@@ -144,7 +154,8 @@
         "webpack": "webpack --mode development",
         "webpack-dev": "webpack --mode development --watch",
         "test-compile": "tsc -p ./",
-        "publish": "vsce package && vsce publish"
+        "publish": "vsce package && vsce publish",
+        "package": "npm run build-webviewapp && vsce package"
     },
     "devDependencies": {
         "@babel/core": "^7.6.3",

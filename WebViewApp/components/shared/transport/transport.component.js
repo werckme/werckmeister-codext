@@ -19,7 +19,7 @@ export class TransportComponent extends BaseComponent {
     }
 
     onPlayClicked() {
-        this.sendMessageToHost("player-play");
+        this.sendMessageToHost("player-play", {begin: this.state.begin});
     }
 
     onPauseClicked() {

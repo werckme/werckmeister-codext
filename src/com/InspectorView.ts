@@ -166,7 +166,8 @@ export class InspectorView extends AWebView {
 		vscode.commands.executeCommand(WMCommandStop);
 	}
 
-	onPlayReceived() {
+	onPlayReceived(begin: number = 0) {
+		getPlayer().begin = begin || 0;
 		vscode.commands.executeCommand(WMCommandPlay);
 	}
 
@@ -174,16 +175,12 @@ export class InspectorView extends AWebView {
 		vscode.commands.executeCommand(WMCommandPause);
 	}
 
-	onRangeChanged(begin: number) {
-		getPlayer().begin = begin;
-	}
-
 	onWebViewMessage(message: any) {
+		console.log(message);
 		switch(message.command) {
 			case "player-stop": return this.onStopReceived();
-			case "player-play": return this.onPlayReceived();
+			case "player-play": return this.onPlayReceived(message.begin);
 			case "player-pause": return this.onPauseReceived();
-			case "player-update-range": return this.onRangeChanged(message.begin);
 			case "debuggerview-ready": return this.onViewReady();
 		}
 	}
