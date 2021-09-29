@@ -30,4 +30,4 @@ jobs:
           VERSION: ${{ github.run_number }}
       - uses: actions/upload-artifact@v2
         with:
-          name: *.vsix
+          name: "*.vsix"
