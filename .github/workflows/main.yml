@@ -30,4 +30,5 @@ jobs:
         run: npm run package
       - uses: actions/upload-artifact@v2
         with:
-          name: "*.vsix"
+          name: vscode-ext-${{ github.run_number }}
+          path: "*.vsix"
