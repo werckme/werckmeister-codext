@@ -24,12 +24,10 @@ jobs:
         run: npm install
       - name: build
         run: npm run package
-      - uses: actions/upload-artifact@v2
-        with:
-          name: dist-${{ github.sha }}
-          path: dist/**/*
       - name: set version
-        working-directory: dist
-        run: npm version 6.6.6-$VERSION
+        run: npm version 1.9.9-dev-$VERSION
         env:
           VERSION: ${{ github.run_number }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: *.vsix
