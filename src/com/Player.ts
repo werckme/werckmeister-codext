@@ -2,7 +2,7 @@
  * exceutes the werckmeister player: sheetp
  */
 
-import { exec, ChildProcess, ExecException } from 'child_process';
+import { exec, spawn, ChildProcess, ExecException } from 'child_process';
 import * as dgram from 'dgram';
 import * as EventEmitter from 'events';
 import { ISheetInfo, IWarning } from './SheetInfo';
@@ -214,8 +214,24 @@ export class Player {
         console.log('udp listener stopped');
     }
     
-    private _execute(cmd:string, callback: (err:any, stdout: any, stderr: any)=>void): ChildProcess {
-        return exec(cmd, {cwd: werckmeisterWorkingDirectory()}, callback);
+    private _execute(cmd:string, args:string[], callback: (err:any, stdout: any, stderr: any)=>void): ChildProcess {
+        const newProcess = spawn(cmd, args);
+        let stdout = "";
+        let stderr = "";
+        newProcess.stdout.on('data', (data) => {
+            stdout += data;
+        });
+
+        newProcess.stderr.on('data', (data) => {
+            stderr += data
+        });
+
+        newProcess.on('close', (code) => {
+            const hasError = code !== 0;
+            callback(hasError ? {} : null, stdout, stderr);
+        });
+
+        return newProcess;
     }
 
     private updateDocumentInfo(): Promise<ISheetInfo> {
@@ -223,8 +239,7 @@ export class Player {
             const config = new Config();
             config.info = true;
             config.sheetPath = this.currentFile as string;
-            let cmd = `${this.wmPlayerPath} ${this.configToString(config)}`;
-            this._execute(cmd, (err:any, stdout: any, stderr: any) => {
+            this._execute(this.wmPlayerPath, this.configToArgs(config), (err:any, stdout: any, stderr: any) => {
                 if (!!err) {
                     reject(err);
                     return;
@@ -291,10 +306,12 @@ export class Player {
             config.watch = true;
             config.port = nextFreePort;
             config.sheetPath = sheetPath;
-            let cmd = `${this.wmPlayerPath} ${this.configToString(config)}`;
-            this.process = this._execute(cmd, (err:any, stdout: any, stderr: any) => {
+            this.process = this._execute(this.wmPlayerPath, this.configToArgs(config), (err:any, stdout: any, stderr: any) => {
                 if (!!err) {
-                    reject(stderr);
+                    // due to a bug in the player it may happen that a part of
+                    // the error message is written to stdout
+                    const errorMessage = `${stderr} ${stdout}`;
+                    reject(errorMessage);
                     this.process = null;
                     this.currentFile = null;
                     this.stopUdpListener();
@@ -304,7 +321,7 @@ export class Player {
                 resolve();
                 this.stopUdpListener();
                 this.process = null;
-                if (this.state === PlayerState.Playing) {
+                if (this.state === PlayerState.Playing || this.state === PlayerState.StartPlaying) {
                     this.state = PlayerState.Stopped;
                 }
             });
@@ -342,6 +359,10 @@ export class Player {
     }
 
     private configToString(config: Config) {
+        return this.configToArgs(config).join(" ");
+    }
+
+    private configToArgs(config: Config) {
         if (!config.sheetPath) {
             throw new Error('missing sheet path');
         }
@@ -364,7 +385,7 @@ export class Player {
         if (config.begin > 0) {
             options.push(`--begin=${config.begin}`);
         }
-        return options.join(" ");
+        return options;
     }
 }
 

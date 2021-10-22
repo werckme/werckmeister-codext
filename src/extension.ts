@@ -11,11 +11,11 @@ import { Pause } from './commands/Pause';
 import { ShowTransportView } from './commands/ShowTransportView';
 import { getSheetHistory } from './com/SheetHistory';
 import { PlayFromPosition } from './commands/PlayFromPosition';
+import { getLanguage } from './language/Language';
 
 function excuteCommand(type: (new (context: vscode.ExtensionContext) => ACommand), context: vscode.ExtensionContext): void {
 	let cmd = new type(context);
 	cmd.execute();
-
 }
 const _ns = "extension.werckmeister";
 export const WMCommandPlay = `${_ns}.play`;
@@ -55,9 +55,20 @@ export function activate(context: vscode.ExtensionContext) {
 
 	disposable = vscode.commands.registerCommand(WMPlayFromPosition, excuteCommand.bind(null, PlayFromPosition, context));
 	context.subscriptions.push(disposable);		
-
+	
+	disposable = vscode.languages.registerCompletionItemProvider({ scheme: 'file', language: 'werckmeister' }, {
+		provideCompletionItems: async (document: vscode.TextDocument, position: vscode.Position, 
+			token: vscode.CancellationToken, context: vscode.CompletionContext) => {
+				const items = await getLanguage().features.autoComplete.complete(document, position, token, context);
+				return items;
+			},
+		
+	}, ...['/', '_', '=', '"']);
+	context.subscriptions.push(disposable);		
+	
 	diagnosticCollection = vscode.languages.createDiagnosticCollection(WMDiagnosticCollectionName);
 	context.subscriptions.push(diagnosticCollection);
+
 
 	getSheetHistory(); // create singleton
 }
