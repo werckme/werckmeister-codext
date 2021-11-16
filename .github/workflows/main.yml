@@ -21,7 +21,7 @@ jobs:
         with:
           node-version: 14
       - name: set version
-        run: npm version 1.9.9-$VERSION --no-git-tag-version
+        run: npm version 1.9.9-dev-$VERSION --no-git-tag-version
         env:
           VERSION: ${{ github.run_number }}
       - name: prepare
