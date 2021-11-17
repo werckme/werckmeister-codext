@@ -54,6 +54,7 @@ export class Play extends ACommand {
     }
 
     async execute(): Promise<void> {
+        console.log("WM COMMAND: PLAY");
         const history = getSheetHistory();
         let sheetpath = history.currentFile;
         if (!sheetpath) {
@@ -62,8 +63,9 @@ export class Play extends ACommand {
         if (!sheetpath) {
             vscode.window.showErrorMessage("no sheet file to play");
             return;
-        }getEditorEventDecorator();
-        
+        }
+
+        getEditorEventDecorator();
         try {
             const diagnose = await getLanguage().features.diagnostic.update(sheetpath);
             if (diagnose.hasErrors) {
@@ -77,7 +79,7 @@ export class Play extends ACommand {
             if (ex instanceof VersionMismatchException) {
                 showVersionMismatchError(ex as VersionMismatchException);
             } else {
-                showCompilerError(ex);
+                showCompilerError(ex as Error);
             }
            
         }

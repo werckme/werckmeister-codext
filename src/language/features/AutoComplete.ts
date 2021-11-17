@@ -25,6 +25,10 @@ export class AutoComplete {
             const commandSuggestion = suggestion as ICommandSuggestion;
             item.kind = commandSuggestion.parameter === null ? vscode.CompletionItemKind.Variable : vscode.CompletionItemKind.Value; 
         }
+        if (suggestion.deprecated) {
+            item.detail = "deprecated: " + suggestion.deprecated;
+            (item as any).tags = [1]; // why that hack? how to set properly?
+        }
         return item;
     }
     public async complete(document: vscode.TextDocument, position: vscode.Position, 

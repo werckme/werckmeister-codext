@@ -1,0 +1,36 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Werckmeister Conduction Rules",
+	"patterns": [
+		{"include": "#selectors"},
+		{"include": "#declarations"},
+		{"include": "#comments"},
+		{"include": "#special"}
+	],
+	"repository": {
+		"selectors": {
+			"patterns": [{
+				"name": "keyword.control.werckmeister",
+				"match": "channel|fromBar|fromBeat|fromPitch|fromPosition|instrument|notOnBeat|nthBar|onBar|onBeat|pitch|expression|toBar|toBeat|toPitch|toPosition"
+			}]
+		},
+		"declarations": {
+			"patterns": [{
+				"name": "entity.name.function.werckmeister",
+				"match": "duration|pitch|timeOffset|velocity"
+			}]
+		},		
+		"comments": {
+			"name": "comment.line.double-dash.werckmeister",
+			"begin": "--",
+			"end": "$"
+		},
+		"special": {
+			"patterns": [{
+				"name": "keyword.other.werckmeister",
+				"match": "&\\s*-|&\\s*\\+|=|-=|\\+="
+			}]
+		}
+	},
+	"scopeName": "source.werckmeister.conduction-rules"
+}

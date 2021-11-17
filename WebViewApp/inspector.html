@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta charset="UTF-8">
+  </head>
+  <body>
+      <style>
+          #debugger-view {
+              color: black;
+              position: relative;
+              top: 70px;
+          }
+          #debugger-view .chkbx-grp {
+              background: none;
+              top: 121px;
+              left: 13px;
+              border: none;
+              padding: 4px 5px;
+          }
+          #debugger-view .chkbx-grp > div {
+            clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 49%, calc(100% - 8px) 100%, 0 100%);
+            border: none;
+            border-radius: 0;
+          }
+          .ccontainer {
+            z-index: 20;
+            background: black;
+            position: fixed;
+            top: 0;
+            width: 339px !important;
+            font-weight: lighter;
+            font-family: monospace;
+            box-shadow: black 5px 6px 12px 0px;
+          }
+          h2 {
+            position: relative;
+            top: 55px;
+            font-weight: 100;
+          }
+          .ccontainer input {
+            background: black;
+          }
+          .error-message {
+            position: fixed;
+            top: calc(50% - 29px);
+          }
+          .transport-state {
+            font-size: 10px;
+          }
+          .wm-dbg-listview th, td {
+              border: none;
+              border-bottom: 1px black;
+          }
+      </style>
+      <div id="debugger-main-component"></div>
+      <div id="debugger-view"></div>
+      <script src="$mainSrc"></script>
+  </body>
+</html>

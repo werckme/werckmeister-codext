@@ -4,7 +4,6 @@
 vsc-extension-quickstart.md
 assets
 node_modules
-WebViewApp
 src
 out
 tsconfig.json
