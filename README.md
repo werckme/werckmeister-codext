@@ -11,17 +11,21 @@ This extension provides support for the [Werckmeister](https://werckme.github.io
 * MIDI Inspector
 * Syntax highlighting
 * Autocompletion
-* Error & Warning highlighting
+
+**MIDI Inspector**
+
+Analyse the compiled MIDI file of a sheet in a Event List view.
+
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/werckmeister-inspector.gif">
+
+**MIDI Inspector - Track Filter**
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/werckmeister-inspector-filter.gif">
+
+**MIDI Inspector - Transport Controller**
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/werckmeister-inspector-transport.gif">
 
 **Playback visualization**
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/playbackvis.gif">
-
-
-**Error highlighting**
-<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/errorvis.gif">
-
-**Warning highlighting**
-<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/warningvis.gif">
 
 **Start playback at random position**
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/startfrompos.gif">

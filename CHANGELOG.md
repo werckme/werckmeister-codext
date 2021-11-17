@@ -1,4 +1,8 @@
 # Change Log
+## Version 0.1.6
+### New Features
+- MIDI Inspector
+- [Conduction Rules](https://werckme.github.io/manual#conduction-rules) language support
 ## Version 0.1.5
  - adding Autocompletion support for usings, command arguments and values
 ## Version 0.1.4
