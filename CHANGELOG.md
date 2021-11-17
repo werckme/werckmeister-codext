@@ -1,5 +1,5 @@
 # Change Log
-## Version 0.1.6
+## Version 0.1.60
 ### New Features
 - MIDI Inspector
 - [Conduction Rules](https://werckme.github.io/manual#conduction-rules) language support
