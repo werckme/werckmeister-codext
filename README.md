@@ -8,12 +8,14 @@ This extension provides support for the [Werckmeister](https://werckme.github.io
 
 * MIDI Playback from source
 * Playback visualization
+* MIDI Inspector
 * Syntax highlighting
 * Autocompletion
 * Error & Warning highlighting
 
 **Playback visualization**
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/playbackvis.gif">
+
 
 **Error highlighting**
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/errorvis.gif">
