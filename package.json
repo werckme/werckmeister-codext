@@ -122,6 +122,17 @@
                     ".template"
                 ],
                 "configuration": "./language-configuration.json"
+            },
+            {
+                "id": "werckmeister-conductions",
+                "aliases": [
+                    "Werckmeister Conduction Rules",
+                    "werckmeister conduction rules"
+                ],
+                "extensions": [
+                    ".conductions"
+                ],
+                "configuration": "./conduction-language-configuration"
             }
         ],
         "grammars": [
@@ -129,6 +140,11 @@
                 "language": "werckmeister",
                 "scopeName": "source.werckmeister",
                 "path": "./syntaxes/werckmeister.tmLanguage.json"
+            },
+            {
+                "language": "werckmeister-conductions",
+                "scopeName": "source.werckmeister.conduction-rules",
+                "path": "./syntaxes/werckmeister-conductions.tmLanguage.json"
             }
         ],
         "configuration": {
