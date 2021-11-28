@@ -10,15 +10,23 @@ export class MidiViewComponent extends React.Component {
             midiData: null
         };
         this.midiView = document.querySelector('#debugger-view');
-        console.log(this.midiView)
+        const filterElement = document.querySelector('#filter');
         this.dbgMidi = new WmMidiFileDebugger();
-        this.dbgMidi.addListView(this.midiView);
+        this.dbgMidi.addFilter(filterElement);
+        this.dbgMidi.addPianoRollView(this.midiView);
     }
 
     componentDidMount() {
     }
 
     componentDidUpdate(prevProps) {
+        if (prevProps.viewType !== this.props.viewType) {
+            if (this.props.viewType === 'listview') {
+                this.switchToListView();
+            } else {
+                this.switchToPianoRollView();
+            }
+        }
         if (prevProps.midiData === this.props.midiData) {
             return;
         }
@@ -26,6 +34,18 @@ export class MidiViewComponent extends React.Component {
         if (this.props.onMidiFile) {
             this.props.onMidiFile(this.dbgMidi.midifile);
         }
+    }
+
+    switchToListView() {
+        this.dbgMidi.clearViews();
+        this.dbgMidi.addListView(this.midiView);
+        this.dbgMidi.update();
+    }
+
+    switchToPianoRollView() {
+        this.dbgMidi.clearViews();
+        this.dbgMidi.addPianoRollView(this.midiView);
+        this.dbgMidi.update();
     }
 
     updateMidiView() {

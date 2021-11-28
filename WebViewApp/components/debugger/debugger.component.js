@@ -30,7 +30,8 @@ export class DebuggerComponent extends BaseComponent {
             midiData: null,
             sheetPath: "",
             sheetName: "",
-            ppq: 0
+            ppq: 0,
+            selectedView: ""
         }
         this.compileResult = null;
         window.addEventListener('message', event => { // get vscode message
@@ -81,6 +82,10 @@ export class DebuggerComponent extends BaseComponent {
         }
     }
 
+    onViewChange(ev) {
+        this.setState({selectedView: ev.target.value});
+    }
+
     render() {
         const message = !this.state.midiData ? <div className="error-message">{MsgMissingMidiData}</div> : <span></span>;
         return (
@@ -91,9 +96,14 @@ export class DebuggerComponent extends BaseComponent {
                     position={this.state.sheetTime}
                     ppq={this.state.ppq}>
                 </TransportComponent>
+
                 <h2> {this.state.sheetName} </h2>
                 {message}
-                <MidiViewComponent midiData={this.state.midiData} onMidiFile={(x) => this.onMidiFile(x)}></MidiViewComponent> 
+                <select value={this.state.selectedView} id="view-switch-ctrl" onChange={(ev)=>this.onViewChange(ev)}>
+                    <option value="pianorollview">Piano Roll</option>
+                    <option value="listview">MIDI Event List</option>
+                </select>
+                <MidiViewComponent viewType={this.state.selectedView} midiData={this.state.midiData} onMidiFile={(x) => this.onMidiFile(x)}></MidiViewComponent> 
             </div>
         );
     }
