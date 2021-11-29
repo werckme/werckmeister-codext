@@ -10,14 +10,17 @@
               position: relative;
               top: 70px;
           }
-          #debugger-view .chkbx-grp {
+         .chkbx-grp {
               background: none;
               top: 121px;
               left: 13px;
               border: none;
               padding: 4px 5px;
           }
-          #debugger-view .chkbx-grp > div {
+          .chkbx-grp label{
+            color: black;
+          }
+          .chkbx-grp > div {
             clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 49%, calc(100% - 8px) 100%, 0 100%);
             border: none;
             border-radius: 0;
@@ -51,8 +54,34 @@
               border: none;
               border-bottom: 1px black;
           }
+          .piano-roll .track {
+            border-color: white;
+          }
+          .piano-roll .pitch-group.pitch-group-hasvalue {
+            border-bottom: 1px dashed rgb(43, 43, 43)
+          }
+          .piano-roll .grid-style {
+            color: rgb(70, 70, 70);
+            background-color: white;
+          }
+          .track .track-title {
+            color: white;
+          }
+          .piano-roll .event {
+            border: 1px solid rgb(167, 167, 167);
+          }
+          .piano-roll .event:hover {
+            box-shadow: 0 0 2px 2px rgb(150, 150, 150);
+          }
+          #view-switch-ctrl {
+            position: fixed;
+            right: 5px;
+            top: 5px;
+            z-index: 20;
+          }                 
       </style>
       <div id="debugger-main-component"></div>
+      <div id="filter"></div>
       <div id="debugger-view"></div>
       <script src="$mainSrc"></script>
   </body>
