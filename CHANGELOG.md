@@ -1,4 +1,13 @@
 # Change Log
+## Version 0.1.71
+### New Features
+- MIDI Inspector Piano Roll View
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/werckmeister-inspector-piano-roll.gif">
+- MIDI Inspector View Selection
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/werckmeister-inspector-view-switch.gif">
+
+
+
 ## Version 0.1.60
 ### New Features
 - MIDI Inspector
