@@ -1,7 +1,7 @@
 /**
  * executes the werckmeister compiler: sheetc
  */
-import { exec, ChildProcess, ExecException } from 'child_process';
+import { spawn, ChildProcess, ExecException } from 'child_process';
 import { IsWindows, toWMBINPath } from './Player';
 import { WMMinimumWerckmeisterCompilerVersion } from '../extension';
 
@@ -102,14 +102,29 @@ export class Compiler {
         throw new VersionMismatchException(strVersion);
     }
 
-    private _execute(cmd:string, callback: (err:any, stdout: any, stderr: any)=>void): ChildProcess {
-        return exec(cmd, callback);
+    private _execute(cmd:string, args: string[], callback: (err:any, stdout: any, stderr: any)=>void): ChildProcess {
+        const newProcess = spawn(cmd, args);
+        let stdout = "";
+        let stderr = "";
+        newProcess.stdout.on('data', (data) => {
+            stdout += data;
+        });
+
+        newProcess.stderr.on('data', (data) => {
+            stderr += data
+        });
+
+        newProcess.on('close', (code) => {
+            const hasError = code !== 0;
+            callback(hasError ? {} : null, stdout, stderr);
+        });
+
+        return newProcess;
     }
 
     protected async executeCompiler(params: Params): Promise<string>  {
         return new Promise((resolve, reject)=>{
-            let cmd = `${this.wmCompilerPath} ${this.paramsToString(params)}`;
-            this.process = this._execute(cmd, (err:any, stdout: any, stderr: any) => {
+            this.process = this._execute(this.wmCompilerPath, this.configToArgs(params), (err:any, stdout: any, stderr: any) => {
                 if (!!err) {
                     this.process = null;
                     if (params.mode !== CompilerMode.validate || !stdout) {
@@ -138,9 +153,9 @@ export class Compiler {
     }
 
 
-    private paramsToString(params: Params) {
+    private configToArgs(params: Params): string[] {
         if (params.getVersion) {
-            return "--version";
+            return ["--version"];
         }
         if (!params.sheetPath) {
             throw new Error('missing sheet path');
@@ -149,6 +164,7 @@ export class Compiler {
             params.sheetPath,
             `--mode=${params.mode.toString()}`
         ];
-        return options.join(" ");
+        return options;
     }
+    
 }
