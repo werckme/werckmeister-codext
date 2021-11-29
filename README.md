@@ -14,8 +14,13 @@ This extension provides support for the [Werckmeister](https://werckme.github.io
 
 **MIDI Inspector**
 
-Analyse the compiled MIDI file of a sheet in a Event List view.
+Analyse the compiled MIDI file of a sheet. 
 
+
+**Piano Roll View**
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/werckmeister-inspector-piano-roll.gif">
+
+**Event List View**
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/werckmeister-inspector.gif">
 
 **MIDI Inspector - Track Filter**
