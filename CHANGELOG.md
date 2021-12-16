@@ -1,4 +1,8 @@
 # Change Log
+## Version 0.1.72
+### Bugfix
+ - minor fix regarding a version check
+
 ## Version 0.1.71
 ### New Features
 - MIDI Inspector Piano Roll View

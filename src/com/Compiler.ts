@@ -54,7 +54,13 @@ export class VersionMismatchException extends Error {
 
 export function werckmeisterVersionToNumber(version: string) {
     version = version.replace(/\./g, "");
-    return Number.parseInt(version);
+    let number = 0;
+    let base = 10000;
+    for(const char of version) {
+        number += Number.parseInt(char) * base;
+        base /= 10;
+    }
+    return number;
 }
 
 export class ValidationResult {

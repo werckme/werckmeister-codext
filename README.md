@@ -3,7 +3,6 @@
 This extension provides support for the [Werckmeister](https://werckme.github.io) sheet music compiler.
 
 
-
 ## Features
 
 * MIDI Playback from source
