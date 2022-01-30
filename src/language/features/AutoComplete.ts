@@ -14,7 +14,9 @@ export class AutoComplete {
         const OrderOffsetToCompensateLexicographicOrdering = 10000000;
         item.insertText = suggestion.text;
         item.filterText = suggestion.text;
-
+        const markdownString = new vscode.MarkdownString();
+        markdownString.appendMarkdown(suggestion.description || "");
+        item.documentation = markdownString;
         item.sortText = (index + OrderOffsetToCompensateLexicographicOrdering).toString();
         item.kind = vscode.CompletionItemKind.Value;
         if ((suggestion as IPathSuggestion).file) {
