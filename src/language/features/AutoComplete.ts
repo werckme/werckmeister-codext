@@ -15,7 +15,12 @@ export class AutoComplete {
         item.insertText = suggestion.text;
         item.filterText = suggestion.text;
         const markdownString = new vscode.MarkdownString();
-        markdownString.appendMarkdown(suggestion.description || "");
+        const url = suggestion.url;
+        const description = suggestion.description || "";
+        const title = url ? `[${suggestion.displayText}](${url})` : suggestion.displayText; 
+        const markdownText = `### ${title}
+${description}`;
+        markdownString.appendMarkdown(markdownText);
         item.documentation = markdownString;
         item.sortText = (index + OrderOffsetToCompensateLexicographicOrdering).toString();
         item.kind = vscode.CompletionItemKind.Value;
