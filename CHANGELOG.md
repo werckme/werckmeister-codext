@@ -1,6 +1,8 @@
 # Change Log
 ## Version 1.0.0
 ### New Features
+- create MIDI function
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/createMIDI.gif">
 - improved Autocompletion
 - Showing Hovers 
 ### Bugfixes
