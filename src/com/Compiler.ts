@@ -17,6 +17,7 @@ let _lastVersionCheckSucceed: boolean = false;
 
 export class Params {
     getVersion: boolean = false;
+    output: string|null = null;
     constructor(public sheetPath: string = "", public mode:CompilerMode = CompilerMode.normal) {
     }
 };
@@ -146,9 +147,10 @@ export class Compiler {
         });
     }
 
-    async compile(sheetPath: string, mode: CompilerMode = CompilerMode.normal): Promise<string> {
+    async compile(sheetPath: string, mode: CompilerMode = CompilerMode.normal, output: string|null = null): Promise<string> {
         await this.checkVersion();
         const params = new Params(sheetPath, mode);
+        params.output = output;
         return this.executeCompiler(params);
     }
 
@@ -168,8 +170,13 @@ export class Compiler {
         }
         let options = [
             params.sheetPath,
-            `--mode=${params.mode.toString()}`
         ];
+        if(params.mode) {
+            options.push(`--mode=${params.mode.toString()}`);
+        }
+        if (params.output) {
+            options.push(`--output=${params.output}`);
+        }
         return options;
     }
     

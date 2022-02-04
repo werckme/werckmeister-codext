@@ -1,4 +1,13 @@
 # Change Log
+## Version 1.0.0
+### New Features
+- improved Autocompletion
+- Showing Hovers 
+### Bugfixes
+- [Debug View dissapears after document was updated](https://github.com/werckme/werckmeister-codext/issues/37)
+- [Piano Roll View fails with velocity = 0](https://github.com/werckme/werckmeister-codext/issues/35)
+- [Piano Roll View Quarter Pos is wrong](https://github.com/werckme/werckmeister-codext/issues/36)
+
 ## Version 0.1.72
 ### Bugfix
  - minor fix regarding a version check

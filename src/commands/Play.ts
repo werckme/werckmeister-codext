@@ -54,14 +54,13 @@ export class Play extends ACommand {
     }
 
     async execute(): Promise<void> {
-        console.log("WM COMMAND: PLAY");
         const history = getSheetHistory();
         let sheetpath = history.currentFile;
         if (!sheetpath) {
             sheetpath = history.lastPlayedSheetFile;
         }
         if (!sheetpath) {
-            vscode.window.showErrorMessage("no sheet file to play");
+            vscode.window.showErrorMessage("no sheet file to process");
             return;
         }
 

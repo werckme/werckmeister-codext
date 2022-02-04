@@ -11,6 +11,7 @@ This extension provides support for the [Werckmeister](https://werckme.github.io
 * Syntax highlighting
 * Autocompletion
 
+
 **MIDI Inspector**
 
 Analyse the compiled MIDI file of a sheet. 

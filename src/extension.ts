@@ -13,6 +13,7 @@ import { getSheetHistory } from './com/SheetHistory';
 import { PlayFromPosition } from './commands/PlayFromPosition';
 import { getLanguage } from './language/Language';
 import { ShowInspector } from './commands/ShowInspector';
+import { SaveMidi } from './commands/SaveMidi';
 
 function excuteCommand(type: (new (context: vscode.ExtensionContext) => ACommand), context: vscode.ExtensionContext): void {
 	let cmd = new type(context);
@@ -21,6 +22,7 @@ function excuteCommand(type: (new (context: vscode.ExtensionContext) => ACommand
 const _ns = "extension.werckmeister";
 export const WMCommandPlay = `${_ns}.play`;
 export const WMCommandStop = `${_ns}.stop`;
+export const WMCommandSaveMidi = `${_ns}.saveMidi`;
 export const WMCommandPause = `${_ns}.pause`;
 export const WMPlayFromPosition = `${_ns}.playFromPosition`;
 export const WMCommandOpenSheeView = `${_ns}.sheetview`;
@@ -44,6 +46,9 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);
 
 	disposable = vscode.commands.registerCommand(WMCommandPause, excuteCommand.bind(null, Pause, context));
+	context.subscriptions.push(disposable);
+
+	disposable = vscode.commands.registerCommand(WMCommandSaveMidi, excuteCommand.bind(null, SaveMidi, context));
 	context.subscriptions.push(disposable);
 
 	disposable = vscode.commands.registerCommand(WMCommandOpenSheeView, excuteCommand.bind(null, ShowSheetView, context));
@@ -70,6 +75,14 @@ export function activate(context: vscode.ExtensionContext) {
 		
 	}, ...['/', '_', '=', '"']);
 	context.subscriptions.push(disposable);		
+
+	disposable = vscode.languages.registerHoverProvider({ scheme: 'file', language: 'werckmeister' }, {
+		provideHover: async (document: vscode.TextDocument, position: vscode.Position, 
+			token: vscode.CancellationToken) => {
+				return await getLanguage().features.hoverInfo.get(document, position, token);
+			},
+		
+	});
 	
 	diagnosticCollection = vscode.languages.createDiagnosticCollection(WMDiagnosticCollectionName);
 	context.subscriptions.push(diagnosticCollection);
