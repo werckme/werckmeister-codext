@@ -4,7 +4,8 @@
 - create MIDI function
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/createMIDI.gif">
 - improved Autocompletion
-- Showing Hovers 
+- Documentation Hovers
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/hovers.gif">
 ### Bugfixes
 - [Debug View dissapears after document was updated](https://github.com/werckme/werckmeister-codext/issues/37)
 - [Piano Roll View fails with velocity = 0](https://github.com/werckme/werckmeister-codext/issues/35)
