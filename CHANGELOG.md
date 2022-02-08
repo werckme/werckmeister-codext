@@ -1,4 +1,8 @@
 # Change Log
+## Version 1.0.1
+### Bugfix
+- playback starting twice when double click on play button (WINDOWS)
+
 ## Version 1.0.0
 ### New Features
 - create MIDI function
@@ -6,6 +10,7 @@
 - improved Autocompletion
 - Documentation Hovers
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/hovers.gif">
+
 ### Bugfixes
 - [Debug View dissapears after document was updated](https://github.com/werckme/werckmeister-codext/issues/37)
 - [Piano Roll View fails with velocity = 0](https://github.com/werckme/werckmeister-codext/issues/35)
