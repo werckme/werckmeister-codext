@@ -1,4 +1,8 @@
 # Change Log
+## Version 1.0.12
+### Feature
+- optimized code completion
+
 ## Version 1.0.1
 ### Bugfix
 - playback starting twice when double click on play button (WINDOWS)
