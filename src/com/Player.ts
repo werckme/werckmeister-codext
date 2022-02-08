@@ -266,8 +266,10 @@ export class Player {
         if (this.isPlaying || this.isStateChangeLocked) {
             return;
         }
+        const oldState = this.state;
+        this.state = PlayerState.StartPlaying;
         const config = new Config();
-        if (this.state === PlayerState.Paused) {
+        if (oldState === PlayerState.Paused) {
             config.begin = this.sheetTime;
         } else {
             config.begin = this.begin;
@@ -275,7 +277,6 @@ export class Player {
         this.currentFile = sheetPath;
         await this.updateDocumentInfo();
         this.notifyDocumentWarningsIfAny();
-        this.state = PlayerState.StartPlaying;
         return this._startPlayer(sheetPath, config);
     }
 
