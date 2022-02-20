@@ -101,7 +101,7 @@ export class InspectorView extends AWebView {
 		}
 		if (fileExt !== '.sheet') {
 			const history = getSheetHistory();
-			sheetPath = history.lastEditedSheetFile;
+			sheetPath = history.lastVisitedSheetFile;
 			if (!sheetPath) {
 				return;
 			}

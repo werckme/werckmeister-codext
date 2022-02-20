@@ -1,4 +1,9 @@
 # Change Log
+## Version 1.0.14
+### Bugfix
+- inspector view updates its content not only when a `.sheet` file was changed
+- start playback fails if an unsupported file type is the current document
+
 ## Version 1.0.13
 ### Bugfix
 - minor bugfixes
