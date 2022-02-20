@@ -150,7 +150,6 @@ export class Player {
         this.lastUpdateTimestamp = 0;
     }
     set state(val: PlayerState) {
-        console.log(`${PlayerState[this.state]}->${PlayerState[val]}`, this._pid);
         if (this.state === val) {
             return;
         }

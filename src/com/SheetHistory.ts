@@ -10,7 +10,7 @@ import * as fs from 'fs';
 
 class SheetHistory {
     fileHistory: string[] = [];
-    played: string[] = [];
+    lastplayed: string|undefined = undefined;
     constructor() {
         vscode.window.onDidChangeActiveTextEditor(this.onTextEditorChanged.bind(this));
         if (vscode.window.activeTextEditor) {
@@ -39,9 +39,9 @@ class SheetHistory {
     }
 
     onPlayerStateChanged(state: PlayerState) {
-        if (state === PlayerState.StartPlaying) {
+        if (state === PlayerState.Playing) {
             const player = getPlayer();
-            this.played.push(player.currentFile as string);
+            this.lastplayed = player.currentFile as string;
         }
     }
 
@@ -58,7 +58,7 @@ class SheetHistory {
     }
 
     get lastPlayedSheetFile() : string | undefined {
-        return _.last(this.played);
+        return this.lastplayed;
     }
 
 }

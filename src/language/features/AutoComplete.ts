@@ -13,7 +13,12 @@ export class AutoComplete {
         const item = new vscode.CompletionItem(suggestion.displayText);
         const OrderOffsetToCompensateLexicographicOrdering = 10000000;
         item.insertText = suggestion.text;
-        item.filterText = suggestion.text;
+        if ((suggestion as any).parameter) {
+            // is parameter suggestion
+            item.filterText = suggestion.displayText;
+        } else {
+            item.filterText = suggestion.text;
+        }
         const markdownString = new vscode.MarkdownString();
         const url = suggestion.url;
         const description = suggestion.description || "";

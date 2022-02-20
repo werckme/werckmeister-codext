@@ -1,4 +1,8 @@
 # Change Log
+## Version 1.0.13
+### Bugfix
+- minor bugfixes
+
 ## Version 1.0.12
 ### Feature
 - optimized code completion
