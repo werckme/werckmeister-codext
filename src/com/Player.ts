@@ -178,10 +178,6 @@ export class Player {
             this.lastUpdateTimestamp = message.lastUpdateTimestamp;
             return;
         }
-        if (message.lastUpdateTimestamp !== this.lastUpdateTimestamp) {
-            this.lastUpdateTimestamp = message.lastUpdateTimestamp;
-            this.playerMessage.emit(OnSourcesChanged)
-        }
     }
 
     private startUdpListener(port: number) {
