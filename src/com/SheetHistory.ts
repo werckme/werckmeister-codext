@@ -61,6 +61,12 @@ class SheetHistory {
         return this.lastplayed;
     }
 
+    get lastVisitedSheetFile(): string | undefined {
+        return _(this.fileHistory)
+            .filter(file => file.endsWith('.sheet'))
+            .last();
+    }
+
 }
 
 let _currentHistory: SheetHistory;

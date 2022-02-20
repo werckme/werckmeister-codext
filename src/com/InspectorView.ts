@@ -6,6 +6,13 @@ import { AWebView } from './AWebView';
 import { WMCommandStop, WMCommandPlay, WMCommandPause } from '../extension';
 import { ISheetInfo } from './SheetInfo';
 import { Compiler, CompilerMode } from './Compiler';
+import { getSheetHistory } from './SheetHistory';
+
+const UpdateIfThisExtension:string[] = [
+	'.sheet',
+	'.template',
+	'.conductions'
+];
 
 const ViewTitle = "Werckmeister Inspector";
 const TitleUpdaterIntervalMillis = 500;
@@ -84,13 +91,20 @@ export class InspectorView extends AWebView {
 	}
 
 
-	async compileAndUpdate(sheetPath: string) {
+	async compileAndUpdate(sheetPath: string|undefined) {
 		if (!sheetPath) {
 			return;
 		}
 		const fileExt = path.extname(sheetPath);
-		if (fileExt !== '.sheet') {
+		if (UpdateIfThisExtension.includes(fileExt) === false) {
 			return;
+		}
+		if (fileExt !== '.sheet') {
+			const history = getSheetHistory();
+			sheetPath = history.lastEditedSheetFile;
+			if (!sheetPath) {
+				return;
+			}
 		}
 		const compileResult = await this.compile(sheetPath);
 		this.sendCompileResult(sheetPath, compileResult);
