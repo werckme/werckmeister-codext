@@ -1,4 +1,9 @@
 # Change Log
+## Version 1.0.15
+### Bugfix
+- windows version could not stop playback, when custom werckmeister path contains a space character
+- sheet position highlighting doesn't work on first playback
+
 ## Version 1.0.14
 ### Bugfix
 - inspector view updates its content not only when a `.sheet` file was changed

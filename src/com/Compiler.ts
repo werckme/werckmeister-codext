@@ -4,6 +4,7 @@
 import { spawn, ChildProcess, ExecException } from 'child_process';
 import { IsWindows, toWMBINPath } from './Player';
 import { WMMinimumWerckmeisterCompilerVersion } from '../extension';
+import { existsSync as exists } from 'fs';
 
 export const CompilerExecutable = IsWindows ? 'sheetc.exe' : 'sheetc';
 

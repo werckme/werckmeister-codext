@@ -31,7 +31,8 @@ export class DebuggerComponent extends BaseComponent {
             sheetPath: "",
             sheetName: "",
             ppq: 0,
-            selectedView: ""
+            selectedView: "",
+            isFollow: false
         }
         this.compileResult = null;
         window.addEventListener('message', event => { // get vscode message
@@ -72,6 +73,14 @@ export class DebuggerComponent extends BaseComponent {
 
     updateSheetTime(sheetTime) {
         this.setState({sheetTime: sheetTime});
+        this.doFollow();
+    }
+   
+    doFollow() {
+        if (!this.state.isFollow) {
+            return;
+        }
+        // TODO: document.querySelector("html").scrollTo(0, 0);
     }
 
     onMidiFile(midifile) {
