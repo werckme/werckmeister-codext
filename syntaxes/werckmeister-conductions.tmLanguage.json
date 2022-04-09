@@ -11,7 +11,7 @@
 		"selectors": {
 			"patterns": [{
 				"name": "keyword.control.werckmeister",
-				"match": "all|withTag|channel|fromBar|fromBeat|fromPitch|fromPosition|instrument|notOnBeat|nthBar|onBar|onBeat|pitch|expression|toBar|toBeat|toPitch|toPosition|withTag"
+				"match": "all|withTag|channel|fromBar|fromBeat|fromPitch|fromPosition|instrument|notOnBeat|nthBar|onBar|onBeat|pitch|expression|toBar|toBeat|toPitch|toPosition|withTag|degree|chord"
 			}]
 		},
 		"declarations": {

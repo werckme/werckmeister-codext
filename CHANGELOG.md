@@ -1,4 +1,9 @@
 # Change Log
+## Version 1.0.16
+### Feature
+- syntax highlighting updated
+
+
 ## Version 1.0.15
 ### Bugfix
 - windows version could not stop playback, when custom werckmeister path contains a space character
