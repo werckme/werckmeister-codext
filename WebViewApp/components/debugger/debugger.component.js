@@ -72,6 +72,12 @@ export class DebuggerComponent extends BaseComponent {
 
     updateSheetTime(sheetTime) {
         this.setState({sheetTime: sheetTime});
+        const parent = document.querySelector("html");
+        const maxw = parent.scrollWidth;
+        const maxd = this.state.duration / this.state.ppq;
+        const x = Math.floor(sheetTime * maxw / maxd);
+        const y = parent.scrollTop;
+        parent.scrollTo(x, y)
     }
 
     onMidiFile(midifile) {
