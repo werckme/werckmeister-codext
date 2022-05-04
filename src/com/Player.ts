@@ -9,6 +9,7 @@ import { ISheetInfo, IWarning } from './SheetInfo';
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as _ from "lodash";
+import { reject } from 'lodash';
 
 const freeUdpPort = require('udp-free-port');
 export const IsWindows:boolean = process.platform === 'win32';
@@ -211,6 +212,22 @@ export class Player {
         });
 
         return newProcess;
+    }
+
+    public listDevices(): Promise<string> {
+        return new Promise((resolve, reject) => {
+            this._execute(this.wmPlayerPath, ["--list"], (err:any, stdout: any, stderr: any) => {
+                if (!!err) {
+                    reject(err);
+                    return;
+                }
+                try {            
+                    resolve(stdout);
+                } catch(ex)  {
+                    reject(ex);
+                }
+            });
+        });
     }
 
     private updateDocumentInfo(): Promise<ISheetInfo> {
