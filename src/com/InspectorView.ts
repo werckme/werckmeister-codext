@@ -36,8 +36,10 @@ export class InspectorView extends AWebView {
 	onSourcesChangedBound: any;
 	onDidDocumentSaveDisposable: vscode.Disposable|null= null;
 	sheetInfo: ISheetInfo|null = null;
-	onViewReady: ()=>void = ()=>{};
+	private onViewReady: ()=>void = ()=>{};
+	private onViewInitialRendered: ()=>void = ()=>{};
 	viewReady: Promise<void>;
+	viewInitialRendered: Promise<void>;
 	titleUpdater: NodeJS.Timeout|null = null;
 	constructor(context: vscode.ExtensionContext) {
 		super(context);
@@ -48,13 +50,17 @@ export class InspectorView extends AWebView {
 		this.viewReady = new Promise(resolve => {
 			this.onViewReady = resolve;
 		});
+		this.viewInitialRendered = new Promise(resolve => {
+			this.onViewInitialRendered = resolve;
+		})
 		if (vscode.window.activeTextEditor) {
 			const currentDocumentPath = vscode.window.activeTextEditor.document.fileName;
-			this.viewReady.then(() => {
-				this.compileAndUpdate(currentDocumentPath);
+			this.viewReady.then(async () => {
+				await this.compileAndUpdate(currentDocumentPath);
 				this.currentPanel!.webview.postMessage({
 					playerState: {newState: PlayerState[getPlayer().state]}
 				});
+				this.onViewInitialRendered();
 			})
 		}
 	}
@@ -262,7 +268,7 @@ export class InspectorView extends AWebView {
 
 	private static async waitUntilInspectorAreAvailable(): Promise<void> {
 		let maxTries = 20;
-		return new Promise<void>((resolve, reject) => {
+		await new Promise<void>((resolve, reject) => {
 			const check = () => {
 				if (openedViews.length > 0) {
 					resolve();
@@ -274,6 +280,7 @@ export class InspectorView extends AWebView {
 			};
 			check();
 		});
+		await Promise.all(openedViews.map(x => x.viewInitialRendered));
 	}
 
 	public static async reveal(documentPath: string, positionOffset: number):Promise<void> {
