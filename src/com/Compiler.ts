@@ -8,13 +8,17 @@ import { existsSync as exists } from 'fs';
 
 export const CompilerExecutable = IsWindows ? 'sheetc.exe' : 'sheetc';
 
+const debugSymbolSupportVersion = 10330;
+
 export enum CompilerMode {
     normal = "normal",
     json = "json",
-    validate = "validate"
+    validate = "validate",
+    debugSymbols = "debugSymbols"
 }
 
 let _lastVersionCheckSucceed: boolean = false;
+let _debugSymbolSupport: boolean = false;
 
 export class Params {
     getVersion: boolean = false;
@@ -95,6 +99,13 @@ export class Compiler {
        return version;
     }
 
+    async isDebugSymbolsSupported(): Promise<boolean> {
+        if (_debugSymbolSupport === null) {
+            await this.checkVersion();
+        }
+        return _debugSymbolSupport;
+    }
+
     async checkVersion() {
         if (_lastVersionCheckSucceed) {
             return;
@@ -102,7 +113,7 @@ export class Compiler {
         const strVersion:string = await this.getVersion();
         const version:number = werckmeisterVersionToNumber(strVersion);
         const minVersion:number = werckmeisterVersionToNumber(WMMinimumWerckmeisterCompilerVersion);
-        
+        _debugSymbolSupport = version >= debugSymbolSupportVersion;
         if (version >= minVersion) {
             _lastVersionCheckSucceed = true;
             return;

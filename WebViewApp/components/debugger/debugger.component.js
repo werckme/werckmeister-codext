@@ -32,7 +32,8 @@ export class DebuggerComponent extends BaseComponent {
             sheetName: "",
             ppq: 0,
             selectedView: "",
-            isFollow: false
+            isFollow: false,
+            debugSymbols: null
         }
         this.compileResult = null;
         window.addEventListener('message', event => { // get vscode message
@@ -60,6 +61,9 @@ export class DebuggerComponent extends BaseComponent {
             this.setState({midiData: this.compileResult.midi.midiData, 
                 sheetPath: message.sheetPath,
                 sheetName: message.sheetName});
+        }
+        if(message.debugSymbols) {
+            this.setState({debugSymbols: message.debugSymbols})
         }
     }
 
@@ -112,7 +116,11 @@ export class DebuggerComponent extends BaseComponent {
                     <option value="pianorollview">Piano Roll</option>
                     <option value="listview">MIDI Event List</option>
                 </select>
-                <MidiViewComponent viewType={this.state.selectedView} midiData={this.state.midiData} onMidiFile={(x) => this.onMidiFile(x)}></MidiViewComponent> 
+                <MidiViewComponent 
+                    viewType={this.state.selectedView}
+                    debugSymbols={this.state.debugSymbols}
+                    midiData={this.state.midiData} 
+                    onMidiFile={(x) => this.onMidiFile(x)}></MidiViewComponent> 
             </div>
         );
     }

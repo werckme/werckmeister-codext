@@ -70,9 +70,9 @@ export class InspectorView extends AWebView {
 		this.currentPanel.webview.postMessage(message);
 	}
 
-	private async compile(sheetPath:string): Promise<any> {
+	private async compile(sheetPath:string, mode:CompilerMode = CompilerMode.json): Promise<any> {
 		const compiler = new Compiler();
-        const result = await compiler.compile(sheetPath, CompilerMode.json);
+        const result = await compiler.compile(sheetPath, mode);
 		let compileResult: any;
 		try {
 			compileResult = JSON.parse(result);
@@ -82,12 +82,27 @@ export class InspectorView extends AWebView {
 		return compileResult;
 	}
 
+	private async createDebugSymbols(sheetPath:string): Promise<any> {
+		const compiler = new Compiler();
+		if (await compiler.isDebugSymbolsSupported() === false) {
+			return null;
+		}
+        return this.compile(sheetPath, CompilerMode.debugSymbols);
+	}
+
 	private async sendCompileResult(sheetPath: string, compileResult: any) {
 		if (!this.currentPanel) {
 			return;
 		}
 		const sheetName = path.basename(sheetPath);
 		this.currentPanel.webview.postMessage({compiled: compileResult, sheetPath, sheetName});
+	}
+
+	private async sendDebugSymbols(sheetPath: string, debugSymbols: any) {
+		if (!this.currentPanel) {
+			return;
+		}
+		this.currentPanel.webview.postMessage({debugSymbols: debugSymbols, sheetPath});
 	}
 
 
@@ -108,6 +123,11 @@ export class InspectorView extends AWebView {
 		}
 		const compileResult = await this.compile(sheetPath);
 		this.sendCompileResult(sheetPath, compileResult);
+		const debugSymbols = await this.createDebugSymbols(sheetPath);
+		if (!debugSymbols) {
+			return;
+		}
+		this.sendDebugSymbols(sheetPath, debugSymbols);
 	}
 
 	onPlayerStateChanged(state: PlayerState) {
