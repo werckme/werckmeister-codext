@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { Player, getPlayer, OnPlayerMessageEvent, OnPlayerStateChanged, PlayerState, OnSourcesChanged } from "./Player";
 import { AWebView } from './AWebView';
-import { WMCommandStop, WMCommandPlay, WMCommandPause } from '../extension';
+import { WMCommandStop, WMCommandPlay, WMCommandPause, WMCommandOpenDebugger, WMCommandRevalInDebugView } from '../extension';
 import { ISheetInfo } from './SheetInfo';
 import { Compiler, CompilerMode } from './Compiler';
 import { getSheetHistory } from './SheetHistory';
@@ -16,6 +16,16 @@ const UpdateIfThisExtension:string[] = [
 
 const ViewTitle = "Werckmeister Inspector";
 const TitleUpdaterIntervalMillis = 500;
+
+const openedViews:InspectorView[] = [];
+function registerInspector(inspector: InspectorView) {
+	openedViews.push(inspector);
+}
+function unregisterInspector(inspector: InspectorView) {
+	const idx = openedViews.indexOf(inspector);
+	openedViews.splice(idx, 1);
+}
+
 export class InspectorView extends AWebView {
 	currentPanel: vscode.WebviewPanel|null = null;
 	get panel():  vscode.WebviewPanel|null {
@@ -31,6 +41,7 @@ export class InspectorView extends AWebView {
 	titleUpdater: NodeJS.Timeout|null = null;
 	constructor(context: vscode.ExtensionContext) {
 		super(context);
+		registerInspector(this);
 		this.onPlayerMessageBound = this.onPlayerMessage.bind(this);
 		this.onPlayerStateChangedBound = this.onPlayerStateChanged.bind(this);
 		this.onSourcesChangedBound = this.onSourcesChanged.bind(this);
@@ -231,9 +242,48 @@ export class InspectorView extends AWebView {
 	}
 
 	onPanelDidDispose() {
+		unregisterInspector(this);
 		super.onPanelDidDispose();
 		getPlayer().begin = 0;
 		this.removeListener();
+	}
+
+	private revealImpl(documentPath: string, positionOffset: number) {
+		if(!this.currentPanel) {
+			return;
+		}
+		this.currentPanel.webview.postMessage({
+			navigateTo: {
+				documentPath,
+				positionOffset
+			}
+		});
+	}
+
+	private static async waitUntilInspectorAreAvailable(): Promise<void> {
+		let maxTries = 20;
+		return new Promise<void>((resolve, reject) => {
+			const check = () => {
+				if (openedViews.length > 0) {
+					resolve();
+				}
+				if (--maxTries <= 0) {
+					reject();
+				}
+				setTimeout(check, 500);
+			};
+			check();
+		});
+	}
+
+	public static async reveal(documentPath: string, positionOffset: number):Promise<void> {
+		if (openedViews.length === 0) {
+			await vscode.commands.executeCommand(WMCommandOpenDebugger);
+			await this.waitUntilInspectorAreAvailable();
+		}
+		for(const inspector of openedViews) {
+			inspector.revealImpl(documentPath, positionOffset);
+		}
 	}
 
     protected createPanelImpl(): Promise<vscode.WebviewPanel> {

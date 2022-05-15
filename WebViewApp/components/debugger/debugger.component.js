@@ -36,6 +36,7 @@ export class DebuggerComponent extends BaseComponent {
             debugSymbols: null
         }
         this.compileResult = null;
+        this.midiViewComponent = null;
         window.addEventListener('message', event => { // get vscode message
             const message = event.data;
             this.handleMessage(message);
@@ -64,6 +65,18 @@ export class DebuggerComponent extends BaseComponent {
         }
         if(message.debugSymbols) {
             this.setState({debugSymbols: message.debugSymbols})
+        }
+        if(message.navigateTo) {
+            if (!this.compileResult || !this.compileResult.midi || !this.compileResult.midi.sources) {
+                return;
+            }
+            const navigateTo = message.navigateTo;
+            const source = this.compileResult.midi.sources.find(x => x.path === navigateTo.documentPath);
+            if (!source) {
+                return;
+            }
+            navigateTo.sourceId = source.sourceId;
+            this.midiViewComponent.navigateTo(navigateTo);
         }
     }
 
@@ -120,7 +133,8 @@ export class DebuggerComponent extends BaseComponent {
                     viewType={this.state.selectedView}
                     debugSymbols={this.state.debugSymbols}
                     midiData={this.state.midiData} 
-                    onMidiFile={(x) => this.onMidiFile(x)}></MidiViewComponent> 
+                    onMidiFile={(x) => this.onMidiFile(x)}
+                    ref={el => (this.midiViewComponent = el)}></MidiViewComponent> 
             </div>
         );
     }

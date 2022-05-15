@@ -14,6 +14,7 @@ import { PlayFromPosition } from './commands/PlayFromPosition';
 import { getLanguage } from './language/Language';
 import { ShowInspector } from './commands/ShowInspector';
 import { SaveMidi } from './commands/SaveMidi';
+import { RevealInDebugView } from './commands/RevealInDebugView';
 
 function excuteCommand(type: (new (context: vscode.ExtensionContext) => ACommand), context: vscode.ExtensionContext): void {
 	let cmd = new type(context);
@@ -29,6 +30,7 @@ export const WMCommandOpenSheeView = `${_ns}.sheetview`;
 export const WMCommandOpenPianoView = `${_ns}.pianoview`;
 export const WMCommandOpenTransportView = `${_ns}.transportview`;
 export const WMCommandOpenDebugger = `${_ns}.inspector`;
+export const WMCommandRevalInDebugView = `${_ns}.revealInDebugView`;
 export const WMDiagnosticCollectionName = "werckmeister";
 export const WMExternalHelpInstallWerckmeisterExtension = "https://werckme.github.io/code-extension";
 export const WMExternalWerckmeisterDownload = "https://werckme.github.io/getting-started";
@@ -64,7 +66,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);	
 
 	disposable = vscode.commands.registerCommand(WMPlayFromPosition, excuteCommand.bind(null, PlayFromPosition, context));
-	context.subscriptions.push(disposable);		
+	context.subscriptions.push(disposable);
+	
+	disposable = vscode.commands.registerCommand(WMCommandRevalInDebugView, excuteCommand.bind(null, RevealInDebugView, context));
+	context.subscriptions.push(disposable);	
 	
 	disposable = vscode.languages.registerCompletionItemProvider({ scheme: 'file', language: 'werckmeister' }, {
 		provideCompletionItems: async (document: vscode.TextDocument, position: vscode.Position, 

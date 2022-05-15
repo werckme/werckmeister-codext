@@ -62,6 +62,10 @@
             {
                 "command": "extension.werckmeister.saveMidi",
                 "title": "Werckmeister: create MIDI file"
+            },
+            {
+                "command": "extension.werckmeister.revealInDebugView",
+                "title": "Werckmeister: Reveal in Debug View"
             }
         ],
         "menus": {
@@ -115,7 +119,11 @@
                 {
                     "when": "resourceExtname == .sheet",
                     "command": "extension.werckmeister.saveMidi"
-                }
+                },
+                {
+                    "when": "resourceExtname == .sheet || resourceExtname == .template",
+                    "command": "extension.werckmeister.revealInDebugView"
+                }                
             ]
         },
         "languages": [

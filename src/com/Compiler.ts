@@ -18,7 +18,7 @@ export enum CompilerMode {
 }
 
 let _lastVersionCheckSucceed: boolean = false;
-let _debugSymbolSupport: boolean = false;
+let _debugSymbolSupport: boolean|null = null;
 
 export class Params {
     getVersion: boolean = false;
@@ -102,6 +102,9 @@ export class Compiler {
     async isDebugSymbolsSupported(): Promise<boolean> {
         if (_debugSymbolSupport === null) {
             await this.checkVersion();
+        }
+        if (_debugSymbolSupport === null) {
+            return false;
         }
         return _debugSymbolSupport;
     }

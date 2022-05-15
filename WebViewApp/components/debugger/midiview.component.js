@@ -1,7 +1,9 @@
 import React from "react";
 import * as _ from 'lodash';
-import {WmMidiFileDebugger} from '@werckmeister/midi-debugger';
+import { WmMidiFileDebugger } from '@werckmeister/midi-debugger';
 import { Base64Binary } from "../shared/Base64Binary";
+
+const highlightedClassName = "highlighted";
 
 export class MidiViewComponent extends React.Component {
     constructor(props) {
@@ -20,7 +22,7 @@ export class MidiViewComponent extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        if(this.props.debugSymbols !== prevProps.debugSymbols) {
+        if (this.props.debugSymbols !== prevProps.debugSymbols) {
             this.updateDebugSymbols(this.props.debugSymbols);
             return;
         }
@@ -39,6 +41,51 @@ export class MidiViewComponent extends React.Component {
         if (this.props.onMidiFile) {
             this.props.onMidiFile(this.dbgMidi.midifile);
         }
+    }
+
+    highlight(eventElement) {
+        eventElement.classList.add(highlightedClassName);
+    }
+
+    clearHighlights() {
+        const elements = document.querySelectorAll(`.${highlightedClassName}`);
+        for (const element of elements) {
+            element.classList.remove(highlightedClassName);
+        }
+    }
+
+    navigateTo(navigateTo) {
+        this.clearHighlights();
+        if (!this.props.debugSymbols) {
+            return;
+        }
+        const debugInfos = this.props.debugSymbols;
+        const dbgView = this.dbgMidi.views[0];
+        let firstViewElement = null;
+        debugInfos.filter(x => x.documentSourceId === navigateTo.sourceId
+            && navigateTo.positionOffset >= x.sourcePositionBegin
+            && navigateTo.positionOffset <= x.sourcePositionEnd
+        ).forEach((debugInfo) => {
+            const foundViewElement = dbgView.getEventElement(debugInfo.trackId, debugInfo.eventId);
+            if (!foundViewElement) {
+                return true; // aka continue
+            }
+            if (!firstViewElement) {
+                firstViewElement = foundViewElement;
+            }
+            this.highlight(foundViewElement);
+        });
+        if (!firstViewElement) {
+            return;
+        }
+        //document.querySelector("html").scrollTo(0, 0);
+        const bounds = firstViewElement.getBoundingClientRect();
+        const scrollView = document.querySelector("html");
+        scrollView.scrollTo({
+            left:bounds.x + scrollView.scrollLeft, 
+            top:bounds.y + scrollView.scrollTop, 
+            behavior: "smooth"
+        });
     }
 
     switchToListView() {
@@ -64,7 +111,7 @@ export class MidiViewComponent extends React.Component {
 
     updatePitchAliases(view, debugInfoJson) {
         const infosWithPitchAlias = debugInfoJson.filter(x => !!x.pitchAlias);
-        for(const info of infosWithPitchAlias) {
+        for (const info of infosWithPitchAlias) {
             const trackId = info.trackId;
             const eventId = info.eventId;
             const oldLabel = view.getEventLabelHtmlText(trackId, eventId);
