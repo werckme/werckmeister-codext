@@ -107,13 +107,26 @@ export class MidiViewComponent extends React.Component {
     }
 
     onViewClicked(ev) {
+        if(!this.props.onGoToEventSource) {
+            return;
+        }
         const view = this.dbgMidi.views[0];
-        const targetElement = ev.target.tagName === 'DIV' ? ev.target : ev.target.parentElement;
+        const elementOfInterestIsOneLevelHigher = ev.target.tagName !== 'DIV';
+        const targetElement = elementOfInterestIsOneLevelHigher ? ev.target.parentElement : ev.target;
         if (!targetElement) {
             return;
         }
         const eventIndices = view.findEventIndices(targetElement);
-        console.log(eventIndices)
+        if (!eventIndices) {
+            return;
+        }
+        const debugSymbolMatch = this.props
+            .debugSymbols
+            .find(x => x.trackId === eventIndices.trackIndex && x.eventId === eventIndices.eventIndex);
+        if(!debugSymbolMatch) {
+            return;
+        }
+        this.props.onGoToEventSource(debugSymbolMatch);
     }
 
     switchToListView() {

@@ -26,6 +26,17 @@ function unregisterInspector(inspector: InspectorView) {
 	openedViews.splice(idx, 1);
 }
 
+interface EventSourceInfo {
+	documentPath: string,
+	documentSourceId: number,
+	eventId: number,
+	midiType: number,
+	pitchAlias: string,
+	sourcePositionBegin:number,
+	sourcePositionEnd:number,
+	trackId:number
+}
+
 export class InspectorView extends AWebView {
 	currentPanel: vscode.WebviewPanel|null = null;
 	get panel():  vscode.WebviewPanel|null {
@@ -233,7 +244,21 @@ export class InspectorView extends AWebView {
 			case "player-play": return this.onPlayReceived(message.begin);
 			case "player-pause": return this.onPauseReceived();
 			case "debuggerview-ready": return this.onViewReady();
+			case "goToEventSource": return this.goToEventSource(message.eventInfo);
 		}
+	}
+
+	private async goToEventSource(eventInfo: EventSourceInfo) {
+		if (!eventInfo.documentPath) {
+			return;
+		}
+		const doc = await vscode.workspace.openTextDocument(eventInfo.documentPath);
+		const editor = await vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
+		const posBegin = editor.document.positionAt(eventInfo.sourcePositionBegin);
+		const posEnd = editor.document.positionAt(eventInfo.sourcePositionEnd);
+		const range = new vscode.Range(posBegin, posEnd);
+		editor.revealRange(range)
+		editor.selection = new vscode.Selection(posBegin, posEnd);
 	}
 
 	onWebViewStateChanged(ev:vscode.WebviewPanelOnDidChangeViewStateEvent) {

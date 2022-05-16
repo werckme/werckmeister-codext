@@ -112,6 +112,11 @@ export class DebuggerComponent extends BaseComponent {
         this.setState({selectedView: ev.target.value});
     }
 
+    onGoToEventSource(eventInfo) {
+        eventInfo.documentPath = (this.compileResult.midi.sources.find(x => x.sourceId === eventInfo.documentSourceId) || {}).path;
+        this.sendMessageToHost("goToEventSource", {eventInfo});
+    }
+
     render() {
         const message = !this.state.midiData ? <div className="error-message">{MsgMissingMidiData}</div> : <span></span>;
         return (
@@ -134,7 +139,9 @@ export class DebuggerComponent extends BaseComponent {
                     debugSymbols={this.state.debugSymbols}
                     midiData={this.state.midiData} 
                     onMidiFile={(x) => this.onMidiFile(x)}
-                    ref={el => (this.midiViewComponent = el)}></MidiViewComponent> 
+                    ref={el => (this.midiViewComponent = el)}
+                    onGoToEventSource={evInfo => this.onGoToEventSource(evInfo)}>
+                </MidiViewComponent> 
             </div>
         );
     }
