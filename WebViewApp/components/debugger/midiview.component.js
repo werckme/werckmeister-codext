@@ -5,6 +5,11 @@ import { Base64Binary } from "../shared/Base64Binary";
 
 const highlightedClassName = "highlighted";
 
+const viewTypes = {
+    Piano: "Piano",
+    List: "List"
+};
+
 export class MidiViewComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -18,6 +23,7 @@ export class MidiViewComponent extends React.Component {
         this.dbgMidi.addFilter(filterElement);
         this.dbgMidi.addPianoRollView(this.midiView);
         this.initListener();
+        this.viewType = viewTypes.Piano;
     }
 
     componentDidMount() {
@@ -81,10 +87,12 @@ export class MidiViewComponent extends React.Component {
             return;
         }
         const bounds = firstViewElement.getBoundingClientRect();
+        const visibleWidth = this.viewType === viewTypes.Piano ? this.midiView.clientWidth : 0;
+        const visibleHeight = this.viewType === viewTypes.Piano ? this.midiView.clientHeight : -250;
         const scrollView = document.querySelector("html");
         scrollView.scrollTo({
-            left:bounds.x + scrollView.scrollLeft, 
-            top:bounds.y + scrollView.scrollTop, 
+            left: bounds.x + scrollView.scrollLeft - visibleWidth/2,
+            top:  bounds.y + scrollView.scrollTop + visibleHeight/2,
             behavior: "smooth"
         });
     }
@@ -102,12 +110,12 @@ export class MidiViewComponent extends React.Component {
         }
         const view = this.dbgMidi.views[0];
         const viewElement = view.element;
-        viewElement.removeEventListener('dblclick', this.boundViewClickedFunction); 
+        viewElement.removeEventListener('dblclick', this.boundViewClickedFunction);
         this.boundViewClickedFunction = null;
     }
 
     onViewClicked(ev) {
-        if(!this.props.onGoToEventSource) {
+        if (!this.props.onGoToEventSource) {
             return;
         }
         const view = this.dbgMidi.views[0];
@@ -123,7 +131,7 @@ export class MidiViewComponent extends React.Component {
         const debugSymbolMatch = this.props
             .debugSymbols
             .find(x => x.trackId === eventIndices.trackIndex && x.eventId === eventIndices.eventIndex);
-        if(!debugSymbolMatch) {
+        if (!debugSymbolMatch) {
             return;
         }
         this.props.onGoToEventSource(debugSymbolMatch);
@@ -134,6 +142,7 @@ export class MidiViewComponent extends React.Component {
         this.dbgMidi.addListView(this.midiView);
         this.dbgMidi.update();
         this.initListener();
+        this.viewType = viewTypes.List;
     }
 
     switchToPianoRollView() {
@@ -141,6 +150,7 @@ export class MidiViewComponent extends React.Component {
         this.dbgMidi.addPianoRollView(this.midiView);
         this.dbgMidi.update();
         this.initListener();
+        this.viewType = viewTypes.Piano;
     }
 
     updateMidiView() {
@@ -158,7 +168,7 @@ export class MidiViewComponent extends React.Component {
             const trackId = info.trackId;
             const eventId = info.eventId;
             const oldLabel = view.getEventLabelHtmlText(trackId, eventId);
-            view.updateEventLabelHtmlText(trackId, eventId, `"${info.pitchAlias}" ${oldLabel}`);
+            view.updateEventLabelHtmlText(trackId, eventId, `"${info.pitchAlias}"->${oldLabel}`);
         }
     };
 
