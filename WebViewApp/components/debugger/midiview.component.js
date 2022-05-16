@@ -11,11 +11,13 @@ export class MidiViewComponent extends React.Component {
         this.state = {
             midiData: null
         };
+        this.boundViewClickedFunction = null;
         this.midiView = document.querySelector('#debugger-view');
         const filterElement = document.querySelector('#filter');
         this.dbgMidi = new WmMidiFileDebugger();
         this.dbgMidi.addFilter(filterElement);
         this.dbgMidi.addPianoRollView(this.midiView);
+        this.initListener();
     }
 
     componentDidMount() {
@@ -78,7 +80,6 @@ export class MidiViewComponent extends React.Component {
         if (!firstViewElement) {
             return;
         }
-        //document.querySelector("html").scrollTo(0, 0);
         const bounds = firstViewElement.getBoundingClientRect();
         const scrollView = document.querySelector("html");
         scrollView.scrollTo({
@@ -87,17 +88,46 @@ export class MidiViewComponent extends React.Component {
             behavior: "smooth"
         });
     }
+    initListener() {
+        this.clearListener();
+        const view = this.dbgMidi.views[0];
+        const viewElement = view.element;
+        this.boundViewClickedFunction = this.onViewClicked.bind(this);
+        viewElement.addEventListener('dblclick', this.boundViewClickedFunction);
+    }
+
+    clearListener() {
+        if (!this.boundViewClickedFunction) {
+            return;
+        }
+        const view = this.dbgMidi.views[0];
+        const viewElement = view.element;
+        viewElement.removeEventListener('dblclick', this.boundViewClickedFunction); 
+        this.boundViewClickedFunction = null;
+    }
+
+    onViewClicked(ev) {
+        const view = this.dbgMidi.views[0];
+        const targetElement = ev.target.tagName === 'DIV' ? ev.target : ev.target.parentElement;
+        if (!targetElement) {
+            return;
+        }
+        const eventIndices = view.findEventIndices(targetElement);
+        console.log(eventIndices)
+    }
 
     switchToListView() {
         this.dbgMidi.clearViews();
         this.dbgMidi.addListView(this.midiView);
         this.dbgMidi.update();
+        this.initListener();
     }
 
     switchToPianoRollView() {
         this.dbgMidi.clearViews();
         this.dbgMidi.addPianoRollView(this.midiView);
         this.dbgMidi.update();
+        this.initListener();
     }
 
     updateMidiView() {
