@@ -100,10 +100,6 @@
             "editor/context": [
                 {
                     "when": "resourceExtname == .sheet",
-                    "command": "extension.werckmeister.inspector"
-                },
-                {
-                    "when": "resourceExtname == .sheet",
                     "command": "extension.werckmeister.saveMidi"
                 },
                 {
