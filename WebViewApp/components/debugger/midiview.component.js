@@ -87,12 +87,13 @@ export class MidiViewComponent extends React.Component {
             return;
         }
         const bounds = firstViewElement.getBoundingClientRect();
-        const visibleWidth = this.viewType === viewTypes.Piano ? this.midiView.clientWidth : 0;
-        const visibleHeight = this.viewType === viewTypes.Piano ? this.midiView.clientHeight : -250;
+        const visibleView =  document.querySelector('html');
+        const visibleWidth = visibleView.clientWidth;
+        const visibleHeight = visibleView.clientHeight;
         const scrollView = document.querySelector("html");
         scrollView.scrollTo({
             left: bounds.x + scrollView.scrollLeft - visibleWidth/2,
-            top:  bounds.y + scrollView.scrollTop + visibleHeight/2,
+            top:  bounds.y + scrollView.scrollTop - visibleHeight/2,
             behavior: "smooth"
         });
     }
