@@ -167,7 +167,12 @@ export class MidiViewComponent extends React.Component {
         for (const info of infosWithPitchAlias) {
             const trackId = info.trackId;
             const eventId = info.eventId;
-            const oldLabel = view.getEventLabelHtmlText(trackId, eventId);
+            const eventElement = view.getEventElement(trackId, eventId);
+            if (!eventElement) {
+                continue;
+            }
+            const oldLabel = eventElement._wm_original_text || view.getEventLabelHtmlText(trackId, eventId);
+            eventElement._wm_original_text = oldLabel;
             view.updateEventLabelHtmlText(trackId, eventId, `"${info.pitchAlias}"->${oldLabel}`);
         }
     };
