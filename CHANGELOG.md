@@ -1,9 +1,11 @@
 # Change Log
 ## Version 1.0.2
 - find event in inspector (requires werckmeister>=1.0.41)
-<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/findevemtininspector.gif">
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/findininspector.gif">
 - find event in editor (requires werckmeister>=1.0.41)
-<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/findevemtineditor.gif">
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/findineditor.gif">
+- show pitch aliases in inspector (requires werckmeister>=1.0.41)
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/pitchaliaspreview.png">
 
 ## Version 1.0.17
 - MIDI output suggestions
