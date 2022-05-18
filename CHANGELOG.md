@@ -1,6 +1,9 @@
 # Change Log
 ## Version 1.0.2
-- find event in inspector (requires werckmeister 1.0.41)
+- find event in inspector (requires werckmeister>=1.0.41)
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/findevemtininspector.gif">
+- find event in editor (requires werckmeister>=1.0.41)
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/findevemtineditor.gif">
 
 ## Version 1.0.17
 - MIDI output suggestions
