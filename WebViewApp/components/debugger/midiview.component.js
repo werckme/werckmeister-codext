@@ -119,6 +119,9 @@ export class MidiViewComponent extends React.Component {
         if (!this.props.onGoToEventSource) {
             return;
         }
+        if (!this.props.debugSymbols) {
+            return;
+        }
         const view = this.dbgMidi.views[0];
         const elementOfInterestIsOneLevelHigher = ev.target.tagName !== 'DIV';
         const targetElement = elementOfInterestIsOneLevelHigher ? ev.target.parentElement : ev.target;
@@ -164,6 +167,9 @@ export class MidiViewComponent extends React.Component {
     }
 
     updatePitchAliases(view, debugInfoJson) {
+        if (!debugInfoJson) {
+            return;
+        }
         const infosWithPitchAlias = debugInfoJson.filter(x => !!x.pitchAlias);
         for (const info of infosWithPitchAlias) {
             const trackId = info.trackId;

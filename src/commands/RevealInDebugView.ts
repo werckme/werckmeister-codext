@@ -6,9 +6,6 @@ import { Compiler } from "../com/Compiler";
 export class RevealInDebugView extends ACommand {
     async execute(): Promise<void> {
         const compiler = new Compiler();
-        if (!(await compiler.isDebugSymbolsSupported())) {
-            vscode.window.showErrorMessage("This feature requires werckmeister >= 1.0.41");
-        }
         const currentEditor = vscode.window.activeTextEditor;
         if (!currentEditor) {
             return;

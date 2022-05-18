@@ -1,4 +1,7 @@
 # Change Log
+## Version 1.0.2
+- find event in inspector (requires werckmeister 1.0.41)
+
 ## Version 1.0.17
 - MIDI output suggestions
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/devicesuggestions.gif">

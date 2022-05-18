@@ -104,8 +104,9 @@ export class InspectorView extends AWebView {
 		let compileResult: any;
 		try {
 			compileResult = JSON.parse(result);
-		} catch {
+		} catch (ex){
 			vscode.window.showErrorMessage("failed parsing compiler response");
+			throw ex;
 		}
 		return compileResult;
 	}

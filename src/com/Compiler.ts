@@ -164,6 +164,9 @@ export class Compiler {
 
     async compile(sheetPath: string, mode: CompilerMode = CompilerMode.normal, output: string|null = null): Promise<string> {
         await this.checkVersion();
+        if (mode == CompilerMode.debugSymbols && !this.isDebugSymbolsSupported) {
+            return "{}";
+        }
         const params = new Params(sheetPath, mode);
         params.output = output;
         return this.executeCompiler(params);
