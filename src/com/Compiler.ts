@@ -8,7 +8,7 @@ import { existsSync as exists } from 'fs';
 
 export const CompilerExecutable = IsWindows ? 'sheetc.exe' : 'sheetc';
 
-const debugSymbolSupportVersion = 10330;
+const debugSymbolSupportVersion = 10410;
 
 export enum CompilerMode {
     normal = "normal",
