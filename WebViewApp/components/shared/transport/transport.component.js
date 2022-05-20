@@ -49,13 +49,11 @@ export class TransportComponent extends BaseComponent {
                 <style dangerouslySetInnerHTML={{
                     __html: `
                     .ccontainer {
-                        padding: 0px;
+                        padding: 4px 2px 2px 2px;
                         display: grid;
                         grid-template-rows: 25px 25px;
-                        grid-template-columns: 48px 48px auto 80px;
-                        grid-template-areas: 
-                            "play stop display range-from" 
-                            "play stop display range-to";
+                        grid-template-columns: 48px 48px auto 77px;
+                        grid-template-areas: "play stop display range-from" "play stop display range-to";
                         width: 288px;
                         font-weight: lighter;
                         font-family: monospace;
@@ -94,7 +92,6 @@ export class TransportComponent extends BaseComponent {
                         top: -10px;
                     }
                     input {
-                        background: #0000;
                         border: none;
                         color: var(--vscode-editor-foreground);
                         text-align: right;

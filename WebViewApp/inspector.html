@@ -8,7 +8,7 @@
           #debugger-view {
               color: black;
               position: relative;
-              top: 70px;
+              top: 120px;
           }
          .chkbx-grp {
               background: none;
@@ -27,21 +27,24 @@
           }
           .ccontainer {
             z-index: 20;
-            background: black;
+            background: #1e1e1ec7;
             position: fixed;
             top: 0;
-            width: 339px !important;
+            width: 370px !important;
+            border-radius: 8px;
             font-weight: lighter;
             font-family: monospace;
-            box-shadow: black 5px 6px 12px 0px;
+            border: 1px solid white;
+            backdrop-filter: blur(8px);
           }
           h2 {
-            position: relative;
-            top: 55px;
+            position: fixed;
+            top: 67px;
             font-weight: 100;
+            left: 21px;
           }
           .ccontainer input {
-            background: black;
+            background: rgba(0, 0, 0, 0);
           }
           .error-message {
             position: fixed;
@@ -49,6 +52,9 @@
           }
           .transport-state {
             font-size: 10px;
+            margin-left: 10px;
+            margin-top: -3px;
+            padding-bottom: 3px;
           }
           .wm-dbg-listview th, td {
               border: none;
@@ -78,7 +84,23 @@
             right: 5px;
             top: 5px;
             z-index: 20;
-          }                 
+          }
+          .event.highlighted {
+            border: 4px solid red;
+          }
+          .wm-dbg-listview  tr.highlighted {
+            border: 4px solid red;
+          }
+          .wm-dbg-listview  thead tr {
+            position: static;
+          }
+          .wm-dbg-listview  tr:hover {
+            filter: saturate(0.5);
+          }          
+          .event {
+            user-select: none;
+            border-radius: 6px;
+          }
       </style>
       <div id="debugger-main-component"></div>
       <div id="filter"></div>

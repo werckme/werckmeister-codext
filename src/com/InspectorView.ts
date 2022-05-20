@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { Player, getPlayer, OnPlayerMessageEvent, OnPlayerStateChanged, PlayerState, OnSourcesChanged } from "./Player";
 import { AWebView } from './AWebView';
-import { WMCommandStop, WMCommandPlay, WMCommandPause } from '../extension';
+import { WMCommandStop, WMCommandPlay, WMCommandPause, WMCommandOpenDebugger, WMCommandRevalInDebugView } from '../extension';
 import { ISheetInfo } from './SheetInfo';
 import { Compiler, CompilerMode } from './Compiler';
 import { getSheetHistory } from './SheetHistory';
@@ -16,6 +16,27 @@ const UpdateIfThisExtension:string[] = [
 
 const ViewTitle = "Werckmeister Inspector";
 const TitleUpdaterIntervalMillis = 500;
+
+const openedViews:InspectorView[] = [];
+function registerInspector(inspector: InspectorView) {
+	openedViews.push(inspector);
+}
+function unregisterInspector(inspector: InspectorView) {
+	const idx = openedViews.indexOf(inspector);
+	openedViews.splice(idx, 1);
+}
+
+interface EventSourceInfo {
+	documentPath: string,
+	documentSourceId: number,
+	eventId: number,
+	midiType: number,
+	pitchAlias: string,
+	sourcePositionBegin:number,
+	sourcePositionEnd:number,
+	trackId:number
+}
+
 export class InspectorView extends AWebView {
 	currentPanel: vscode.WebviewPanel|null = null;
 	get panel():  vscode.WebviewPanel|null {
@@ -26,24 +47,31 @@ export class InspectorView extends AWebView {
 	onSourcesChangedBound: any;
 	onDidDocumentSaveDisposable: vscode.Disposable|null= null;
 	sheetInfo: ISheetInfo|null = null;
-	onViewReady: ()=>void = ()=>{};
+	private onViewReady: ()=>void = ()=>{};
+	private onViewInitialRendered: ()=>void = ()=>{};
 	viewReady: Promise<void>;
+	viewInitialRendered: Promise<void>;
 	titleUpdater: NodeJS.Timeout|null = null;
 	constructor(context: vscode.ExtensionContext) {
 		super(context);
+		registerInspector(this);
 		this.onPlayerMessageBound = this.onPlayerMessage.bind(this);
 		this.onPlayerStateChangedBound = this.onPlayerStateChanged.bind(this);
 		this.onSourcesChangedBound = this.onSourcesChanged.bind(this);
 		this.viewReady = new Promise(resolve => {
 			this.onViewReady = resolve;
 		});
+		this.viewInitialRendered = new Promise(resolve => {
+			this.onViewInitialRendered = resolve;
+		})
 		if (vscode.window.activeTextEditor) {
 			const currentDocumentPath = vscode.window.activeTextEditor.document.fileName;
-			this.viewReady.then(() => {
-				this.compileAndUpdate(currentDocumentPath);
+			this.viewReady.then(async () => {
+				await this.compileAndUpdate(currentDocumentPath);
 				this.currentPanel!.webview.postMessage({
 					playerState: {newState: PlayerState[getPlayer().state]}
 				});
+				this.onViewInitialRendered();
 			})
 		}
 	}
@@ -70,16 +98,25 @@ export class InspectorView extends AWebView {
 		this.currentPanel.webview.postMessage(message);
 	}
 
-	private async compile(sheetPath:string): Promise<any> {
+	private async compile(sheetPath:string, mode:CompilerMode = CompilerMode.json): Promise<any> {
 		const compiler = new Compiler();
-        const result = await compiler.compile(sheetPath, CompilerMode.json);
+        const result = await compiler.compile(sheetPath, mode);
 		let compileResult: any;
 		try {
 			compileResult = JSON.parse(result);
-		} catch {
+		} catch (ex){
 			vscode.window.showErrorMessage("failed parsing compiler response");
+			throw ex;
 		}
 		return compileResult;
+	}
+
+	private async createDebugSymbols(sheetPath:string): Promise<any> {
+		const compiler = new Compiler();
+		if (await compiler.isDebugSymbolsSupported() === false) {
+			return null;
+		}
+        return this.compile(sheetPath, CompilerMode.debugSymbols);
 	}
 
 	private async sendCompileResult(sheetPath: string, compileResult: any) {
@@ -88,6 +125,13 @@ export class InspectorView extends AWebView {
 		}
 		const sheetName = path.basename(sheetPath);
 		this.currentPanel.webview.postMessage({compiled: compileResult, sheetPath, sheetName});
+	}
+
+	private async sendDebugSymbols(sheetPath: string, debugSymbols: any) {
+		if (!this.currentPanel) {
+			return;
+		}
+		this.currentPanel.webview.postMessage({debugSymbols: debugSymbols, sheetPath});
 	}
 
 
@@ -108,6 +152,11 @@ export class InspectorView extends AWebView {
 		}
 		const compileResult = await this.compile(sheetPath);
 		this.sendCompileResult(sheetPath, compileResult);
+		const debugSymbols = await this.createDebugSymbols(sheetPath);
+		if (!debugSymbols) {
+			return;
+		}
+		this.sendDebugSymbols(sheetPath, debugSymbols);
 	}
 
 	onPlayerStateChanged(state: PlayerState) {
@@ -196,7 +245,21 @@ export class InspectorView extends AWebView {
 			case "player-play": return this.onPlayReceived(message.begin);
 			case "player-pause": return this.onPauseReceived();
 			case "debuggerview-ready": return this.onViewReady();
+			case "goToEventSource": return this.goToEventSource(message.eventInfo);
 		}
+	}
+
+	private async goToEventSource(eventInfo: EventSourceInfo) {
+		if (!eventInfo.documentPath) {
+			return;
+		}
+		const doc = await vscode.workspace.openTextDocument(eventInfo.documentPath);
+		const editor = await vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
+		const posBegin = editor.document.positionAt(eventInfo.sourcePositionBegin);
+		const posEnd = editor.document.positionAt(eventInfo.sourcePositionEnd);
+		const range = new vscode.Range(posBegin, posEnd);
+		editor.revealRange(range)
+		editor.selection = new vscode.Selection(posBegin, posEnd);
 	}
 
 	onWebViewStateChanged(ev:vscode.WebviewPanelOnDidChangeViewStateEvent) {
@@ -211,9 +274,49 @@ export class InspectorView extends AWebView {
 	}
 
 	onPanelDidDispose() {
+		unregisterInspector(this);
 		super.onPanelDidDispose();
 		getPlayer().begin = 0;
 		this.removeListener();
+	}
+
+	private revealImpl(documentPath: string, positionOffset: number) {
+		if(!this.currentPanel) {
+			return;
+		}
+		this.currentPanel.webview.postMessage({
+			navigateTo: {
+				documentPath,
+				positionOffset
+			}
+		});
+	}
+
+	private static async waitUntilInspectorAreAvailable(): Promise<void> {
+		let maxTries = 20;
+		await new Promise<void>((resolve, reject) => {
+			const check = () => {
+				if (openedViews.length > 0) {
+					resolve();
+				}
+				if (--maxTries <= 0) {
+					reject();
+				}
+				setTimeout(check, 500);
+			};
+			check();
+		});
+		await Promise.all(openedViews.map(x => x.viewInitialRendered));
+	}
+
+	public static async reveal(documentPath: string, positionOffset: number):Promise<void> {
+		if (openedViews.length === 0) {
+			await vscode.commands.executeCommand(WMCommandOpenDebugger);
+			await this.waitUntilInspectorAreAvailable();
+		}
+		for(const inspector of openedViews) {
+			inspector.revealImpl(documentPath, positionOffset);
+		}
 	}
 
     protected createPanelImpl(): Promise<vscode.WebviewPanel> {

@@ -31,9 +31,12 @@ export class DebuggerComponent extends BaseComponent {
             sheetPath: "",
             sheetName: "",
             ppq: 0,
-            selectedView: ""
+            selectedView: "",
+            isFollow: false,
+            debugSymbols: null
         }
         this.compileResult = null;
+        this.midiViewComponent = null;
         window.addEventListener('message', event => { // get vscode message
             const message = event.data;
             this.handleMessage(message);
@@ -59,6 +62,21 @@ export class DebuggerComponent extends BaseComponent {
             this.setState({midiData: this.compileResult.midi.midiData, 
                 sheetPath: message.sheetPath,
                 sheetName: message.sheetName});
+        }
+        if(message.debugSymbols) {
+            this.setState({debugSymbols: message.debugSymbols})
+        }
+        if(message.navigateTo) {
+            if (!this.compileResult || !this.compileResult.midi || !this.compileResult.midi.sources) {
+                return;
+            }
+            const navigateTo = message.navigateTo;
+            const source = this.compileResult.midi.sources.find(x => x.path === navigateTo.documentPath);
+            if (!source) {
+                return;
+            }
+            navigateTo.sourceId = source.sourceId;
+            this.midiViewComponent.navigateTo(navigateTo);
         }
     }
 
@@ -92,6 +110,11 @@ export class DebuggerComponent extends BaseComponent {
         this.setState({selectedView: ev.target.value});
     }
 
+    onGoToEventSource(eventInfo) {
+        eventInfo.documentPath = (this.compileResult.midi.sources.find(x => x.sourceId === eventInfo.documentSourceId) || {}).path;
+        this.sendMessageToHost("goToEventSource", {eventInfo});
+    }
+
     render() {
         const message = !this.state.midiData ? <div className="error-message">{MsgMissingMidiData}</div> : <span></span>;
         return (
@@ -109,7 +132,14 @@ export class DebuggerComponent extends BaseComponent {
                     <option value="pianorollview">Piano Roll</option>
                     <option value="listview">MIDI Event List</option>
                 </select>
-                <MidiViewComponent viewType={this.state.selectedView} midiData={this.state.midiData} onMidiFile={(x) => this.onMidiFile(x)}></MidiViewComponent> 
+                <MidiViewComponent 
+                    viewType={this.state.selectedView}
+                    debugSymbols={this.state.debugSymbols}
+                    midiData={this.state.midiData} 
+                    onMidiFile={(x) => this.onMidiFile(x)}
+                    ref={el => (this.midiViewComponent = el)}
+                    onGoToEventSource={evInfo => this.onGoToEventSource(evInfo)}>
+                </MidiViewComponent> 
             </div>
         );
     }

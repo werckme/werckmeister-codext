@@ -9,6 +9,7 @@ import { ISheetInfo, IWarning } from './SheetInfo';
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as _ from "lodash";
+import { reject } from 'lodash';
 
 const freeUdpPort = require('udp-free-port');
 export const IsWindows:boolean = process.platform === 'win32';
@@ -33,26 +34,6 @@ export function werckmeisterWorkingDirectory() {
 export function toWMBINPath(executable: string) {
     return path.join(werckmeisterWorkingDirectory(), executable);
 }
-
-function killProcess(childProcess:ChildProcess, pid: number) {
-    if (IsWindows) {
-        if (!pid) {
-            return;
-        }
-        const cmd = toWMBINPath(`win32-kill-sheetp-process.exe ${pid}`)
-        exec(cmd, (err:ExecException|null, stdout: string, stderr: string)=>{
-            if (stderr.toString()) {
-                vscode.window.showErrorMessage(stderr.toString());
-            }
-            if (err != null) {
-                vscode.window.showInformationMessage(err.message || "");
-            }
-        });
-        return;
-    }
-    childProcess!.kill("SIGINT");
-}
-
 
 class Config {
     watch: boolean = false;
@@ -233,6 +214,22 @@ export class Player {
         return newProcess;
     }
 
+    public listDevices(): Promise<string> {
+        return new Promise((resolve, reject) => {
+            this._execute(this.wmPlayerPath, ["--list"], (err:any, stdout: any, stderr: any) => {
+                if (!!err) {
+                    reject(err);
+                    return;
+                }
+                try {            
+                    resolve(stdout);
+                } catch(ex)  {
+                    reject(ex);
+                }
+            });
+        });
+    }
+
     private updateDocumentInfo(): Promise<ISheetInfo> {
         return new Promise((resolve, reject) => {
             const config = new Config();
@@ -262,7 +259,6 @@ export class Player {
             return;
         }
         const oldState = this.state;
-        this.state = PlayerState.StartPlaying;
         const config = new Config();
         if (oldState === PlayerState.Paused) {
             config.begin = this.sheetTime;
@@ -272,7 +268,9 @@ export class Player {
         this.currentFile = sheetPath;
         await this.updateDocumentInfo();
         this.notifyDocumentWarningsIfAny();
-        return this._startPlayer(sheetPath, config);
+        const promise = this._startPlayer(sheetPath, config);
+        this.state = PlayerState.StartPlaying;
+        return promise;
     }
 
     async pause(): Promise<void> {
@@ -286,7 +284,7 @@ export class Player {
                 return;
             }
             this.stopUdpListener();
-            killProcess(this.process as ChildProcess,  this._pid);
+            this.killProcess(this.process as ChildProcess,  this._pid);
             let waitUntilEnd = () => {
                 if (!this.isPlaying) {
                     resolve();
@@ -298,6 +296,27 @@ export class Player {
             waitUntilEnd();
         });
     }
+
+    killProcessWindowsWorkaround(pid: number) {
+        if (!pid) {
+            return;
+        }
+        const killPath = toWMBINPath(`win32-kill-sheetp-process.exe`)
+        this._execute(killPath, [pid.toString()], (err:any, stdout: any, stderr: any) => {
+            if (!!err) {
+                vscode.window.showErrorMessage(stderr.toString());
+            }
+        });
+    }
+
+    killProcess(childProcess:ChildProcess, pid: number) {
+        if (IsWindows) {
+            this.killProcessWindowsWorkaround(pid);
+            return;
+        }
+        childProcess!.kill("SIGINT");
+    }
+    
 
     private async _startPlayer(sheetPath: string, config: Config): Promise<void> {
         return new Promise(async (resolve, reject) => {
@@ -340,7 +359,7 @@ export class Player {
         this.state = PlayerState.Stopping;
         return new Promise((resolve, reject) => {
             this.stopUdpListener();
-            killProcess(this.process as ChildProcess,  this._pid);
+            this.killProcess(this.process as ChildProcess,  this._pid);
             let waitUntilEnd = () => { // will be stopped after _startPlayer process exits
                 if (!this.isStopped) {
                     resolve();

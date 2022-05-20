@@ -1,40 +1,61 @@
-# Change Log
-## Version 1.0.14
-### Bugfix
+# Version 1.0.2
+## Feature
+- find event in inspector (requires werckmeister>=1.0.41)
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/findininspector.gif">
+- find event in editor (requires werckmeister>=1.0.41)
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/findineditor.gif">
+- show pitch aliases in inspector (requires werckmeister>=1.0.41)
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/pitchaliaspreview.png">
+
+# Version 1.0.17
+- MIDI output suggestions
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/devicesuggestions.gif">
+
+# Version 1.0.16
+## Feature
+- syntax highlighting updated
+
+# Version 1.0.15
+## Bugfix
+- windows version could not stop playback, when custom werckmeister path contains a space character
+- sheet position highlighting doesn't work on first playback
+
+# Version 1.0.14
+## Bugfix
 - inspector view updates its content not only when a `.sheet` file was changed
 - start playback fails if an unsupported file type is the current document
 
-## Version 1.0.13
-### Bugfix
+# Version 1.0.13
+## Bugfix
 - minor bugfixes
 
-## Version 1.0.12
-### Feature
+# Version 1.0.12
+## Feature
 - optimized code completion
 
-## Version 1.0.1
-### Bugfix
+# Version 1.0.1
+## Bugfix
 - playback starting twice when double click on play button (WINDOWS)
 
-## Version 1.0.0
-### New Features
+# Version 1.0.0
+## New Features
 - create MIDI function
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/createMIDI.gif">
 - improved Autocompletion
 - Documentation Hovers
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/hovers.gif">
 
-### Bugfixes
+## Bugfixes
 - [Debug View dissapears after document was updated](https://github.com/werckme/werckmeister-codext/issues/37)
 - [Piano Roll View fails with velocity = 0](https://github.com/werckme/werckmeister-codext/issues/35)
 - [Piano Roll View Quarter Pos is wrong](https://github.com/werckme/werckmeister-codext/issues/36)
 
-## Version 0.1.72
-### Bugfix
+# Version 0.1.72
+## Bugfix
  - minor fix regarding a version check
 
-## Version 0.1.71
-### New Features
+# Version 0.1.71
+## New Features
 - MIDI Inspector Piano Roll View
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/werckmeister-inspector-piano-roll.gif">
 - MIDI Inspector View Selection
@@ -42,39 +63,39 @@
 
 
 
-## Version 0.1.60
-### New Features
+# Version 0.1.60
+## New Features
 - MIDI Inspector
 - [Conduction Rules](https://werckme.github.io/manual#conduction-rules) language support
-## Version 0.1.51
+# Version 0.1.51
  - fixing typo in type ahead feature
-## Version 0.1.5
+# Version 0.1.5
  - adding Autocompletion support for usings, command arguments and values
-## Version 0.1.4
+# Version 0.1.4
  - [stop dosen't work on ubuntu](https://github.com/werckme/werckmeister-codext/issues/16)
 
-## Version 0.1.31
+# Version 0.1.31
 * Changelog updated
 
-## Version 0.1.3
-### Bugfixes
+# Version 0.1.3
+## Bugfixes
 
 - [player got into a state where it was'nt possible to start playback](https://github.com/werckme/werckmeister-codext/issues/13)
 - some error messages got no information 
 
-## Version 0.1.2
-### Bugfixes
+# Version 0.1.2
+## Bugfixes
 
  - [playback highlighting doesn't start](https://github.com/werckme/werckmeister-codext/issues/9)
  - [player fails to execute if warning is missing its source file](https://github.com/werckme/werckmeister-codext/issues/10)
 
 
-## Version 0.1.1
-### Bugfixes
+# Version 0.1.1
+## Bugfixes
 
  - [stop dosen't work on windows](https://github.com/werckme/werckmeister-codext/issues/6)
 
-## Version 0.1.0
+# Version 0.1.0
 
 - MIDI Playback from source
 - Playback visualization

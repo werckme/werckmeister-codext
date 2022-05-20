@@ -4,16 +4,21 @@
 import { spawn, ChildProcess, ExecException } from 'child_process';
 import { IsWindows, toWMBINPath } from './Player';
 import { WMMinimumWerckmeisterCompilerVersion } from '../extension';
+import { existsSync as exists } from 'fs';
 
 export const CompilerExecutable = IsWindows ? 'sheetc.exe' : 'sheetc';
+
+const debugSymbolSupportVersion = 10410;
 
 export enum CompilerMode {
     normal = "normal",
     json = "json",
-    validate = "validate"
+    validate = "validate",
+    debugSymbols = "debugSymbols"
 }
 
 let _lastVersionCheckSucceed: boolean = false;
+let _debugSymbolSupport: boolean|null = null;
 
 export class Params {
     getVersion: boolean = false;
@@ -94,6 +99,16 @@ export class Compiler {
        return version;
     }
 
+    async isDebugSymbolsSupported(): Promise<boolean> {
+        if (_debugSymbolSupport === null) {
+            await this.checkVersion();
+        }
+        if (_debugSymbolSupport === null) {
+            return false;
+        }
+        return _debugSymbolSupport;
+    }
+
     async checkVersion() {
         if (_lastVersionCheckSucceed) {
             return;
@@ -101,7 +116,7 @@ export class Compiler {
         const strVersion:string = await this.getVersion();
         const version:number = werckmeisterVersionToNumber(strVersion);
         const minVersion:number = werckmeisterVersionToNumber(WMMinimumWerckmeisterCompilerVersion);
-        
+        _debugSymbolSupport = version >= debugSymbolSupportVersion;
         if (version >= minVersion) {
             _lastVersionCheckSucceed = true;
             return;
@@ -149,6 +164,9 @@ export class Compiler {
 
     async compile(sheetPath: string, mode: CompilerMode = CompilerMode.normal, output: string|null = null): Promise<string> {
         await this.checkVersion();
+        if (mode == CompilerMode.debugSymbols && !this.isDebugSymbolsSupported) {
+            return "{}";
+        }
         const params = new Params(sheetPath, mode);
         params.output = output;
         return this.executeCompiler(params);
