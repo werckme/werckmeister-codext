@@ -18,6 +18,7 @@
         "onCommand:extension.werckmeister.stop",
         "onCommand:extension.werckmeister.pause",
         "onCommand:extension.werckmeister.inspector",
+        "onCommand:extension.werckmeister.connectToVst",
         "onLanguage:werckmeister"
     ],
     "main": "./dist/extension.js",
@@ -66,6 +67,10 @@
             {
                 "command": "extension.werckmeister.revealInDebugView",
                 "title": "Werckmeister: Show in Inspector"
+            },
+            {
+                "command": "extension.werckmeister.connectToVst",
+                "title": "Werckmeister: Connect To VST"
             }
         ],
         "menus": {

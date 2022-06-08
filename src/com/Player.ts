@@ -68,7 +68,8 @@ export enum PlayerState {
     Stopped,
     Stopping,
     Pausing,
-    Paused
+    Paused,
+    VstConnection
 }
 
 export class Player {
@@ -182,6 +183,14 @@ export class Player {
         });
         this.socket.bind(port);
         console.log(`listen udp messages on port ${port}`);
+    }
+
+    public async connectToVst(port: number): Promise<void> {
+        if(this.state !== PlayerState.Stopped) {
+            await this.stop();
+        }
+        this.state = PlayerState.VstConnection;
+        this.startUdpListener(port);
     }
 
     private stopUdpListener() {
