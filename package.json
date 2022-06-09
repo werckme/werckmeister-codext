@@ -19,6 +19,7 @@
         "onCommand:extension.werckmeister.pause",
         "onCommand:extension.werckmeister.inspector",
         "onCommand:extension.werckmeister.connectToVst",
+        "onCommand:extension.werckmeister.closeVstConnection",
         "onLanguage:werckmeister"
     ],
     "main": "./dist/extension.js",
@@ -71,6 +72,10 @@
             {
                 "command": "extension.werckmeister.connectToVst",
                 "title": "Werckmeister: Connect To VST"
+            },
+            {
+                "command": "extension.werckmeister.closeVstConnection",
+                "title": "Werckmeister: Close VST connection"
             }
         ],
         "menus": {

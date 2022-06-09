@@ -10,17 +10,29 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as _ from "lodash";
 import { reject } from 'lodash';
+import { getEditorEventDecorator } from './EditorEventDecorator';
 
 const freeUdpPort = require('udp-free-port');
 export const IsWindows:boolean = process.platform === 'win32';
 export const PlayerExecutable = IsWindows ? 'sheetp.exe' : 'sheetp';
 
+export interface ISheetEventInfo {
+    sourceId: number;
+    beginPosition: number;
+    endPosition: number;
+    beginTime?: number;
+    endTime?: number;
+}
+
 export interface IFunkfeuerMessage {
-    pid: number;
+    pid?: number;
+    type?: string;
+    sheetPath?: string;
     sheetTime: number;
     lastUpdateTimestamp: number;
-    sheetEventInfos: any[];
+    sheetEventInfos: ISheetEventInfo[];
 }
+
 
 export function werckmeisterWorkingDirectory() {
     const settings = vscode.workspace.getConfiguration('werckmeister');
@@ -65,11 +77,12 @@ export enum PlayerState {
     Undefined,
     StartPlaying,
     Playing,
+    ConnectingToVst,
+    ConnectedToVst,
     Stopped,
     Stopping,
     Pausing,
     Paused,
-    VstConnection
 }
 
 export class Player {
@@ -87,7 +100,8 @@ export class Player {
     get inTransition(): boolean {
         return this.state === PlayerState.StartPlaying
             || this.state === PlayerState.Stopping
-            || this.state === PlayerState.Pausing;
+            || this.state === PlayerState.Pausing
+            || this.state === PlayerState.ConnectedToVst;
     }
 
     get isStateChangeLocked(): boolean {
@@ -108,6 +122,11 @@ export class Player {
 
     get isPaused(): boolean {
         return this.state === PlayerState.Paused;
+    }
+
+    get isVstMode(): boolean {
+        return this.state === PlayerState.ConnectedToVst 
+        || this.state === PlayerState.ConnectingToVst;
     }
 
     get sheetTime(): number {
@@ -135,6 +154,7 @@ export class Player {
         if (this.state === val) {
             return;
         }
+        const oldState = this._state;
         this._state = val;
         if (this._state === PlayerState.Stopped) {
             this.begin = 0;
@@ -143,7 +163,7 @@ export class Player {
         if (this._state === PlayerState.Paused) {
             this._pid = 0;
         }
-        this.playerMessage.emit(OnPlayerStateChanged, this._state);
+        this.playerMessage.emit(OnPlayerStateChanged, this._state, oldState);
     }
 
     private updateSheetTime(message:IFunkfeuerMessage) {
@@ -162,35 +182,17 @@ export class Player {
         }
     }
 
-    private startUdpListener(port: number) {
+
+    private startUdpListener(port: number, onMessageCallback: (msg:Buffer) => void) {
         if (this.socket !== null) {
             return;
         }
         if (this.socket === null) {
             this.socket = dgram.createSocket('udp4');
         }
-        this.socket.on('message', (msg) => {
-            if (this.state === PlayerState.StartPlaying) {
-                this.state = PlayerState.Playing;
-            }
-            let message:IFunkfeuerMessage = JSON.parse(msg.toString());
-            if (this._pid === 0) {
-                this._pid = message.pid;
-            }
-            this.updateSheetTime(message);
-            this.checkForUpdate(message);
-            this.playerMessage.emit(exports.OnPlayerMessageEvent, message);
-        });
+        this.socket.on('message', onMessageCallback);
         this.socket.bind(port);
         console.log(`listen udp messages on port ${port}`);
-    }
-
-    public async connectToVst(port: number): Promise<void> {
-        if(this.state !== PlayerState.Stopped) {
-            await this.stop();
-        }
-        this.state = PlayerState.VstConnection;
-        this.startUdpListener(port);
     }
 
     private stopUdpListener() {
@@ -325,7 +327,50 @@ export class Player {
         }
         childProcess!.kill("SIGINT");
     }
-    
+
+
+    public async connectToVst(port: number): Promise<void> {
+        if(this.state !== PlayerState.Stopped) {
+            await this.stop();
+        }
+        this.state = PlayerState.ConnectingToVst;
+        this.startUdpListener(port, this.onVstUdpMessage.bind(this));
+    }
+
+    public async closeVstConnection(): Promise<void> {
+        if(!this.isVstMode) {
+            return;
+        }
+        this.stopUdpListener();
+        this.state = PlayerState.Stopped;
+        
+    }
+
+    private async onVstUdpMessage(msg: any): Promise<void> {
+        let message:IFunkfeuerMessage = JSON.parse(msg.toString());
+        const needToRecompile = message.sheetPath && message.sheetPath != this.currentFile;
+        if (needToRecompile) {
+            this.currentFile = message.sheetPath as string;
+            await this.updateDocumentInfo();
+            this.state = PlayerState.ConnectedToVst;
+        }
+        this.updateSheetTime(message);
+        this.checkForUpdate(message);
+        this.playerMessage.emit(exports.OnPlayerMessageEvent, message);
+    }
+
+    private onPlayerUdpMessage(msg: any): void {
+        if (this.state === PlayerState.StartPlaying) {
+            this.state = PlayerState.Playing;
+        }
+        let message:IFunkfeuerMessage = JSON.parse(msg.toString());
+        if (this._pid === 0 && message.pid) {
+            this._pid = message.pid;
+        }
+        this.updateSheetTime(message);
+        this.checkForUpdate(message);
+        this.playerMessage.emit(exports.OnPlayerMessageEvent, message);
+    }
 
     private async _startPlayer(sheetPath: string, config: Config): Promise<void> {
         return new Promise(async (resolve, reject) => {
@@ -353,7 +398,7 @@ export class Player {
                     this.state = PlayerState.Stopped;
                 }
             });
-            this.startUdpListener(config.port);
+            this.startUdpListener(config.port, this.onPlayerUdpMessage.bind(this));
         });
     }
 
@@ -426,6 +471,7 @@ let globalPlayer: Player;
 export function getPlayer(): Player {
     if (!globalPlayer) {
         globalPlayer = new Player();
+        getEditorEventDecorator(); // initiate singleton
     }
     return globalPlayer;
 }

@@ -16,6 +16,7 @@ import { ShowInspector } from './commands/ShowInspector';
 import { SaveMidi } from './commands/SaveMidi';
 import { RevealInDebugView } from './commands/RevealInDebugView';
 import { ConnectToVst } from './commands/ConnectToVst';
+import { CloseVstConnection } from './commands/CloseVstConnection';
 
 function excuteCommand(type: (new (context: vscode.ExtensionContext) => ACommand), context: vscode.ExtensionContext): void {
 	let cmd = new type(context);
@@ -32,7 +33,8 @@ export const WMCommandOpenPianoView = `${_ns}.pianoview`;
 export const WMCommandOpenTransportView = `${_ns}.transportview`;
 export const WMCommandOpenDebugger = `${_ns}.inspector`;
 export const WMCommandRevalInDebugView = `${_ns}.revealInDebugView`;
-export const WMCommandConnectToVst = `${_ns}.connectToVst`;
+export const WMCommandConnectToVst = `${_ns}.connectToVst`; 
+export const WMCommandCloseVstConnection = `${_ns}.closeVstConnection`; 
 export const WMDiagnosticCollectionName = "werckmeister";
 export const WMExternalHelpInstallWerckmeisterExtension = "https://werckme.github.io/code-extension";
 export const WMExternalWerckmeisterDownload = "https://werckme.github.io/getting-started";
@@ -74,7 +76,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);	
 
 	disposable = vscode.commands.registerCommand(WMCommandConnectToVst, excuteCommand.bind(null, ConnectToVst, context));
-	context.subscriptions.push(disposable);		
+	context.subscriptions.push(disposable);
+	
+	disposable = vscode.commands.registerCommand(WMCommandCloseVstConnection, excuteCommand.bind(null, CloseVstConnection, context));
+	context.subscriptions.push(disposable);
 	
 	disposable = vscode.languages.registerCompletionItemProvider({ scheme: 'file', language: 'werckmeister' }, {
 		provideCompletionItems: async (document: vscode.TextDocument, position: vscode.Position, 
