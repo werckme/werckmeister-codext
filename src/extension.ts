@@ -17,6 +17,7 @@ import { SaveMidi } from './commands/SaveMidi';
 import { RevealInDebugView } from './commands/RevealInDebugView';
 import { ConnectToVst } from './commands/ConnectToVst';
 import { CloseVstConnection } from './commands/CloseVstConnection';
+import { VstConnectionsProvider } from './com/VstConnectionsProvider';
 
 function excuteCommand(type: (new (context: vscode.ExtensionContext) => ACommand), context: vscode.ExtensionContext): void {
 	let cmd = new type(context);
@@ -98,6 +99,10 @@ export function activate(context: vscode.ExtensionContext) {
 			},
 		
 	});
+
+	vscode.window.createTreeView('werckmeister-vstConnections', {
+		treeDataProvider: new VstConnectionsProvider()
+	  });
 	
 	diagnosticCollection = vscode.languages.createDiagnosticCollection(WMDiagnosticCollectionName);
 	context.subscriptions.push(diagnosticCollection);

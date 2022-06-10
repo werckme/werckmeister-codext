@@ -20,10 +20,28 @@
         "onCommand:extension.werckmeister.inspector",
         "onCommand:extension.werckmeister.connectToVst",
         "onCommand:extension.werckmeister.closeVstConnection",
+        "onView:werckmeister-vstConnections",
         "onLanguage:werckmeister"
     ],
     "main": "./dist/extension.js",
     "contributes": {
+        "viewsContainers": {
+            "activitybar": [
+              {
+                "id": "werckmeister-vst",
+                "title": "Werckmeister VST",
+                "icon": "resources/werckmeister.svg"
+              }
+            ]
+          },
+        "views": {
+            "werckmeister-vst": [
+                {
+                    "id": "werckmeister-vstConnections",
+                    "name": "Werckmeister Vst Connections"
+                }
+            ]
+        },
         "commands": [
             {
                 "command": "extension.werckmeister.play",
