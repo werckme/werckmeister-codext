@@ -27,13 +27,13 @@
     "contributes": {
         "viewsContainers": {
             "activitybar": [
-              {
-                "id": "werckmeister-vst",
-                "title": "Werckmeister VST",
-                "icon": "resources/werckmeister.svg"
-              }
+                {
+                    "id": "werckmeister-vst",
+                    "title": "Werckmeister VST",
+                    "icon": "./resources/werckmeister.svg"
+                }
             ]
-          },
+        },
         "views": {
             "werckmeister-vst": [
                 {
@@ -94,9 +94,29 @@
             {
                 "command": "extension.werckmeister.closeVstConnection",
                 "title": "Werckmeister: Close VST connection"
+            },
+            {
+                "command": "extension.werckmeister.refreshVstConnections",
+                "title": "Refresh",
+                "icon": {
+                    "light": "resources/light/refresh.svg",
+                    "dark": "resources/dark/refresh.svg"
+                }
             }
         ],
         "menus": {
+            "view/item/context": [
+                {
+                    "command": "extension.werckmeister.connectToVst",
+                    "when": "view == werckmeister-vstConnections && viewItem == werckmeister-vst-instance-open",
+                    "group": "inline"
+                },
+                {
+                    "command": "extension.werckmeister.closeVstConnection",
+                    "when": "view == werckmeister-vstConnections && viewItem == werckmeister-vst-instance-connected",
+                    "group": "inline"
+                }
+            ],
             "commandPalette": [
                 {
                     "when": "resourceExtname == .sheet",

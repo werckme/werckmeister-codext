@@ -1,21 +1,15 @@
-import * as vscode from 'vscode';
-import { Play } from "./Play";
 import { getPlayer } from '../com/Player';
+import { Connection, ConnectionState, getVstConnectionProvider, VstConnectionTreeItem } from '../com/VstConnectionsProvider';
+import { ACommand } from './ACommand';
 
-let _lastPosition = 0;
 
-export class ConnectToVst extends Play {
-    async execute(): Promise<void> {
-        const input = await vscode.window.showInputBox({value: _lastPosition.toString(), prompt: "port"});
-        if (input === undefined) {
-            return;
-        }
-        const port = Number.parseFloat(input);
-        if (Number.isNaN(port)) {
-            return;
-        }
+export class ConnectToVst extends ACommand {
+    async execute(...args: any[]): Promise<void> {
+        const treeItem:VstConnectionTreeItem = args[0][0];
         const player = getPlayer();
-        player.connectToVst(port);
+        await player.connectToVst(treeItem.connection.port);
+        treeItem.connection.state = ConnectionState.Connected;
+        getVstConnectionProvider().refresh();
     }
 
 }

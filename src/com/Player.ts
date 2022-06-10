@@ -329,12 +329,33 @@ export class Player {
     }
 
 
+    /**
+     * waits for an expected state, rejects if state changes but not to the expected
+     * @param expectedState 
+     */
+    public waitForStateChange(expectedState: PlayerState, waitIdleMillis = 500): Promise<void> {
+        const currentState = this.state;
+        return new Promise((resolve, reject)=>{
+            const checkConnection = () => {
+                if (this.state === expectedState) {
+                    resolve();
+                }
+                if (this.state !== currentState) {
+                    reject();
+                }
+                setTimeout(checkConnection.bind(this), waitIdleMillis);
+            }
+            checkConnection();
+        });
+    }
+
     public async connectToVst(port: number): Promise<void> {
         if(this.state !== PlayerState.Stopped) {
             await this.stop();
         }
         this.state = PlayerState.ConnectingToVst;
         this.startUdpListener(port, this.onVstUdpMessage.bind(this));
+        await this.waitForStateChange(PlayerState.ConnectedToVst);
     }
 
     public async closeVstConnection(): Promise<void> {
@@ -343,7 +364,6 @@ export class Player {
         }
         this.stopUdpListener();
         this.state = PlayerState.Stopped;
-        
     }
 
     private async onVstUdpMessage(msg: any): Promise<void> {
