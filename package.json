@@ -38,7 +38,7 @@
             "werckmeister-vst": [
                 {
                     "id": "werckmeister-vstConnections",
-                    "name": "Werckmeister Vst Connections"
+                    "name": "VST Connections"
                 }
             ]
         },
@@ -99,12 +99,19 @@
                 "command": "extension.werckmeister.refreshVstConnections",
                 "title": "Refresh",
                 "icon": {
-                    "light": "resources/light/refresh.svg",
-                    "dark": "resources/dark/refresh.svg"
+                    "light": "./resources/refresh_light.svg",
+                    "dark": "./resources/refresh_dark.svg"
                 }
             }
         ],
         "menus": {
+            "view/title": [
+                {
+                    "command": "extension.werckmeister.refreshVstConnections",
+                    "when": "view == werckmeister-vstConnections",
+                    "group": "navigation"
+                }
+            ],
             "view/item/context": [
                 {
                     "command": "extension.werckmeister.connectToVst",
