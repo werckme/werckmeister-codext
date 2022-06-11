@@ -11,6 +11,8 @@ import * as path from 'path';
 import * as _ from "lodash";
 import { reject } from 'lodash';
 import { getEditorEventDecorator } from './EditorEventDecorator';
+import { Connection, ConnectionState } from './VstConnectionsProvider';
+import { getVstConnectionListener, ListenerId } from './VstConnectionListener';
 
 const freeUdpPort = require('udp-free-port');
 export const IsWindows:boolean = process.platform === 'win32';
@@ -93,9 +95,11 @@ export class Player {
     private process: ChildProcess|null = null;
     sheetInfo: ISheetInfo|null = null;
     currentFile: string|null = null;
+    vstConnection: Connection|null = null;
     begin: number = 0;
     private _sheetTime: number = 0;
     private lastUpdateTimestamp = 0;
+    private vstConnectionListenerId: ListenerId|null = null;
 
     get inTransition(): boolean {
         return this.state === PlayerState.StartPlaying
@@ -333,15 +337,24 @@ export class Player {
      * waits for an expected state, rejects if state changes but not to the expected
      * @param expectedState 
      */
-    public waitForStateChange(expectedState: PlayerState, waitIdleMillis = 500): Promise<void> {
+    public waitForStateChange(expectedState: PlayerState, waitIdleMillis = 500, timeoutMillis = 3000): Promise<void> {
         const currentState = this.state;
+        let waitedTotal = 0;
+        timeoutMillis += waitIdleMillis; // first call doesn't wait
         return new Promise((resolve, reject)=>{
             const checkConnection = () => {
+                waitedTotal += waitIdleMillis;
+                if (waitedTotal > timeoutMillis) {
+                    reject();
+                    return;
+                }
                 if (this.state === expectedState) {
                     resolve();
+                    return;
                 }
                 if (this.state !== currentState) {
                     reject();
+                    return;
                 }
                 setTimeout(checkConnection.bind(this), waitIdleMillis);
             }
@@ -349,29 +362,51 @@ export class Player {
         });
     }
 
-    public async connectToVst(port: number): Promise<void> {
+    public async connectToVst(connecttion:Connection): Promise<void> {
         if(this.state !== PlayerState.Stopped) {
             await this.stop();
         }
+        if (this.vstConnectionListenerId !== null) {
+            return;
+        }
         this.state = PlayerState.ConnectingToVst;
-        this.startUdpListener(port, this.onVstUdpMessage.bind(this));
-        await this.waitForStateChange(PlayerState.ConnectedToVst);
+        try {
+            const needToRecompile = connecttion.sheetPath != this.currentFile;
+            if (needToRecompile) {
+                this.currentFile = connecttion.sheetPath as string;
+                await this.updateDocumentInfo();
+            }
+            this.vstConnectionListenerId = getVstConnectionListener().addListener(this.onVstUdpMessage.bind(this));
+            await this.waitForStateChange(PlayerState.ConnectedToVst);
+            connecttion.state = ConnectionState.Connected;
+            this.vstConnection = connecttion;
+        } catch {
+            this.state = PlayerState.Stopped;
+            return;
+        }
     }
 
     public async closeVstConnection(): Promise<void> {
         if(!this.isVstMode) {
             return;
         }
-        this.stopUdpListener();
+        if (!this.vstConnectionListenerId) {
+            return;
+        }
+        if (!this.vstConnection) {
+            return;
+        }
+        getVstConnectionListener().removeListener(this.vstConnectionListenerId);
+        this.vstConnectionListenerId = null;
         this.state = PlayerState.Stopped;
+        this.vstConnection.state = ConnectionState.Open;
     }
 
-    private async onVstUdpMessage(msg: any): Promise<void> {
-        let message:IFunkfeuerMessage = JSON.parse(msg.toString());
-        const needToRecompile = message.sheetPath && message.sheetPath != this.currentFile;
-        if (needToRecompile) {
-            this.currentFile = message.sheetPath as string;
-            await this.updateDocumentInfo();
+    private async onVstUdpMessage(message: IFunkfeuerMessage): Promise<void> {
+        if (message.sheetPath !== this.currentFile) {
+            return;
+        }
+        if (this.state !== PlayerState.ConnectedToVst) {
             this.state = PlayerState.ConnectedToVst;
         }
         this.updateSheetTime(message);

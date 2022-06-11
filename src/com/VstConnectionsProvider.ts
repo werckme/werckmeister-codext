@@ -1,11 +1,10 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as dgram from 'dgram';
-import { IFunkfeuerMessage } from './Player';
+import { getPlayer, IFunkfeuerMessage } from './Player';
+import { getVstConnectionListener } from './VstConnectionListener';
 
-const numParalelRequest = 500;
-const portRange = [9000, 10000];
-
+const port = 99192
+const scanWaitTimeMillis = 2 * 1000;
 export enum ConnectionState {
     Open = "Not Connected",
     Connected = "Connected"
@@ -19,27 +18,20 @@ export class Connection {
 
     set state(newValue: ConnectionState) {
         this._state = newValue;
-        if (newValue === ConnectionState.Connected) {
-            establishedConnections.push(this);
-        } else {
-            establishedConnections.splice(establishedConnections.indexOf(this), 1);
-        }
     }
 
-    constructor(public port: number = 0, public sheetPath: string = "") {}
+    constructor(public port: number, public sheetPath: string = "") {}
     get fileName(): string {
         return path.basename(this.sheetPath);
     }
     
 };
 
-const werckmeisterMagic = "werckmeister-vst-funk";
+
 let vstConnectionsProviderInstance: VstConnectionsProvider | null;
 
-const establishedConnections: Connection[] = [];
-
 export class VstConnectionsProvider implements vscode.TreeDataProvider<VstConnectionTreeItem> {
-
+    private connections: Map<string, Connection> = new Map<string, Connection>();
     private _onDidChangeTreeData: vscode.EventEmitter<VstConnectionTreeItem | undefined | null> = new vscode.EventEmitter<VstConnectionTreeItem | undefined | null>();
 	readonly onDidChangeTreeData: vscode.Event<VstConnectionTreeItem | undefined | null> = this._onDidChangeTreeData.event;
 
@@ -59,51 +51,38 @@ export class VstConnectionsProvider implements vscode.TreeDataProvider<VstConnec
     }
 
     private async scanForConnections(): Promise<Connection[]> {
-        let results: Connection[] = [];
-        for(let portBegin = portRange[0]; portBegin < portRange[1]; portBegin+= numParalelRequest) {
-            const tasks:Promise<Connection>[] = [];
-            const portEnd = portBegin + numParalelRequest;
-            for(let port = portBegin; port < portEnd; ++port) {
-                tasks.push(this.tryToConnect(port));
-            }
-            results = [...results, ...await Promise.all(tasks)];
-        }
-        return results.filter(x => !!x.port);
-    }
-
-    private tryToConnect(port: number): Promise<Connection> {
-        return new Promise<Connection>(resolve => {
-            const established = establishedConnections.find(x=>x.port===port) 
-            if(!!established) {
-                resolve(established);
-                return;
-            }
-            let socket: dgram.Socket = dgram.createSocket('udp4');
-            socket.on('message', (msg) => {
-                try {
-                    const json: IFunkfeuerMessage = JSON.parse(msg.toString());
-                    if (json.type !== werckmeisterMagic) {
-                        resolve(new Connection());
-                        return;
-                    }
-                    resolve(new Connection(port, json.sheetPath));
-                } catch {
-                    resolve(new Connection());
-                } finally {
-                    socket.close();
+        return new Promise<Connection[]>((resolve, reject) => {
+            const sheetFiles:Set<string> = new Set<string>();
+            const vstConnectionListener = getVstConnectionListener();
+            const listenerId = vstConnectionListener.addListener(msg => {
+                if (!msg.sheetPath) {
+                    return;
                 }
+                sheetFiles.add(msg.sheetPath);
             });
-            socket.on('error', (msg) => {
-                resolve(new Connection());
-            });            
-            socket.bind(port);
-            const cancel = () => {
-                resolve(new Connection());
-                socket.close();
-            };
-            setTimeout(cancel, 500);
+            setTimeout(() => {
+                vstConnectionListener.removeListener(listenerId);
+                const receivedSheets = Array.from(sheetFiles);
+                const newConnections = receivedSheets
+                    .filter(x => this.connections.has(x) === false)
+                    .map(x => new Connection(port, x));
+                for(const newConnection of newConnections) {
+                    this.connections.set(newConnection.sheetPath, newConnection);
+                }
+                const lostConnections = Array.from(this.connections.keys())
+                    .filter(x => receivedSheets.includes(x) === false);
+                for(const lostConnectionId of lostConnections) {
+                    const connection = this.connections.get(lostConnectionId);
+                    if (connection && connection.state === ConnectionState.Connected) {
+                        getPlayer().closeVstConnection();
+                    }
+                    this.connections.delete(lostConnectionId);
+                }
+                resolve(Array.from(this.connections.values()));
+            }, scanWaitTimeMillis);
         });
-    }
+    }  
+
 }
 
 export function getVstConnectionProvider(): VstConnectionsProvider {
