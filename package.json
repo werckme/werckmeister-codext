@@ -206,7 +206,7 @@
                 "werckmeister.werckmeisterBinaryDirectory": {
                     "type": "string",
                     "default": null,
-                    "description": "Specifiy the folder path where the executables \"sheetp\" and \"sheetc\" are located. If empty systems default will be used."
+                    "description": "Specifiy the folder path where the executables \"sheetp\" and \"sheetc\" are located. If empty system default will be used."
                 },
                 "werckmeister.vstUdpPort": {
                     "type": "number",
