@@ -97,7 +97,7 @@
             },
             {
                 "command": "extension.werckmeister.refreshVstConnections",
-                "title": "Refresh",
+                "title": "Werckmeister: Refresh VST connections",
                 "icon": {
                     "light": "./resources/refresh_light.svg",
                     "dark": "./resources/refresh_dark.svg"
@@ -206,7 +206,7 @@
                 "werckmeister.werckmeisterBinaryDirectory": {
                     "type": "string",
                     "default": null,
-                    "description": "Specifiy the folder path where the executables \"sheetp\" and \"sheetc\" are located. If empty system default will be used."
+                    "description": "Specifiy the folder path where the executables \"sheetp\" and \"sheetc\" are located. If empty system search PATH will be used."
                 },
                 "werckmeister.vstUdpPort": {
                     "type": "number",
