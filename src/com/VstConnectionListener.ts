@@ -2,7 +2,6 @@ import * as dgram from 'dgram';
 import * as vscode from 'vscode';
 import { IFunkfeuerMessage } from './Player';
 
-const port = 99192;
 const werckmeisterMagic = "werckmeister-vst-funk";
 
 export type Callback = (msg:IFunkfeuerMessage) => void;
@@ -11,6 +10,12 @@ export type ListenerId = number;
 let idCounter = 0;
 
 export class VstConnectionListener {
+
+    public get port() : number {
+        const settings = vscode.workspace.getConfiguration('werckmeister');
+        return settings.vstUdpPort as number;
+    }
+    
     private onMessageEventEmitter: vscode.EventEmitter<IFunkfeuerMessage> = new vscode.EventEmitter<IFunkfeuerMessage>();
 	private readonly onMessageEvent: vscode.Event<IFunkfeuerMessage> = this.onMessageEventEmitter.event;
     private socket: dgram.Socket|null = null;
@@ -36,7 +41,7 @@ export class VstConnectionListener {
             this.socket = dgram.createSocket('udp4');
         }
         this.socket.on('message', this.onMessageCallback.bind(this));
-        this.socket.bind(port);
+        this.socket.bind(this.port);
     }
     
     stop() {

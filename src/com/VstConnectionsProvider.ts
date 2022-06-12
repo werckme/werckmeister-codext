@@ -3,7 +3,6 @@ import * as path from 'path';
 import { getPlayer, IFunkfeuerMessage } from './Player';
 import { getVstConnectionListener } from './VstConnectionListener';
 
-const port = 99192
 const scanWaitTimeMillis = 2 * 1000;
 export enum ConnectionState {
     Open = "Not Connected",
@@ -65,7 +64,7 @@ export class VstConnectionsProvider implements vscode.TreeDataProvider<VstConnec
                 const receivedSheets = Array.from(sheetFiles);
                 const newConnections = receivedSheets
                     .filter(x => this.connections.has(x) === false)
-                    .map(x => new Connection(port, x));
+                    .map(x => new Connection(vstConnectionListener.port, x));
                 for(const newConnection of newConnections) {
                     this.connections.set(newConnection.sheetPath, newConnection);
                 }

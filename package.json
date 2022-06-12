@@ -206,7 +206,12 @@
                 "werckmeister.werckmeisterBinaryDirectory": {
                     "type": "string",
                     "default": null,
-                    "description": "Specifiy the folder path where the executables \"sheetp\" and \"sheetc\" are located."
+                    "description": "Specifiy the folder path where the executables \"sheetp\" and \"sheetc\" are located. If empty systems default will be used."
+                },
+                "werckmeister.vstUdpPort": {
+                    "type": "number",
+                    "default": 7935,
+                    "description": "VST UDP Port, must match with the port set in the Werckmeister-VST preferences."
                 }
             }
         }
