@@ -90,7 +90,7 @@ export class EditorEventDecorator {
         }
         const editorPath = path.resolve(editor.document.uri.fsPath);
         const sourcePath = path.resolve(sourceInfo.path);
-        return editorPath === sourcePath;
+        return editorPath.toLowerCase() === sourcePath.toLowerCase();
     }
 
     protected updateSheetEventInfos(sheetEventInfos: ISheetEventInfo[]) {
