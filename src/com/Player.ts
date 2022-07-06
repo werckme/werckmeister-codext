@@ -13,6 +13,7 @@ import { reject } from 'lodash';
 import { getEditorEventDecorator } from './EditorEventDecorator';
 import { Connection, ConnectionState } from './VstConnectionsProvider';
 import { getVstConnectionListener, ListenerId } from './VstConnectionListener';
+import { getLanguage } from '../language/Language';
 
 const freeUdpPort = require('udp-free-port');
 export const IsWindows:boolean = process.platform === 'win32';
@@ -100,6 +101,7 @@ export class Player {
     private _sheetTime: number = 0;
     private lastUpdateTimestamp = 0;
     private vstConnectionListenerId: ListenerId|null = null;
+    private onDidDocumentSaveDisposable: vscode.Disposable|null= null;
 
     get inTransition(): boolean {
         return this.state === PlayerState.StartPlaying
@@ -362,7 +364,7 @@ export class Player {
         });
     }
 
-    public async connectToVst(connecttion:Connection): Promise<void> {
+    public async connectToVst(connection:Connection): Promise<void> {
         if(this.state !== PlayerState.Stopped) {
             await this.stop();
         }
@@ -371,18 +373,35 @@ export class Player {
         }
         this.state = PlayerState.ConnectingToVst;
         try {
-            const needToRecompile = connecttion.sheetPath != this.currentFile;
-            if (needToRecompile) {
-                this.currentFile = connecttion.sheetPath as string;
-                await this.updateDocumentInfo();
-            }
+            this.currentFile = connection.sheetPath;
             this.vstConnectionListenerId = getVstConnectionListener().addListener(this.onVstUdpMessage.bind(this));
             await this.waitForStateChange(PlayerState.ConnectedToVst);
-            connecttion.state = ConnectionState.Connected;
-            this.vstConnection = connecttion;
+            connection.state = ConnectionState.Connected;
+            this.vstConnection = connection;
+            this.onDidDocumentSaveDisposable = vscode.workspace.onDidSaveTextDocument(this.checkCurrentSheetForErrors.bind(this));
+            await this.checkCurrentSheetForErrors();
         } catch {
             this.state = PlayerState.Stopped;
+            this.vstConnectionListenerId = null;
             return;
+        }
+    }
+
+    private async checkCurrentSheetForErrors(): Promise<void> {
+        try {
+            if (!this.currentFile) {
+                return;
+            }
+            const diagnose = await getLanguage().features.diagnostic.update(this.currentFile);
+            if (diagnose.hasErrors) {
+                const sourcefile = diagnose.errorResult.sourceFile || "unkown location"
+                vscode.window.showErrorMessage(` ${sourcefile}: ${diagnose.errorResult.errorMessage}`,'Ok');
+                return;
+            } else {
+                await this.updateDocumentInfo();
+            }
+        } catch (ex) {
+            vscode.window.showErrorMessage(` ${this.currentFile}: ${ex}`,'Ok');
         }
     }
 
@@ -395,6 +414,10 @@ export class Player {
         }
         if (!this.vstConnection) {
             return;
+        }
+        if (this.onDidDocumentSaveDisposable) {
+            this.onDidDocumentSaveDisposable.dispose();
+            this.onDidDocumentSaveDisposable = null;
         }
         getVstConnectionListener().removeListener(this.vstConnectionListenerId);
         this.vstConnectionListenerId = null;
