@@ -42,6 +42,12 @@
                 }
             ]
         },
+        "viewsWelcome": [
+            {
+              "view": "werckmeister-vstConnections",
+              "contents": "No VST connections found.\nYour DAW is running?\nYou have a Werckmeister VST Plugin loaded?\nThat plugin has a \"*.sheet\" file loaded?\n[Learn More](https://werckme.github.io/).\n[Refresh](command:extension.werckmeister.refreshVstConnections)"
+            }
+        ],
         "commands": [
             {
                 "command": "extension.werckmeister.play",
@@ -222,7 +228,7 @@
         "pretest": "npm run compile",
         "test": "node ./out/test/runTest.js",
         "build-webviewapp": "webpack --config webViewApp.webpack.config.js",
-        "dev-webviewapp": "webpack --config webViewApp.webpack.config.js --watch",
+        "webview-dev": "webpack --config webViewApp.webpack.config.js --watch",
         "vscode:prepublish": "webpack --mode production",
         "webpack": "webpack --mode development",
         "webpack-dev": "webpack --mode development --watch",

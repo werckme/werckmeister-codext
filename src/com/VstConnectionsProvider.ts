@@ -19,11 +19,17 @@ export class Connection {
         this._state = newValue;
     }
 
-    constructor(public port: number, public sheetPath: string = "") {}
+    constructor(public port: number, public sheetPath: string = "", private _host: string = "") {}
     get fileName(): string {
         return path.basename(this.sheetPath);
     }
-    
+  
+    get host(): string {
+        if (!this._host || this._host.toLowerCase().includes("unknown")) {
+            return "VST";
+        }
+        return this._host;
+    }
 };
 
 
@@ -52,19 +58,21 @@ export class VstConnectionsProvider implements vscode.TreeDataProvider<VstConnec
     private async scanForConnections(): Promise<Connection[]> {
         return new Promise<Connection[]>((resolve, reject) => {
             const sheetFiles:Set<string> = new Set<string>();
+            const hosts: Map<string, string> = new Map<string, string>();
             const vstConnectionListener = getVstConnectionListener();
             const listenerId = vstConnectionListener.addListener(msg => {
                 if (!msg.sheetPath) {
                     return;
                 }
                 sheetFiles.add(msg.sheetPath);
+                hosts.set(msg.sheetPath, msg.host || "");
             });
             setTimeout(() => {
                 vstConnectionListener.removeListener(listenerId);
                 const receivedSheets = Array.from(sheetFiles);
                 const newConnections = receivedSheets
                     .filter(x => this.connections.has(x) === false)
-                    .map(x => new Connection(vstConnectionListener.port, x));
+                    .map(x => new Connection(vstConnectionListener.port, x, hosts.get(x)));
                 for(const newConnection of newConnections) {
                     this.connections.set(newConnection.sheetPath, newConnection);
                 }
@@ -93,9 +101,14 @@ export function getVstConnectionProvider(): VstConnectionsProvider {
 
 export class VstConnectionTreeItem extends vscode.TreeItem {
     constructor(public connection: Connection) {
-        super(`VST ${connection.fileName}`);
+        super(`${connection.host}: ${connection.fileName}`);
         this.description = connection.state;
         const isConnected = this.connection.state === ConnectionState.Connected;
         this.contextValue = `werckmeister-vst-instance-${isConnected?'connected':'open'}`;
+        const fileName = `vst_${isConnected?'cn_':''}`;
+        this.iconPath = {
+            light: path.join(__filename, '..', '..', 'resources', `${fileName}light.svg`),
+            dark: path.join(__filename, '..', '..', 'resources', `${fileName}dark.svg`)
+        };
     }
 }

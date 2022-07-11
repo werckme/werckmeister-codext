@@ -9,7 +9,6 @@ import { ISheetInfo, IWarning } from './SheetInfo';
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as _ from "lodash";
-import { reject } from 'lodash';
 import { getEditorEventDecorator } from './EditorEventDecorator';
 import { Connection, ConnectionState } from './VstConnectionsProvider';
 import { getVstConnectionListener, ListenerId } from './VstConnectionListener';
@@ -30,6 +29,7 @@ export interface ISheetEventInfo {
 export interface IFunkfeuerMessage {
     pid?: number;
     type?: string;
+    host?: string;
     sheetPath?: string;
     sheetTime: number;
     lastUpdateTimestamp: number;
