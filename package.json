@@ -45,7 +45,7 @@
         "viewsWelcome": [
             {
               "view": "werckmeister-vstConnections",
-              "contents": "No VST connections found.\nYour DAW is running?\nYou have a Werckmeister VST Plugin loaded?\nThat plugin has a \"*.sheet\" file loaded?\n[Learn More](https://werckme.github.io/).\n[Refresh](command:extension.werckmeister.refreshVstConnections)"
+              "contents": "No VST connections found.\nYour DAW is running?\nYou have a Werckmeister VST Plugin loaded?\nThat plugin has a \"*.sheet\" file loaded?\nThe VST Plugin log shows no errors?\n[Learn More](https://werckme.github.io/).\n[Refresh](command:extension.werckmeister.refreshVstConnections)"
             }
         ],
         "commands": [
