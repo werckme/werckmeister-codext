@@ -34,6 +34,7 @@ export interface IFunkfeuerMessage {
     sheetTime: number;
     lastUpdateTimestamp: number;
     sheetEventInfos: ISheetEventInfo[];
+    instance: number; // the udp callers memory id, for debug reasons
 }
 
 
@@ -374,12 +375,12 @@ export class Player {
         this.state = PlayerState.ConnectingToVst;
         try {
             this.currentFile = connection.sheetPath;
+            await this.checkCurrentSheetForErrors();
             this.vstConnectionListenerId = getVstConnectionListener().addListener(this.onVstUdpMessage.bind(this));
             await this.waitForStateChange(PlayerState.ConnectedToVst);
             connection.state = ConnectionState.Connected;
             this.vstConnection = connection;
             this.onDidDocumentSaveDisposable = vscode.workspace.onDidSaveTextDocument(this.checkCurrentSheetForErrors.bind(this));
-            await this.checkCurrentSheetForErrors();
         } catch {
             this.state = PlayerState.Stopped;
             this.vstConnectionListenerId = null;
