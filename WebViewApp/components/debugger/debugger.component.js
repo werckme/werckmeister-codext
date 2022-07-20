@@ -90,14 +90,12 @@ export class DebuggerComponent extends BaseComponent {
 
     updateSheetTime(sheetTime) {
         this.setState({sheetTime: sheetTime});
-        this.doFollow();
-    }
-   
-    doFollow() {
-        if (!this.state.isFollow) {
-            return;
-        }
-        // TODO: document.querySelector("html").scrollTo(0, 0);
+        const parent = document.querySelector("html");
+        const maxw = parent.scrollWidth;
+        const maxd = this.state.duration / this.state.ppq;
+        const x = Math.floor(sheetTime * maxw / maxd);
+        const y = parent.scrollTop;
+        parent.scrollTo(x, y)
     }
 
     onMidiFile(midifile) {
