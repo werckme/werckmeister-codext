@@ -5,6 +5,8 @@ import { BaseComponent } from "../base/base.component";
 import { PlayerState } from "../com/playerStates";
 import { pauseIcon } from "./pause.icon";
 import { vstIcon } from "./vst.icon";
+import { SwitchComponent } from "../com/switch.component";
+import { followIcon } from "./follow.icon";
 export class TransportComponent extends BaseComponent {
     constructor(props) {
         super(props);
@@ -72,6 +74,7 @@ export class TransportComponent extends BaseComponent {
 
     render() {
         const position = this.props.position || 0;
+        const { followTransport, followTransportChange } = this.props;
         return (
             <div>
                 <style dangerouslySetInnerHTML={{
@@ -79,9 +82,9 @@ export class TransportComponent extends BaseComponent {
                     .ccontainer {
                         padding: 4px 2px 2px 2px;
                         display: grid;
-                        grid-template-rows: 25px 25px;
+                        grid-template-rows: 25px 25px 25px;
                         grid-template-columns: 48px 48px auto 77px;
-                        grid-template-areas: "play stop display range-from" "play stop display range-to";
+                        grid-template-areas: "play stop display range-from" "play stop display range-to" "status-bar status-bar status-bar status-bar";
                         width: 288px;
                         font-weight: lighter;
                         font-family: monospace;
@@ -132,7 +135,30 @@ export class TransportComponent extends BaseComponent {
                         width: 82px;
                         margin: 5px;
                     }
-                    
+                    #status-bar {
+                        grid-area: status-bar;
+                        display: flex;
+                        width: 100%;
+                        flex-wrap: nowrap;
+                        flex-direction: row;
+                        align-content: space-between;
+                        align-items: flex-end;
+                    }
+                    .transport-state {
+                        width: 100%;
+                    }
+                    .switch-component {
+                        margin-right: 15px;
+                    }
+                    .switch-component svg {
+                        width: 20px;
+                        opacity: 0.7;
+                    }
+                    .switch-component.isOn svg {
+                        width: 20px;
+                        color: cornflowerblue;
+                        filter: drop-shadow(2px 2px 11px cornflowerblue);
+                    }
                 `}}></style>
                 <div className="ccontainer">
                     {this.playerControls()}
@@ -146,7 +172,10 @@ export class TransportComponent extends BaseComponent {
                         disabled={this.props.playerState === PlayerState.Playing || this.isConnectedToVst()}
                         min="0" />
                     <input title="End Time (qtrs)" className="range-to" type="number" value={this.props.sheetDuration.toFixed(0) / this.props.ppq || 1} disabled />
-                    <span className="transport-state" style={{ visibility: this.isConnectedToVst() ? "hidden" : "visible" }}>{this.props.playerState || 'Stopped'}</span>
+                    <div id="status-bar">
+                        <span className="transport-state" style={{ visibility: this.isConnectedToVst() ? "hidden" : "visible" }}>{this.props.playerState || 'Stopped'}</span>
+                        <SwitchComponent icon={followIcon()} switchValue={followTransport} onChange={followTransportChange} title="Turn Follow Mode On/Off" id="followSwitch"></SwitchComponent>
+                    </div>
                 </div>
             </div>
         );

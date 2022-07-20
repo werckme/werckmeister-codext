@@ -32,8 +32,8 @@ export class DebuggerComponent extends BaseComponent {
             sheetName: "",
             ppq: 0,
             selectedView: "",
-            isFollow: false,
-            debugSymbols: null
+            debugSymbols: null,
+            isFollowTransport: true
         }
         this.compileResult = null;
         this.midiViewComponent = null;
@@ -90,6 +90,13 @@ export class DebuggerComponent extends BaseComponent {
 
     updateSheetTime(sheetTime) {
         this.setState({sheetTime: sheetTime});
+        this.follow(sheetTime);
+    }
+
+    follow(sheetTime) {
+        if (!this.state.isFollowTransport) {
+            return;
+        }
         const parent = document.querySelector("html");
         const maxw = parent.scrollWidth;
         const maxd = this.state.duration / this.state.ppq;
@@ -123,16 +130,17 @@ export class DebuggerComponent extends BaseComponent {
                     sheetDuration={this.state.duration} 
                     playerState={this.state.playerState} 
                     position={this.state.sheetTime}
-                    ppq={this.state.ppq}>
+                    ppq={this.state.ppq}
+                    followTransport={this.state.isFollowTransport}
+                    followTransportChange={(v) => this.setState({isFollowTransport: v})}>
                 </TransportComponent>
-
                 <h2> {this.state.sheetName} </h2>
                 {message}
                 <select value={this.state.selectedView} id="view-switch-ctrl" onChange={(ev)=>this.onViewChange(ev)}>
                     <option value="pianorollview">Piano Roll</option>
                     <option value="listview">MIDI Event List</option>
                 </select>
-                <MidiViewComponent 
+                <MidiViewComponent
                     viewType={this.state.selectedView}
                     debugSymbols={this.state.debugSymbols}
                     midiData={this.state.midiData} 
