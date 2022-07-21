@@ -35,6 +35,7 @@ export class DebuggerComponent extends BaseComponent {
             debugSymbols: null,
             isFollowTransport: true
         }
+        this.lastFollowPosition = NaN;
         this.compileResult = null;
         this.midiViewComponent = null;
         window.addEventListener('message', event => { // get vscode message
@@ -97,6 +98,11 @@ export class DebuggerComponent extends BaseComponent {
         if (!this.state.isFollowTransport) {
             return;
         }
+        const positionChanged = sheetTime !== this.lastFollowPosition;
+        if (!positionChanged) {
+            return;
+        }
+        this.lastFollowPosition = sheetTime;
         const parent = document.querySelector("html");
         const maxw = parent.scrollWidth;
         const maxd = this.state.duration / this.state.ppq;
