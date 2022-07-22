@@ -7,32 +7,35 @@ This extension provides support for the [Werckmeister](https://werckme.github.io
 
 * MIDI Playback from source
 * Playback visualization
+* Werckmeister-VST Plugin integration
 * MIDI Inspector
 * Syntax highlighting
 * Autocompletion
 
 
-**MIDI Inspector**
+### Werckmeister-VST Plugin integration
+Connect a Werckmeister-VST instance with VSCode
+<img src="https://raw.githubusercontent.com/werckme/werckmeister/manual-update/assets/vst2vscode.gif">
 
+### MIDI Inspector
 Analyse the compiled MIDI file of a sheet. 
 
-
-**Piano Roll View**
+### Piano Roll View
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/werckmeister-inspector-piano-roll.gif">
 
-**Event List View**
+### Event List View
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/werckmeister-inspector.gif">
 
-**MIDI Inspector - Track Filter**
+### MIDI Inspector - Track Filter
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/werckmeister-inspector-filter.gif">
 
-**MIDI Inspector - Transport Controller**
+### MIDI Inspector - Transport Controller
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/werckmeister-inspector-transport.gif">
 
-**Playback visualization**
+### Playback visualization
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/playbackvis.gif">
 
-**Start playback at random position**
+### Start playback at random position
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/startfrompos.gif">
 
 

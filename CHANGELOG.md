@@ -1,3 +1,9 @@
+# Version 1.0.3
+## Feature
+- Werckmeister VST integration
+<img src="https://raw.githubusercontent.com/werckme/werckmeister/manual-update/assets/vst2vscode.gif">
+- Piano Roll Follow Mode
+
 # Version 1.0.2
 ## Feature
 - find event in inspector (requires werckmeister>=1.0.41)
