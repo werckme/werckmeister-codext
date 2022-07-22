@@ -4,6 +4,9 @@ import { stopIcon } from "./stop.icon";
 import { BaseComponent } from "../base/base.component";
 import { PlayerState } from "../com/playerStates";
 import { pauseIcon } from "./pause.icon";
+import { vstIcon } from "./vst.icon";
+import { SwitchComponent } from "../com/switch.component";
+import { followIcon } from "./follow.icon";
 export class TransportComponent extends BaseComponent {
     constructor(props) {
         super(props);
@@ -19,7 +22,7 @@ export class TransportComponent extends BaseComponent {
     }
 
     onPlayClicked() {
-        this.sendMessageToHost("player-play", {begin: this.state.begin});
+        this.sendMessageToHost("player-play", { begin: this.state.begin });
     }
 
     onPauseClicked() {
@@ -27,12 +30,12 @@ export class TransportComponent extends BaseComponent {
     }
 
     updateBegin() {
-        this.sendMessageToHost("player-update-range", {begin: this.state.begin});
+        this.sendMessageToHost("player-update-range", { begin: this.state.begin });
     }
 
     onBeginChanged(ev) {
         const value = ev.target.value;
-        this.setState({begin: value})
+        this.setState({ begin: value })
         this.updateBeginBounced();
     }
 
@@ -42,8 +45,36 @@ export class TransportComponent extends BaseComponent {
             || this.props.playerState === PlayerState.Pausing;
     }
 
+    isConnectedToVst() {
+        return this.props.playerState === PlayerState.ConnectedToVst;
+    }
+
+    playerControls() {
+        if (this.props.playerState === PlayerState.ConnectedToVst) {
+            return <div id="vsticon" title="Transport control via your DAW">{vstIcon()}</div>;
+        }
+        return (
+            <React.Fragment>
+                {
+                    this.props.playerState !== PlayerState.Playing ?
+                        <button className="btn-play" onClick={this.onPlayClicked.bind(this)} disabled={this.inbetweenStates()}>
+                            {playIcon()}
+                        </button>
+                        :
+                        <button className="btn-paused" onClick={this.onPauseClicked.bind(this)} disabled={this.inbetweenStates()}>
+                            {pauseIcon()}
+                        </button>
+                }
+                <button className="btn-stop" onClick={this.onStopClicked.bind(this)} disabled={this.inbetweenStates()}>
+                    {stopIcon()}
+                </button>
+            </React.Fragment>
+        );
+    }
+
     render() {
         const position = this.props.position || 0;
+        const { followTransport, followTransportChange } = this.props;
         return (
             <div>
                 <style dangerouslySetInnerHTML={{
@@ -51,9 +82,9 @@ export class TransportComponent extends BaseComponent {
                     .ccontainer {
                         padding: 4px 2px 2px 2px;
                         display: grid;
-                        grid-template-rows: 25px 25px;
+                        grid-template-rows: 25px 25px 25px;
                         grid-template-columns: 48px 48px auto 77px;
-                        grid-template-areas: "play stop display range-from" "play stop display range-to";
+                        grid-template-areas: "play stop display range-from" "play stop display range-to" "status-bar status-bar status-bar status-bar";
                         width: 288px;
                         font-weight: lighter;
                         font-family: monospace;
@@ -96,33 +127,55 @@ export class TransportComponent extends BaseComponent {
                         color: var(--vscode-editor-foreground);
                         text-align: right;
                     }
-                    
+                    #vsticon {
+                        grid-row-start: play;
+                        grid-column-start: play;
+                        grid-row-end: stop;
+                        grid-column-end: stop;
+                        width: 82px;
+                        margin: 5px;
+                    }
+                    #status-bar {
+                        grid-area: status-bar;
+                        display: flex;
+                        width: 100%;
+                        flex-wrap: nowrap;
+                        flex-direction: row;
+                        align-content: space-between;
+                        align-items: flex-end;
+                    }
+                    .transport-state {
+                        width: 100%;
+                    }
+                    .switch-component {
+                        margin-right: 15px;
+                    }
+                    .switch-component svg {
+                        width: 20px;
+                        opacity: 0.7;
+                    }
+                    .switch-component.isOn svg {
+                        width: 20px;
+                        color: cornflowerblue;
+                        filter: drop-shadow(2px 2px 11px cornflowerblue);
+                    }
                 `}}></style>
                 <div className="ccontainer">
-                    {
-                        this.props.playerState !== PlayerState.Playing ?
-                        <button className="btn-play" onClick={this.onPlayClicked.bind(this)} disabled={ this.inbetweenStates() }>
-                            {playIcon()}
-                        </button>
-                        :
-                        <button className="btn-paused" onClick={this.onPauseClicked.bind(this)} disabled={ this.inbetweenStates() }>
-                            {pauseIcon()}
-                        </button>   
-                    }                 
-                    <button className="btn-stop" onClick={this.onStopClicked.bind(this)} disabled={ this.inbetweenStates() }>
-                        {stopIcon()}
-                    </button>
+                    {this.playerControls()}
                     <div className="display">
-                        <span>{ _.padStart(position.toFixed(2), 2+4, "0") }</span>
+                        <span>{_.padStart(position.toFixed(2), 2 + 4, "0")}</span>
                     </div>
-                    <input className="range-from" type="number" 
+                    <input className="range-from" type="number"
                         value={this.state.begin}
                         title="Begin Time (qtrs)"
-                        onChange={this.onBeginChanged.bind(this)} 
-                        disabled={this.props.playerState === PlayerState.Playing}
-                        min="0"/>
-	                <input title="End Time (qtrs)" className="range-to" type="number" value={this.props.sheetDuration.toFixed(0) / this.props.ppq || 1 } disabled/>
-                    <span className="transport-state">{this.props.playerState || 'Stopped'}</span>
+                        onChange={this.onBeginChanged.bind(this)}
+                        disabled={this.props.playerState === PlayerState.Playing || this.isConnectedToVst()}
+                        min="0" />
+                    <input title="End Time (qtrs)" className="range-to" type="number" value={this.props.sheetDuration.toFixed(0) / this.props.ppq || 1} disabled />
+                    <div id="status-bar">
+                        <span className="transport-state" style={{ visibility: this.isConnectedToVst() ? "hidden" : "visible" }}>{this.props.playerState || 'Stopped'}</span>
+                        <SwitchComponent icon={followIcon()} switchValue={followTransport} onChange={followTransportChange} title="Turn Follow Mode On/Off" id="followSwitch"></SwitchComponent>
+                    </div>
                 </div>
             </div>
         );

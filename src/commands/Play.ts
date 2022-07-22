@@ -2,7 +2,6 @@ import { ACommand } from "./ACommand";
 import * as vscode from 'vscode';
 import { getPlayer, Player } from '../com/Player';
 import * as path from 'path';
-import { getEditorEventDecorator } from "../com/EditorEventDecorator";
 import { getSheetHistory } from "../com/SheetHistory";
 import { WMExternalHelpInstallWerckmeisterExtension, WMExternalWerckmeisterDownload } from "../extension";
 import { getLanguage } from "../language/Language";
@@ -44,7 +43,6 @@ You are using version ${ex.currentVersion}.`, action).then((val)=>{
 export class Play extends ACommand {
 
     startPlayer(sheetPath:string) {
-        getEditorEventDecorator(); // initiate singleton, do it before start playback
         let player:Player = getPlayer();
         player.play(sheetPath) 
         .then(()=>{})
@@ -64,7 +62,6 @@ export class Play extends ACommand {
             return;
         }
 
-        getEditorEventDecorator();
         try {
             const diagnose = await getLanguage().features.diagnostic.update(sheetpath);
             if (diagnose.hasErrors) {

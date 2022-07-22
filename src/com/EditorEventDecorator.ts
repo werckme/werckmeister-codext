@@ -28,11 +28,14 @@ export class EditorEventDecorator {
 		this.onPlayerStateChangedBound = this.onPlayerStateChanged.bind(this);
 	}
 
-	onPlayerStateChanged(state: PlayerState) {
+	onPlayerStateChanged(state: PlayerState, oldState: PlayerState) {
         if (state===PlayerState.Stopped) {
             this.removeDecorationsOnAllSheetEditors();
         }
-        if (state===PlayerState.StartPlaying) {
+        const needToUpdateSheetInfo = state===PlayerState.StartPlaying
+             || (oldState === PlayerState.ConnectingToVst && state === PlayerState.ConnectedToVst);
+
+        if (needToUpdateSheetInfo) {
             this.updateSheetInfo();
         }
 	}
@@ -87,7 +90,7 @@ export class EditorEventDecorator {
         }
         const editorPath = path.resolve(editor.document.uri.fsPath);
         const sourcePath = path.resolve(sourceInfo.path);
-        return editorPath === sourcePath;
+        return editorPath.toLowerCase() === sourcePath.toLowerCase();
     }
 
     protected updateSheetEventInfos(sheetEventInfos: ISheetEventInfo[]) {

@@ -3,6 +3,8 @@ export const PlayerState = {
     StartPlaying: "StartPlaying",
     Playing: "Playing",
     Stopped: "Stopped",
+    ConnectingToVst: "ConnectingToVst",
+    ConnectedToVst: "ConnectedToVst",
     Stopping: "Stopping",
     Pausing: "Pausing",
     Paused: "Paused"

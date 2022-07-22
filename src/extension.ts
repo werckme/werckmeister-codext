@@ -15,10 +15,13 @@ import { getLanguage } from './language/Language';
 import { ShowInspector } from './commands/ShowInspector';
 import { SaveMidi } from './commands/SaveMidi';
 import { RevealInDebugView } from './commands/RevealInDebugView';
+import { ConnectToVst } from './commands/ConnectToVst';
+import { CloseVstConnection } from './commands/CloseVstConnection';
+import { getVstConnectionProvider, VstConnectionsProvider } from './com/VstConnectionsProvider';
 
-function excuteCommand(type: (new (context: vscode.ExtensionContext) => ACommand), context: vscode.ExtensionContext): void {
+function excuteCommand(type: (new (context: vscode.ExtensionContext) => ACommand), context: vscode.ExtensionContext, ...args: any[]): void {
 	let cmd = new type(context);
-	cmd.execute();
+	cmd.execute(args);
 }
 const _ns = "extension.werckmeister";
 export const WMCommandPlay = `${_ns}.play`;
@@ -31,6 +34,9 @@ export const WMCommandOpenPianoView = `${_ns}.pianoview`;
 export const WMCommandOpenTransportView = `${_ns}.transportview`;
 export const WMCommandOpenDebugger = `${_ns}.inspector`;
 export const WMCommandRevalInDebugView = `${_ns}.revealInDebugView`;
+export const WMCommandConnectToVst = `${_ns}.connectToVst`; 
+export const WMCommandCloseVstConnection = `${_ns}.closeVstConnection`;
+export const WMCommandRefreshVstConnections = `${_ns}.refreshVstConnections`;
 export const WMDiagnosticCollectionName = "werckmeister";
 export const WMExternalHelpInstallWerckmeisterExtension = "https://werckme.github.io/code-extension";
 export const WMExternalWerckmeisterDownload = "https://werckme.github.io/getting-started";
@@ -70,6 +76,12 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	disposable = vscode.commands.registerCommand(WMCommandRevalInDebugView, excuteCommand.bind(null, RevealInDebugView, context));
 	context.subscriptions.push(disposable);	
+
+	disposable = vscode.commands.registerCommand(WMCommandConnectToVst, excuteCommand.bind(null, ConnectToVst, context));
+	context.subscriptions.push(disposable);
+	
+	disposable = vscode.commands.registerCommand(WMCommandCloseVstConnection, excuteCommand.bind(null, CloseVstConnection, context));
+	context.subscriptions.push(disposable);
 	
 	disposable = vscode.languages.registerCompletionItemProvider({ scheme: 'file', language: 'werckmeister' }, {
 		provideCompletionItems: async (document: vscode.TextDocument, position: vscode.Position, 
@@ -88,6 +100,15 @@ export function activate(context: vscode.ExtensionContext) {
 			},
 		
 	});
+
+	const vstConnectionProvider = getVstConnectionProvider();
+
+	vscode.window.createTreeView('werckmeister-vstConnections', {
+		treeDataProvider: vstConnectionProvider
+	});
+
+	disposable = vscode.commands.registerCommand(WMCommandRefreshVstConnections, () => {vstConnectionProvider.refresh()});
+	context.subscriptions.push(disposable);
 	
 	diagnosticCollection = vscode.languages.createDiagnosticCollection(WMDiagnosticCollectionName);
 	context.subscriptions.push(diagnosticCollection);

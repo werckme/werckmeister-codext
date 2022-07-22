@@ -163,7 +163,7 @@ export class InspectorView extends AWebView {
 		this.currentPanel!.webview.postMessage({
 			playerState: {newState: PlayerState[state]}
 		});
-		if (state===PlayerState.Playing) {
+		if (state===PlayerState.Playing || state==PlayerState.ConnectedToVst) {
 			this.updateSheetSourceMapAndSend();
 			const player = getPlayer();
 			this.compileAndUpdate(player.currentFile!);
@@ -337,7 +337,10 @@ export class InspectorView extends AWebView {
 			this.currentPanel.onDidChangeViewState(this.onWebViewStateChanged.bind(this));
 			this.viewReady.then(()=>{
 				const player = getPlayer();
-				if (player.state === PlayerState.Playing || player.state === PlayerState.StartPlaying) {
+				if (player.state === PlayerState.Playing 
+					|| player.state === PlayerState.StartPlaying
+					|| player.state === PlayerState.ConnectingToVst
+					|| player.state === PlayerState.ConnectedToVst) {
 					this.startTitleUpdater();
 				}
 				this.updateSheetSourceMapAndSend();
