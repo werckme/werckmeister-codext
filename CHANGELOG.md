@@ -3,6 +3,7 @@
 - Werckmeister VST integration
 <img src="https://raw.githubusercontent.com/werckme/werckmeister/manual-update/assets/vst2vscode.gif">
 - Piano Roll Follow Mode
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/piano-roll-follow.gif">
 
 # Version 1.0.2
 ## Feature
