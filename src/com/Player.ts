@@ -102,7 +102,6 @@ export class Player {
     private _sheetTime: number = 0;
     private lastUpdateTimestamp = 0;
     private vstConnectionListenerId: ListenerId|null = null;
-    private onDidDocumentSaveDisposable: vscode.Disposable|null= null;
 
     get inTransition(): boolean {
         return this.state === PlayerState.StartPlaying
@@ -380,7 +379,6 @@ export class Player {
             await this.waitForStateChange(PlayerState.ConnectedToVst);
             connection.state = ConnectionState.Connected;
             this.vstConnection = connection;
-            this.onDidDocumentSaveDisposable = vscode.workspace.onDidSaveTextDocument(this.checkCurrentSheetForErrors.bind(this));
         } catch {
             this.state = PlayerState.Stopped;
             this.vstConnectionListenerId = null;
@@ -415,10 +413,6 @@ export class Player {
         }
         if (!this.vstConnection) {
             return;
-        }
-        if (this.onDidDocumentSaveDisposable) {
-            this.onDidDocumentSaveDisposable.dispose();
-            this.onDidDocumentSaveDisposable = null;
         }
         getVstConnectionListener().removeListener(this.vstConnectionListenerId);
         this.vstConnectionListenerId = null;

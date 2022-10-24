@@ -18,6 +18,7 @@ import { RevealInDebugView } from './commands/RevealInDebugView';
 import { ConnectToVst } from './commands/ConnectToVst';
 import { CloseVstConnection } from './commands/CloseVstConnection';
 import { getVstConnectionProvider, VstConnectionsProvider } from './com/VstConnectionsProvider';
+import { FileWatcher } from './com/FileWatcher';
 
 function excuteCommand(type: (new (context: vscode.ExtensionContext) => ACommand), context: vscode.ExtensionContext, ...args: any[]): void {
 	let cmd = new type(context);
@@ -113,6 +114,9 @@ export function activate(context: vscode.ExtensionContext) {
 	diagnosticCollection = vscode.languages.createDiagnosticCollection(WMDiagnosticCollectionName);
 	context.subscriptions.push(diagnosticCollection);
 
+
+	disposable = new FileWatcher();
+	context.subscriptions.push(disposable);
 
 	getSheetHistory(); // create singleton
 }

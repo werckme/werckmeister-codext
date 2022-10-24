@@ -2,6 +2,8 @@
 ## Bugfix
 * https://github.com/werckme/werckmeister/issues/327
 * https://github.com/werckme/werckmeister/issues/326
+* https://github.com/werckme/werckmeister/issues/341
+* https://github.com/werckme/werckmeister/issues/342
 
 # Version 1.0.3
 ## Feature

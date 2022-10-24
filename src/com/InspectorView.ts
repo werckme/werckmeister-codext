@@ -7,6 +7,7 @@ import { WMCommandStop, WMCommandPlay, WMCommandPause, WMCommandOpenDebugger, WM
 import { ISheetInfo } from './SheetInfo';
 import { Compiler, CompilerMode, unknownSourcePositionValue } from './Compiler';
 import { getSheetHistory } from './SheetHistory';
+import { getLanguage } from '../language/Language';
 
 const UpdateIfThisExtension:string[] = [
 	'.sheet',
@@ -67,11 +68,14 @@ export class InspectorView extends AWebView {
 		if (vscode.window.activeTextEditor) {
 			const currentDocumentPath = vscode.window.activeTextEditor.document.fileName;
 			this.viewReady.then(async () => {
-				await this.compileAndUpdate(currentDocumentPath);
-				this.currentPanel!.webview.postMessage({
-					playerState: {newState: PlayerState[getPlayer().state]}
-				});
-				this.onViewInitialRendered();
+				const hasErrors = await this.checkForErrors(currentDocumentPath);
+				if (!hasErrors) {
+					await this.compileAndUpdate(currentDocumentPath);
+					this.currentPanel!.webview.postMessage({
+						playerState: {newState: PlayerState[getPlayer().state]}
+					});
+					this.onViewInitialRendered();
+				}
 			})
 		}
 	}
@@ -98,9 +102,19 @@ export class InspectorView extends AWebView {
 		this.currentPanel.webview.postMessage(message);
 	}
 
+	private async checkForErrors(sheetPath:string): Promise<boolean> {
+		const diagnose = await getLanguage().features.diagnostic.update(sheetPath);
+		if (diagnose.hasErrors) {
+			const sourcefile = diagnose.errorResult.sourceFile || "unkown location"
+			vscode.window.showErrorMessage(` ${sourcefile}: ${diagnose.errorResult.errorMessage}`,'Ok');
+			return true;
+		}
+		return false;
+	}
+
 	private async compile(sheetPath:string, mode:CompilerMode = CompilerMode.json): Promise<any> {
 		const compiler = new Compiler();
-        const result = await compiler.compile(sheetPath, mode);
+		const result = await compiler.compile(sheetPath, mode);
 		let compileResult: any;
 		try {
 			compileResult = JSON.parse(result);
