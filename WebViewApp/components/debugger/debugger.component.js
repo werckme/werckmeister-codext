@@ -5,15 +5,7 @@ import { BaseComponent } from "../shared/base/base.component";
 import { MidiViewComponent } from "./midiview.component";
 
 const MsgMissingMidiData = <div>
-    No MIDI data available. You have two options to fix this: 
-    <ol>
-        <li>
-            Trigger a view update by saving a ".sheet" file.
-        </li>
-        <li>
-            Start the playback of a ".sheet" file
-        </li>
-    </ol>
+    No MIDI data available for this sheet. 
 </div>;
 
 export class DebuggerComponent extends BaseComponent {
@@ -33,7 +25,8 @@ export class DebuggerComponent extends BaseComponent {
             ppq: 0,
             selectedView: "",
             debugSymbols: null,
-            isFollowTransport: true
+            isFollowTransport: true,
+            midiViewError: null
         }
         this.lastFollowPosition = NaN;
         this.compileResult = null;
@@ -48,7 +41,7 @@ export class DebuggerComponent extends BaseComponent {
         this.sendMessageToHost("debuggerview-ready");
     }
 
-    handleMessage(message) {      
+    handleMessage(message) {
         if (message.sheetTime !== undefined) {
             this.updateSheetTime(message.sheetTime);
         }
@@ -114,8 +107,12 @@ export class DebuggerComponent extends BaseComponent {
     onMidiFile(midifile) {
         if (midifile) {
             const ppq = midifile.header.getTicksPerBeat();
-            this.setState({duration: this.compileResult.midi.duration});
-            this.setState({ppq});
+            this.setState({
+                duration: this.compileResult.midi.duration,
+                ppq,
+                midiViewError: null
+            });
+        
         }
     }
 
@@ -128,8 +125,13 @@ export class DebuggerComponent extends BaseComponent {
         this.sendMessageToHost("goToEventSource", {eventInfo});
     }
 
+    onMidiViewError(ex) {
+        console.log("!!!!")
+        this.setState({midiViewError: ex});
+    }
+
     render() {
-        const message = !this.state.midiData ? <div className="error-message">{MsgMissingMidiData}</div> : <span></span>;
+        const message = (!this.state.midiData || this.state.midiViewError) ? <div className="error-message">{MsgMissingMidiData}</div> : <span></span>;
         return (
             <div>
                 <TransportComponent 
@@ -152,7 +154,8 @@ export class DebuggerComponent extends BaseComponent {
                     midiData={this.state.midiData} 
                     onMidiFile={(x) => this.onMidiFile(x)}
                     ref={el => (this.midiViewComponent = el)}
-                    onGoToEventSource={evInfo => this.onGoToEventSource(evInfo)}>
+                    onGoToEventSource={evInfo => this.onGoToEventSource(evInfo)}
+                    onError={ex=>this.onMidiViewError(ex)}>
                 </MidiViewComponent> 
             </div>
         );

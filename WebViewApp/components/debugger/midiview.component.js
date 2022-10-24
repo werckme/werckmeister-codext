@@ -170,8 +170,15 @@ export class MidiViewComponent extends React.Component {
             return;
         }
         const midiBuffer = Base64Binary.decodeArrayBuffer(this.props.midiData);
-        this.dbgMidi.setMidiFile(midiBuffer);
-        this.dbgMidi.update();
+        try {
+            this.dbgMidi.setMidiFile(midiBuffer);
+            this.dbgMidi.update();
+        } catch(ex) {
+            console.error(ex);
+            if (this.props.onError) {
+                this.props.onError(ex);
+            }
+        }
     }
 
     updatePitchAliases(view, debugInfoJson) {
