@@ -24,6 +24,7 @@ export class MidiViewComponent extends React.Component {
         this.dbgMidi = new WmMidiFileDebugger();
         this.dbgMidi.addFilter(filterElement);
         this.dbgMidi.addPianoRollView(this.midiView);
+        this.dbgMidi.onFilterUpdated = this.onFilterUpdated.bind(this);
         this.initListener();
         this.viewType = viewTypes.Piano;
     }
@@ -51,6 +52,10 @@ export class MidiViewComponent extends React.Component {
         if (this.props.onMidiFile) {
             this.props.onMidiFile(this.dbgMidi.midifile);
         }
+    }
+
+    onFilterUpdated() {
+        this.updateDebugSymbols();
     }
 
     highlight(eventElement) {
@@ -188,6 +193,9 @@ export class MidiViewComponent extends React.Component {
     };
 
     updateDebugSymbols(debugSymbols) {
+        if (!debugSymbols) {
+            debugSymbols = this.props.debugSymbols;
+        }
         this.updatePitchAliases(this.dbgMidi.views[0], debugSymbols);
     }
 

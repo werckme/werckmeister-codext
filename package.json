@@ -246,7 +246,7 @@
         "@types/vscode": "^1.38.0",
         "babel-loader": "^8.0.6",
         "glob": "^7.1.4",
-        "mocha": "^9.2.1",
+        "mocha": "^10.1.0",
         "regenerator-runtime": "^0.13.7",
         "ts-loader": "^6.2.2",
         "tslint": "^5.12.1",
@@ -259,7 +259,7 @@
     "dependencies": {
         "@types/lodash": "^4.14.144",
         "@werckmeister/language-features": "1.0.0-57",
-        "@werckmeister/midi-debugger": "1.0.0-31",
+        "@werckmeister/midi-debugger": "1.0.0-32",
         "ace-builds": "^1.4.6",
         "antd": "^4.18.7",
         "lodash": "^4.17.21",
