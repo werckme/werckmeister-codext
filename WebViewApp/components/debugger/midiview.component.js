@@ -10,6 +10,8 @@ const viewTypes = {
     List: "List"
 };
 
+const undefinedSourcePos = 2147483647;
+
 export class MidiViewComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -73,15 +75,16 @@ export class MidiViewComponent extends React.Component {
         debugInfos.filter(x => x.documentSourceId === navigateTo.sourceId
             && navigateTo.positionOffset >= x.sourcePositionBegin
             && navigateTo.positionOffset <= x.sourcePositionEnd
-        ).forEach((debugInfo) => {
-            const foundViewElement = dbgView.getEventElement(debugInfo.trackId, debugInfo.eventId);
-            if (!foundViewElement) {
-                return true; // aka continue
-            }
-            if (!firstViewElement) {
-                firstViewElement = foundViewElement;
-            }
-            this.highlight(foundViewElement);
+            && x.sourcePositionEnd !== undefinedSourcePos 
+            ).forEach((debugInfo) => {
+                const foundViewElement = dbgView.getEventElement(debugInfo.trackId, debugInfo.eventId);
+                if (!foundViewElement) {
+                    return true; // aka continue
+                }
+                if (!firstViewElement) {
+                    firstViewElement = foundViewElement;
+                }
+                this.highlight(foundViewElement);
         });
         if (!firstViewElement) {
             return;

@@ -20,6 +20,8 @@ export enum CompilerMode {
 let _lastVersionCheckSucceed: boolean = false;
 let _debugSymbolSupport: boolean|null = null;
 
+export const unknownSourcePositionValue = 2147483647;
+
 export class Params {
     getVersion: boolean = false;
     output: string|null = null;

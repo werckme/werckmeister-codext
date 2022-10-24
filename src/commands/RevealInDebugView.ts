@@ -1,11 +1,9 @@
 import { ACommand } from "./ACommand";
 import * as vscode from 'vscode';
 import { InspectorView } from "../com/InspectorView";
-import { Compiler } from "../com/Compiler";
 
 export class RevealInDebugView extends ACommand {
     async execute(): Promise<void> {
-        const compiler = new Compiler();
         const currentEditor = vscode.window.activeTextEditor;
         if (!currentEditor) {
             return;

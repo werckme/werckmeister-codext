@@ -5,7 +5,7 @@ import { Player, getPlayer, OnPlayerMessageEvent, OnPlayerStateChanged, PlayerSt
 import { AWebView } from './AWebView';
 import { WMCommandStop, WMCommandPlay, WMCommandPause, WMCommandOpenDebugger, WMCommandRevalInDebugView } from '../extension';
 import { ISheetInfo } from './SheetInfo';
-import { Compiler, CompilerMode } from './Compiler';
+import { Compiler, CompilerMode, unknownSourcePositionValue } from './Compiler';
 import { getSheetHistory } from './SheetHistory';
 
 const UpdateIfThisExtension:string[] = [
@@ -256,7 +256,11 @@ export class InspectorView extends AWebView {
 		const doc = await vscode.workspace.openTextDocument(eventInfo.documentPath);
 		const editor = await vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
 		const posBegin = editor.document.positionAt(eventInfo.sourcePositionBegin);
-		const posEnd = editor.document.positionAt(eventInfo.sourcePositionEnd);
+		let sourcePosEnd = eventInfo.sourcePositionEnd;
+		if (sourcePosEnd === unknownSourcePositionValue) {
+			sourcePosEnd = eventInfo.sourcePositionBegin + 1;
+		}
+		const posEnd = editor.document.positionAt(sourcePosEnd);
 		const range = new vscode.Range(posBegin, posEnd);
 		editor.revealRange(range)
 		editor.selection = new vscode.Selection(posBegin, posEnd);
