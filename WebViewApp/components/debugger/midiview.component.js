@@ -11,6 +11,7 @@ const viewTypes = {
 };
 
 const undefinedSourcePos = 2147483647;
+const foundBySearch = 'found-by-search';
 
 export class MidiViewComponent extends React.Component {
     constructor(props) {
@@ -210,9 +211,34 @@ export class MidiViewComponent extends React.Component {
         this.updatePitchAliases(this.dbgMidi.views[0], debugSymbols);
     }
 
+    search(term) {
+        this.dbgMidi.search(term);
+        const foundElements = document.querySelectorAll(`.${foundBySearch}`);
+        const firstViewElement = foundElements[0];
+        if (!firstViewElement) {
+            return;
+        }
+        const bounds = firstViewElement.getBoundingClientRect();
+        const visibleView =  document.querySelector('html');
+        const visibleWidth = visibleView.clientWidth;
+        const visibleHeight = visibleView.clientHeight;
+        const scrollView = document.querySelector("html");
+        scrollView.scrollTo({
+            top:  bounds.y + scrollView.scrollTop - visibleHeight/2,
+            behavior: "smooth"
+        });
+    }
+
+    onSearchKeyUp(event) {
+        if (event.which === 13) {
+          this.search(event.target.value);
+        }
+    }
+
     render() {
         return (
             <div className={this.state.viewType.toLowerCase() + ' midiview-top'}>
+                <input type="text" id="view-search-ctrl" onKeyUp={this.onSearchKeyUp.bind(this)}></input>
             </div>
         );
     }

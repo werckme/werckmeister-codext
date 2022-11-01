@@ -1,3 +1,8 @@
+# Version 1.0.41
+## Improvements
+* Pinao Roll View rendering is faster now
+* Event List View dosen't hide the sheets title name anymore
+
 # Version 1.0.40
 ## Bugfix
 * https://github.com/werckme/werckmeister/issues/327
