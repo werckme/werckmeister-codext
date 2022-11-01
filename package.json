@@ -259,7 +259,7 @@
     "dependencies": {
         "@types/lodash": "^4.14.144",
         "@werckmeister/language-features": "1.0.0-57",
-        "@werckmeister/midi-debugger": "1.0.0-35",
+        "@werckmeister/midi-debugger": "1.0.0-36",
         "ace-builds": "^1.4.6",
         "antd": "^4.18.7",
         "lodash": "^4.17.21",
