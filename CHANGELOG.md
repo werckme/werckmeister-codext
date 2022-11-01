@@ -1,4 +1,4 @@
-# Version 1.0.4
+# Version 1.0.40
 ## Bugfix
 * https://github.com/werckme/werckmeister/issues/327
 * https://github.com/werckme/werckmeister/issues/326

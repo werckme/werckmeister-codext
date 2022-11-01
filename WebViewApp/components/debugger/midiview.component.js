@@ -16,7 +16,9 @@ export class MidiViewComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            midiData: null
+            midiData: null,
+            viewName: "",
+            viewType: viewTypes.Piano
         };
         this.boundViewClickedFunction = null;
         this.midiView = document.querySelector('#debugger-view');
@@ -155,6 +157,7 @@ export class MidiViewComponent extends React.Component {
         this.dbgMidi.update();
         this.initListener();
         this.viewType = viewTypes.List;
+        this.setState({viewType: this.viewType});
     }
 
     switchToPianoRollView() {
@@ -163,6 +166,7 @@ export class MidiViewComponent extends React.Component {
         this.dbgMidi.update();
         this.initListener();
         this.viewType = viewTypes.Piano;
+        this.setState({viewType: this.viewType});
     }
 
     updateMidiView() {
@@ -208,7 +212,7 @@ export class MidiViewComponent extends React.Component {
 
     render() {
         return (
-            <div>
+            <div className={this.state.viewType.toLowerCase() + ' midiview-top'}>
             </div>
         );
     }
