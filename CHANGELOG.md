@@ -1,3 +1,9 @@
+# Version 1.0.50
+## Feature
+* Event List search
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/event-list-search.png">
+
+
 # Version 1.0.41
 ## Improvements
 * Pinao Roll View rendering is faster now
