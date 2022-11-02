@@ -107,17 +107,33 @@
           .midiview-top.list #view-search-ctrl {
             display: block;
             position: fixed;
-            right: 5px;
-            top: 25px;
+            right: 70px;
+            top: 70px;
             z-index: 20;
+          }
+          .midiview-top.list #view-search-ctrl input {
             text-align: left;
             color: black;
+          }
+          .midiview-top.list #view-search-ctrl button {
+            font-size: 14px;
+            color: white;
+            width: 10px;
           }
           .event.highlighted {
             border: 4px solid red;
           }
-          .wm-dbg-listview  tr.highlighted {
-            border: 4px solid red;
+          .wm-dbg-listview  tr.highlighted, .wm-dbg-listview tr.found-by-search {
+            border: 4px solid yellow;
+            filter: none !important;
+          }
+          .wm-dbg-listview  tr.highlighted::after, .wm-dbg-listview tr.found-by-search:after {
+            content: "◀";
+            font-size: 25px;
+            position: absolute;
+            right: 20px;
+            margin-top: -5px;
+            color: yellow;
           }
           .wm-dbg-listview  thead tr {
             position: sticky;
