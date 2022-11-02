@@ -2,6 +2,7 @@ import React from "react";
 import * as _ from 'lodash';
 import { WmMidiFileDebugger } from '@werckmeister/midi-debugger';
 import { Base64Binary } from "../shared/Base64Binary";
+import { Button } from "antd";
 
 const highlightedClassName = "highlighted";
 
@@ -19,7 +20,8 @@ export class MidiViewComponent extends React.Component {
         this.state = {
             midiData: null,
             viewName: "",
-            viewType: viewTypes.Piano
+            viewType: viewTypes.Piano,
+            searchResultMaxFound: ""
         };
         this.boundViewClickedFunction = null;
         this.midiView = document.querySelector('#debugger-view');
@@ -218,9 +220,11 @@ export class MidiViewComponent extends React.Component {
         if (!firstViewElement) {
             return;
         }
+        this.setState({
+            searchResultMaxFound: foundElements.length || ""
+        });
         const bounds = firstViewElement.getBoundingClientRect();
         const visibleView =  document.querySelector('html');
-        const visibleWidth = visibleView.clientWidth;
         const visibleHeight = visibleView.clientHeight;
         const scrollView = document.querySelector("html");
         scrollView.scrollTo({
@@ -238,7 +242,12 @@ export class MidiViewComponent extends React.Component {
     render() {
         return (
             <div className={this.state.viewType.toLowerCase() + ' midiview-top'}>
-                <input type="text" id="view-search-ctrl" onKeyUp={this.onSearchKeyUp.bind(this)}></input>
+                <div id="view-search-ctrl">
+                    <input type="text" onKeyUp={this.onSearchKeyUp.bind(this)}></input>
+                    <span>{`${this.state.searchResultMaxFound}`}</span>
+                    <button>▲</button>
+                    <button>▼</button>
+                </div>
             </div>
         );
     }
