@@ -1,4 +1,4 @@
-# Version 1.0.50
+# Version 1.0.51
 ## Feature
 * Event List search
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/event-list-search.png">
@@ -6,7 +6,7 @@
 
 # Version 1.0.41
 ## Improvements
-* Pinao Roll View rendering is faster now
+* Piano Roll View rendering is faster now
 * Event List View dosen't hide the sheets title name anymore
 
 # Version 1.0.40
