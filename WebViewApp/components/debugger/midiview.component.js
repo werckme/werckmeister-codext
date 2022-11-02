@@ -35,6 +35,7 @@ export class MidiViewComponent extends React.Component {
         this.initListener();
         this.viewType = viewTypes.Piano;
         this.searchTerm = "";
+        this.lastSearch = "";
     }
 
     componentDidMount() {
@@ -64,6 +65,8 @@ export class MidiViewComponent extends React.Component {
 
     onFilterUpdated() {
         this.updateDebugSymbols();
+        this.lastSearch = "";
+        this.search(this.searchTerm, false);
     }
 
     highlight(eventElement) {
@@ -222,19 +225,19 @@ export class MidiViewComponent extends React.Component {
         });
     }
 
-    search(term) {
-        if (term === this.searchTerm) {
+    search(term, navigate = true) {
+        if (term === this.lastSearch) {
             return;
         }
-        this.searchTerm = term;
+        this.lastSearch = term;
         this.dbgMidi.search(term);
         const foundElements = document.querySelectorAll(`.${foundBySearch}`);
-        this.updateStateAsync({
+        return this.updateStateAsync({
             searchResultMaxFound: foundElements.length,
             searchResultIndex: -1
         }).then(()=>{
             const hasFoundSomething = foundElements.length > 0;
-            if (!hasFoundSomething) {
+            if (!hasFoundSomething || !navigate) {
                 return;
             }
             this.gotoNextSearchResult(foundElements);
@@ -242,21 +245,27 @@ export class MidiViewComponent extends React.Component {
     }
 
     onSearchKeyUp(event) {
+        this.searchTerm = event.target.value;
         if (event.which === 13) {
-            this.search(event.target.value);
+            this.search(this.searchTerm);
         }
     }
 
-    onSearchBlur(event) {
-        this.search(event.target.value);
-    }
-
     navigateSearchResult(searchResults = null, direction) {
+        if (this.searchTerm !== this.lastSearch) {
+            this.search(this.searchTerm);
+            return;
+        }
         const foundElements = searchResults || document.querySelectorAll(`.${foundBySearch}`);
+        if (foundElements.length === 0) {
+            return;
+        }
         let index = this.state.searchResultIndex;
-        console.log(index)
         index += direction;
-        index = Math.min(foundElements.length - 1, Math.max(0, index));
+        if (index < 0) {
+            index = foundElements.length - 1;
+        }
+        index = index % foundElements.length;
         this.setState({searchResultIndex: index});
         const nextElement = foundElements[index];
         if (!nextElement) {
@@ -287,9 +296,9 @@ export class MidiViewComponent extends React.Component {
         return (
             <div className={this.state.viewType.toLowerCase() + ' midiview-top'}>
                 <div id="view-search-ctrl">
-                    <input type="text" placeholder="search" onKeyUp={this.onSearchKeyUp.bind(this)} onBlur={this.onSearchBlur.bind(this)}></input>
+                    <input type="text" placeholder="search" onKeyUp={this.onSearchKeyUp.bind(this)}></input>
                     <span>{
-                        this.state.searchResultIndex !== null ? `${this.state.searchResultIndex+1}/${this.state.searchResultMaxFound}` : ""
+                        this.state.searchResultIndex !== null ? `${this.state.searchResultIndex+1}/${this.state.searchResultMaxFound}` : "0/0"
                     }</span>
                     <button onClick={this.prevSearchResult.bind(this)}>▲</button>
                     <button onClick={this.gotoNextSearchResult.bind(this)}>▼</button>
