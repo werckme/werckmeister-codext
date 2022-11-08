@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { getLanguage } from '../language/Language';
+import { getSheetHistory } from './SheetHistory';
 
 export class FileWatcher extends vscode.Disposable {
     onDidDocumentSaveDisposable: vscode.Disposable;
@@ -18,7 +19,18 @@ export class FileWatcher extends vscode.Disposable {
 
     private async checkCurrentSheetForErrors(doc: vscode.TextDocument): Promise<void> {
         try {
-            const diagnose = await getLanguage().features.diagnostic.update(doc.uri.fsPath);
+            const sheetHistory = getSheetHistory();
+            let sheetpath = sheetHistory.currentFile;
+            if (!sheetpath) {
+                sheetpath = sheetHistory.lastPlayedSheetFile;
+            }
+            if (!sheetpath) {
+                sheetpath = sheetHistory.lastVisitedSheetFile;
+            }
+            if (!sheetpath) {
+                return;
+            }
+            const diagnose = await getLanguage().features.diagnostic.update(sheetpath);
         } catch (ex) {
             vscode.window.showErrorMessage(` ${doc.uri.fsPath}: ${ex}`,'Ok');
         }
