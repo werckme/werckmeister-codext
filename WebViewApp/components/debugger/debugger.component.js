@@ -126,7 +126,6 @@ export class DebuggerComponent extends BaseComponent {
     }
 
     onMidiViewError(ex) {
-        console.log("!!!!")
         this.setState({midiViewError: ex});
     }
 

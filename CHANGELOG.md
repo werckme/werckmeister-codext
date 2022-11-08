@@ -1,3 +1,7 @@
+# Version 1.0.52
+## Bugfix
+* minor bugfixes
+
 # Version 1.0.51
 ## Feature
 * Event List search
