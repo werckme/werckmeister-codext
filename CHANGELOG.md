@@ -1,3 +1,7 @@
+# Version 1.0.53
+## Feature
+* conduction selector syntax updated
+
 # Version 1.0.52
 ## Bugfix
 * minor bugfixes
