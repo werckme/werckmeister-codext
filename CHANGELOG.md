@@ -1,3 +1,11 @@
+# Version 1.0.55
+## Bugfix
+* minor issues
+
+# Version 1.0.54
+## Bugfix
+* fixed issues with sysex events in MidiList view
+
 # Version 1.0.53
 ## Feature
 * conduction selector syntax updated
