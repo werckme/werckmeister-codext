@@ -1,8 +1,9 @@
-import { IEnvironmentInspector, MidiDeviceInfo } from "@werckmeister/language-features/IEnvironmentInspector";
+import { EnvironmentType, IEnvironmentInspector, MidiDeviceInfo } from "@werckmeister/language-features/IEnvironmentInspector";
 import { getPlayer } from "../../../com/Player";
 import { EOL } from 'os';
 
 export class EnvironmentInspector implements IEnvironmentInspector {
+    environment: EnvironmentType = "local";
     public async getMidiOutputDevices(): Promise<MidiDeviceInfo[]> {
         try {
             const player = getPlayer();
