@@ -5,13 +5,14 @@
 		{"include": "#selectors"},
 		{"include": "#declarations"},
 		{"include": "#comments"},
+		{"include": "#blockcomments"},
 		{"include": "#special"}
 	],
 	"repository": {
 		"selectors": {
 			"patterns": [{
 				"name": "keyword.control.werckmeister",
-				"match": "all|withTag|channel|fromBar|fromBeat|fromPitch|fromPosition|instrument|notOnBeat|nthBar|onBar|onBeat|pitch|expression|toBar|toBeat|toPitch|toPosition|withTag|degree|chord|phrase"
+				"match": "all|withTag|channel|fromBar|fromBeat|fromPitch|fromPosition|instrument|notOnBeat|nthBar|onBar|onBeat|pitch|expression|toBar|toBeat|toPitch|toPosition|withTag|degree|chord|phrase|template|voice"
 			}]
 		},
 		"declarations": {
@@ -24,6 +25,11 @@
 			"name": "comment.line.double-dash.werckmeister",
 			"begin": "--",
 			"end": "$"
+		},
+		"blockcomments": {
+			"name": "comment.line.double-dash.werckmeister",
+			"begin": "/\\*",
+			"end": "\\*/"
 		},
 		"special": {
 			"patterns": [{

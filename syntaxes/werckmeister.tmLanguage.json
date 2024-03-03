@@ -5,6 +5,7 @@
 		{"include": "#keywords"},
 		{"include": "#strings"},
 		{"include": "#comments"},
+		{"include": "#blockcomments"},
 		{"include": "#track"},
 		{"include": "#meta"}
 	],
@@ -31,12 +32,18 @@
 			"begin": "--",
 			"end": "$"
 		},
+		"blockcomments": {
+			"name": "comment.line.double-dash.werckmeister",
+			"begin": "/\\*",
+			"end": "\\*/"
+		},
 		"track": {
 			"name": "entity.name.track",
 			"begin": "\\[",
 			"end": "\\]",
 			"patterns": [
 				{ "include": "#comments" },
+				{ "include": "#blockcomments" },
 				{ "include": "#voice" },
 				{ "include": "#meta" }
 			]
@@ -47,6 +54,7 @@
 			"end": "\\}",
 			"patterns": [
 				{ "include": "#comments" },
+				{ "include": "#blockcomments" },
 				{ "include": "#voicemeta" },
 				{
 					"name": "keyword.other.barline",
@@ -65,6 +73,7 @@
 			"end": ";",
 			"patterns": [
 				{ "include": "#comments" },
+				{ "include": "#blockcomments" },
 				{
 					"name": "variable.parameter.meta.werckmeister",
 					"match": "[a-zA-Z0-9]+"
@@ -87,6 +96,7 @@
 			},			
 			"patterns": [
 				{ "include": "#comments" },
+				{ "include": "#blockcomments" },
 				{
 					"name": "entity.name.function.voicemeta.werckmeister",
 					"match": "\\w+:"

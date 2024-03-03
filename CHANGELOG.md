@@ -1,3 +1,16 @@
+# Version 1.0.59
+## Feature
+* updating language features
+* adding block comment highlighting
+
+# Version 1.0.58
+## Feature
+* updating language features
+
+# Version 1.0.57
+## Feature
+* updating language features
+
 # Version 1.0.56
 ## Feature
 * updating language features
