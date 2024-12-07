@@ -329,6 +329,10 @@ export class InspectorView extends AWebView {
 
 	public static async reveal(documentPath: string, positionOffset: number):Promise<void> {
 		if (openedViews.length === 0) {
+			if (path.extname(documentPath) !== '.sheet') {
+				vscode.window.showErrorMessage(`you need to open the inspector view of the main sheet first.`);
+				return;
+			}
 			await vscode.commands.executeCommand(WMCommandOpenDebugger);
 			await this.waitUntilInspectorAreAvailable();
 		}

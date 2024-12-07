@@ -1,3 +1,13 @@
+# Version 1.0.61
+## Feature
+* updating language features
+## Bugfix
+* fixed: "reveal in inspector" does'nt work in .part files
+
+# Version 1.0.60
+## Feature
+* updating language features
+
 # Version 1.0.59
 ## Feature
 * updating language features
