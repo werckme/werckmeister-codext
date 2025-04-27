@@ -12,7 +12,8 @@ import { getLanguage } from '../language/Language';
 const UpdateIfThisExtension:string[] = [
 	'.sheet',
 	'.template',
-	'.conductions'
+	'.conductions',
+	'.part'
 ];
 
 const ViewTitle = "Werckmeister Inspector";

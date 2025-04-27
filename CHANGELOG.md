@@ -1,3 +1,7 @@
+# Version 1.0.62
+## Bugfix
+* fixed: .part file changes will be ignored in Inspector View
+
 # Version 1.0.61
 ## Feature
 * updating language features
