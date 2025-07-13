@@ -3,7 +3,6 @@
 import * as vscode from 'vscode';
 import { ACommand } from './commands/ACommand';
 import { Play } from './commands/Play';
-import { PlayTerminal } from './commands/PlayTerminal';
 import { Stop } from './commands/Stop';
 import { ShowSheetView } from './commands/ShowSheetView';
 import { ShowPianoView } from './commands/ShowPianoView';
@@ -19,6 +18,7 @@ import { ConnectToVst } from './commands/ConnectToVst';
 import { CloseVstConnection } from './commands/CloseVstConnection';
 import { getVstConnectionProvider, VstConnectionsProvider } from './com/VstConnectionsProvider';
 import { FileWatcher } from './com/FileWatcher';
+import { CountQuarters } from './commands/CountQuarters';
 
 function excuteCommand(type: (new (context: vscode.ExtensionContext) => ACommand), context: vscode.ExtensionContext, ...args: any[]): void {
 	let cmd = new type(context);
@@ -27,6 +27,7 @@ function excuteCommand(type: (new (context: vscode.ExtensionContext) => ACommand
 const _ns = "extension.werckmeister";
 export const WMCommandPlay = `${_ns}.play`;
 export const WMCommandStop = `${_ns}.stop`;
+export const WMCommandCountQuarters = `${_ns}.countQuarters`;
 export const WMCommandSaveMidi = `${_ns}.saveMidi`;
 export const WMCommandPause = `${_ns}.pause`;
 export const WMPlayFromPosition = `${_ns}.playFromPosition`;
@@ -82,6 +83,9 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);
 	
 	disposable = vscode.commands.registerCommand(WMCommandCloseVstConnection, excuteCommand.bind(null, CloseVstConnection, context));
+	context.subscriptions.push(disposable);
+
+	disposable = vscode.commands.registerCommand(WMCommandCountQuarters, excuteCommand.bind(null, CountQuarters, context));
 	context.subscriptions.push(disposable);
 	
 	disposable = vscode.languages.registerCompletionItemProvider({ scheme: 'file', language: 'werckmeister' }, {

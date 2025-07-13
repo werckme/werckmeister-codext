@@ -20,6 +20,7 @@
         "onCommand:extension.werckmeister.inspector",
         "onCommand:extension.werckmeister.connectToVst",
         "onCommand:extension.werckmeister.closeVstConnection",
+        "onCommand:extension.werckmeister.countQuarters",
         "onView:werckmeister-vstConnections",
         "onLanguage:werckmeister"
     ],
@@ -108,6 +109,10 @@
                     "light": "./resources/refresh_light.svg",
                     "dark": "./resources/refresh_dark.svg"
                 }
+            },
+            {
+                "command": "extension.werckmeister.countQuarters",
+                "title": "Werckmeister: Count quarters of selection"
             }
         ],
         "menus": {
