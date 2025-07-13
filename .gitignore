@@ -3,8 +3,7 @@ tsconfig.json
 # Edit at https://www.gitignore.io/?templates=visualstudiocode
 dist
 *.vsix
-
-./out/*
+out
 
 ### VisualStudioCode ###
 .vscode/*
