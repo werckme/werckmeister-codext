@@ -226,9 +226,6 @@ export class MidiViewComponent extends React.Component {
     }
 
     search(term, navigate = true) {
-        if (term === this.lastSearch) {
-            return;
-        }
         this.lastSearch = term;
         this.dbgMidi.search(term);
         const foundElements = document.querySelectorAll(`.${foundBySearch}`);

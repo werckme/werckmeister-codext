@@ -5,6 +5,50 @@
   </head>
   <body>
       <style type="text/css">
+        .octave, .keyboard {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: nowrap;
+          justify-content: flex-start;
+        }
+        .key {
+          height: 120px;
+          width: 30px;
+          border: 2px black solid;
+        }
+        .key button {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+        }
+        .key .bk button {
+          background-color: black;
+        }
+        .key .wk button {
+          background-color: white;
+        }
+        .key button:hover {
+          background-color: rgb(86, 112, 86);
+        }
+        .key button span {
+          position: absolute;
+          bottom: 9px;
+          left: 8px;
+        }
+        .key .bk button span {
+          left: 2px;
+          color: white;
+        }        
+        .wk {
+          position: relative;
+        }
+        .bk {
+          height: 60px;
+          width: 15px;
+          position: absolute;
+          left: 22px;
+          z-index: 1;
+        } 
       </style>
       <div id="piano-view-main-component"></div>
       <script src="$mainSrc"></script>

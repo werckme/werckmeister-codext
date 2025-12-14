@@ -87,6 +87,14 @@
                 }
             },
             {
+                "command": "extension.werckmeister.pianoview",
+                "title": "Werckmeister: Piano Input Helper",
+                "icon": {
+                    "light": "./resources/werckmeister_light.svg",
+                    "dark": "./resources/werckmeister_dark.svg"
+                }
+            },
+            {
                 "command": "extension.werckmeister.saveMidi",
                 "title": "Werckmeister: create MIDI file"
             },
