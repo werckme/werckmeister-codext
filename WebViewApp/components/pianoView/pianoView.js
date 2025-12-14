@@ -1,27 +1,59 @@
 import React from "react";
 import * as _ from 'lodash';
-import { TransportComponent } from "../shared/transport/transport.component";
 import { BaseComponent } from "../shared/base/base.component";
+
+
+// https://en.wikipedia.org/wiki/Musical_Symbols_(Unicode_block)
+const Sharp = "♯";
+const Flat = "♭";
+
 
 export class PianoView extends BaseComponent {
     constructor(props) {
         super(props);
+        const noneOption = "none";
         this.state = {
+            selectedDuration: noneOption,
+            selectedEnharmonicEq: Sharp
         }
+        this.durations = [noneOption, "64", "32", "16", "8", "4", "2", "1"];
+        this.keyboardRef = React.createRef();
     }
 
     componentDidMount() {
         this.sendMessageToHost("pianoview-ready");
+        if (this.keyboardRef.current) {
+            this.keyboardRef.current.scrollLeft = 800;
+        }
     }
 
 
-    onKeyClick(note) {
-       this.sendMessageToHost("send-text", {text: note + " "});
+    onKeyClick(note, octaveNr, acc) {
+        const d = this.state.selectedDuration;
+        if (acc === Flat) {
+            note = this.getNextNoteName(note);
+            note = note + "b";
+        }
+        if (acc === Sharp) {
+            note = note + "#";
+        }
+        note = `${note}${this.getOctaveTokens(octaveNr)}`;
+        if (this.state.selectedDuration && d !== 'none') {
+            note = note + d;
+        }
+        this.sendMessageToHost("send-text", {text: note + " "});
     }
 
-    renderKeyLabel(name, octave, enharmonicEq) {
-        if (enharmonicEq) {
-            return (<span>{'#'}</span>)
+    getNextNoteName(note) {
+        if (note === 'g') {
+            return 'a';
+        }
+        return String.fromCharCode(note.charCodeAt(0) + 1);
+    }
+
+    renderKeyLabel(name, octave, acc) {
+        if (acc) {
+            return (<span><b>{acc}</b></span>)
         }
         if (name !== 'c' || octave !== 0) {
             return <></>;
@@ -42,9 +74,60 @@ export class PianoView extends BaseComponent {
         return tokens.join('')
     }
 
-    renderKey(name, octaveNr, enharmonicEq) {
-        let note = `${name}${this.getOctaveTokens(octaveNr)}`;
-        return (<button title={note} onClick={this.onKeyClick.bind(this, note)}>{this.renderKeyLabel(name, octaveNr, enharmonicEq)}</button>)
+    renderKey(note, octaveNr, acc) {
+        return (<button title={note} onClick={this.onKeyClick.bind(this, note, octaveNr, acc)}>{this.renderKeyLabel(name, octaveNr, acc)}</button>)
+    }
+
+    onDurationChange(event) {
+        this.setState({ selectedDuration: event.target.value });
+    };
+
+    onEnharmonicEqChange(event) {
+        this.setState({ selectedEnharmonicEq: event.target.value });
+    };
+    
+
+    renderDurationControls() {
+        return (
+            <div className="control duration">
+                {this.durations.map(duration => (
+                    <label key={duration}>
+                        <input
+                            type="radio"
+                            value={duration}
+                            checked={this.state.selectedDuration === duration}
+                            onChange={this.onDurationChange.bind(this)}
+                        />
+                        {duration}
+                    </label>
+                ))}
+            </div>
+        );
+    }
+
+    renderEnharmonicEqControls() {
+        return (
+            <div className="control duration">
+                <label key="#">
+                    <input
+                        type="radio"
+                        value={Sharp}
+                        checked={this.state.selectedEnharmonicEq === Sharp}
+                        onChange={this.onEnharmonicEqChange.bind(this)}
+                    />
+                    <b>{Sharp}</b>
+                </label>
+                <label key="#">
+                    <input
+                        type="radio"
+                        value={Flat}
+                        checked={this.state.selectedEnharmonicEq === Flat}
+                        onChange={this.onEnharmonicEqChange.bind(this)}
+                    />
+                    <b>{Flat}</b>
+                </label>
+            </div>
+        );
     }
 
     renderOctave(octaveNr) {
@@ -53,13 +136,13 @@ export class PianoView extends BaseComponent {
                 <div className="key wk c">
                     {this.renderKey('c', octaveNr)}
                     <div className="key bk cs">
-                        {this.renderKey('c#', octaveNr, 'db')}
+                        {this.renderKey('c#', octaveNr, this.state.selectedEnharmonicEq)}
                     </div>
                 </div>
                 <div className="key wk d">
                     {this.renderKey('d', octaveNr)}
                     <div className="key bk ds">
-                        {this.renderKey('d#', octaveNr, 'eb')}
+                        {this.renderKey('d', octaveNr,  this.state.selectedEnharmonicEq)}
                     </div>
                 </div>
                 <div className="key wk e">
@@ -68,19 +151,19 @@ export class PianoView extends BaseComponent {
                 <div className="key wk f">
                     {this.renderKey('f', octaveNr)}
                         <div className="key bk fs">
-                        {this.renderKey('f#', octaveNr, 'gb')}
+                        {this.renderKey('f', octaveNr,  this.state.selectedEnharmonicEq)}
                     </div>                        
                 </div>
                 <div className="key wk g">
                     {this.renderKey('g', octaveNr)}
                         <div className="key bk gs">
-                        {this.renderKey('g#', octaveNr, 'ab')}
+                        {this.renderKey('g', octaveNr,  this.state.selectedEnharmonicEq)}
                     </div>
                 </div>
                 <div className="key wk a">
                     {this.renderKey('a', octaveNr)}
                     <div className="key bk as">
-                        {this.renderKey('a#', octaveNr, 'bb')}
+                        {this.renderKey('a', octaveNr,  this.state.selectedEnharmonicEq)}
                     </div>
                 </div>
                 <div className="key wk b">
@@ -94,9 +177,15 @@ export class PianoView extends BaseComponent {
     render() {
         const octaves = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];
         return (
-            <div className="keyboard">
-                {octaves.map(octaveNr => this.renderOctave(octaveNr))}
-            </div>
+            <>
+                <div ref={this.keyboardRef} className="keyboard">
+                    {octaves.map(octaveNr => this.renderOctave(octaveNr))}
+                </div>
+                <div className="controls">
+                    {this.renderDurationControls()}
+                    {this.renderEnharmonicEqControls()}
+                </div>
+            </>
         );
     }
 }

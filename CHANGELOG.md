@@ -1,3 +1,7 @@
+# Version 1.1.0
+* adding piano input helper
+* improving search bar behaviour in MIDI Event List
+
 # Version 1.0.62
 ## Bugfix
 * fixed: .part file changes will be ignored in Inspector View

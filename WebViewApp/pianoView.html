@@ -5,6 +5,9 @@
   </head>
   <body>
       <style type="text/css">
+        .keyboard {
+          overflow-x: scroll;
+        }
         .octave, .keyboard {
           display: flex;
           flex-direction: row;
@@ -49,6 +52,9 @@
           left: 22px;
           z-index: 1;
         } 
+        .control.duration label{
+          margin-left: 1em;
+        }
       </style>
       <div id="piano-view-main-component"></div>
       <script src="$mainSrc"></script>
