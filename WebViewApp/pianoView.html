@@ -38,11 +38,11 @@
         }
         .key button span {
           position: absolute;
-          bottom: 9px;
+          bottom: 0px;
           left: 8px;
         }
         .key .bk button span {
-          left: 2px;
+          left: 0px;
           color: white;
         }        
         .wk {
@@ -74,6 +74,12 @@
         .control.duration input.blink {
             accent-color: green;
             animation: blink 1s steps(2, start) infinite;
+        }
+        span.mus {
+          font-size: 1.5em;
+        }
+        .control button + button {
+          margin-left: 5px;
         }
         @keyframes blink {
           to {

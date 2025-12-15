@@ -6,9 +6,10 @@ import { BaseComponent } from "../shared/base/base.component";
 // https://en.wikipedia.org/wiki/Musical_Symbols_(Unicode_block)
 const Sharp = "♯";
 const Flat = "♭";
-const Bar = "𝄀";
-const BarBeginRepeat = "𝄆";
-const BarEndRepeat = "𝄇";
+const TokenBar = "𝄀";
+const TokenBarBeginRepeat = "𝄆";
+const TokenBarEndRepeat = "𝄇";
+const TokenChord = "C";
 const NoDurationOption = "none";
 const NoDotOption = "none";
 
@@ -62,11 +63,15 @@ export class PianoView extends BaseComponent {
         this.sendMessageToHost("send-text", {text});
     }
 
+    resetDurationSelection() {
+        this.setState({selectedDuration: NoDurationOption});
+        this.setState({selectedDotOption: NoDotOption})
+    }
+
     onKeyClick(noteName, octaveNr, acc) {
         const note = this.renderNote(noteName, octaveNr, acc)
         this.sendToEditor(note + " ");
-        this.setState({selectedDuration: NoDurationOption})
-
+        this.resetDurationSelection();
     }
 
     getNextNoteName(note) {
@@ -184,19 +189,34 @@ export class PianoView extends BaseComponent {
         );
     }
 
-    addBar(barType) {
-        switch(barType) {
-            case Bar: return this.sendToEditor("| ");
-            case BarBeginRepeat: return this.sendToEditor("|: ");
-            case BarEndRepeat: return this.sendToEditor(":| ");
+    addToken(tokenType) {
+        switch(tokenType) {
+            case TokenBar: return this.sendToEditor("| ");
+            case TokenBarBeginRepeat: return this.sendToEditor("|: ");
+            case TokenBarEndRepeat: return this.sendToEditor(":| ");
+            case TokenChord: {
+                const duration = this.state.selectedDuration;
+                const dot = this.state.selectedDotOption;
+                let token = `<>`;
+                if (duration && duration !== NoDurationOption) {
+                    token = token + duration;
+                }
+                if (dot && dot !== NoDotOption) {
+                    token = token + dot;
+                }
+                this.resetDurationSelection();
+                return this.sendToEditor(`${token} `);
+            }
         }
     }
 
-    renderAddBarControls() {
+    renderAddTokenControls() {
         return(<div className="control bar">
-            <button onClick={this.addBar.bind(this, Bar)}>{mus(Bar)}</button>
-            <button onClick={this.addBar.bind(this, BarBeginRepeat)}>{mus(BarBeginRepeat)}</button>
-            <button onClick={this.addBar.bind(this, BarEndRepeat)}>{mus(BarEndRepeat)}</button>
+            <button onClick={this.addToken.bind(this, TokenBar)}>{mus(TokenBar)}</button>
+            <button onClick={this.addToken.bind(this, TokenBarBeginRepeat)}>{mus(TokenBarBeginRepeat)}</button>
+            <button onClick={this.addToken.bind(this, TokenBarEndRepeat)}>{mus(TokenBarEndRepeat)}</button>
+            <button onClick={this.addToken.bind(this, TokenBarEndRepeat)}>{mus(TokenBarEndRepeat)}</button>
+            <button onClick={this.addToken.bind(this, TokenChord)}>{mus(TokenChord)}</button>
         </div>);
     }
 
@@ -254,7 +274,7 @@ export class PianoView extends BaseComponent {
                 <div className="controls">
                     {this.renderDurationControls()} {this.renderDotControls()}
                     {this.renderEnharmonicEqControls()}
-                    {this.renderAddBarControls()}
+                    {this.renderAddTokenControls()}
                 </div>
             </>
         );

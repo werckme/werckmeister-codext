@@ -20,6 +20,10 @@ Connect a Werckmeister-VST instance with VSCode
 ### MIDI Inspector
 Analyse the compiled MIDI file of a sheet. 
 
+
+### Piano Input
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/piano-input.gif">
+
 ### Piano Roll View
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/werckmeister-inspector-piano-roll.gif">
 

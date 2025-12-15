@@ -4,61 +4,72 @@ import { AWebView } from './AWebView';
 import { getSheetHistory } from './SheetHistory';
 
 export class PianoView extends AWebView {
-	currentPanel: vscode.WebviewPanel|null = null;
-	get panel():  vscode.WebviewPanel|null {
-		return this.currentPanel;
-	}
-	constructor(context: vscode.ExtensionContext) {
-		super(context);
-	}
+    currentPanel: vscode.WebviewPanel|null = null;
+    get panel():  vscode.WebviewPanel|null {
+        return this.currentPanel;
+    }
+    constructor(context: vscode.ExtensionContext) {
+        super(context);
+    }
 
-	async onText(textMessage: {text: string}) {
-		 const sheetHistory = getSheetHistory();
-		 const lastSheetFile = sheetHistory.lastVisitedSheetFile;
-		 if (!lastSheetFile) {
-			vscode.window.showWarningMessage("no active sheet document found");
-			return;
-		 }
-		 const uri = vscode.Uri.file(lastSheetFile);
-		 const editor = vscode.window.visibleTextEditors.find(e => e.document.uri.fsPath === uri.fsPath);
-		 if (!editor) {
-			vscode.window.showWarningMessage("no active sheet edtor found");
-			return;
-		 }
-		 const position = editor.selection.active;
-		 editor.edit(editBuilder => {
-    		editBuilder.insert(position, textMessage.text);
-			setTimeout(()=>{
-				const endPoisition = new vscode.Position(position.line, position.character + textMessage.text.length)
-				const range = new vscode.Range(position, endPoisition);
-				editor.revealRange(range)
-				editor.selection = new vscode.Selection(position, endPoisition);
-				vscode.window.showTextDocument(editor.document, {
-					viewColumn: editor.viewColumn,
-					preserveFocus: false
-				});
-			}, 50);
+    async onText(textMessage: {text: string}) {
+         const sheetHistory = getSheetHistory();
+         const lastSheetFile = sheetHistory.lastVisitedSheetFile;
+         if (!lastSheetFile) {
+            vscode.window.showWarningMessage("no active sheet document found");
+            return;
+         }
+         const uri = vscode.Uri.file(lastSheetFile);
+         const editor = vscode.window.visibleTextEditors.find(e => e.document.uri.fsPath === uri.fsPath);
+         if (!editor) {
+            vscode.window.showWarningMessage("no active sheet edtor found");
+            return;
+         }
+         const position = editor.selection.active;
+         editor.edit(editBuilder => {
+            editBuilder.insert(position, textMessage.text);
+            setTimeout(()=>{
+                const endPoisition = new vscode.Position(position.line, position.character + textMessage.text.length)
+                const range = new vscode.Range(position, endPoisition);
+                editor.revealRange(range)
+                editor.selection = new vscode.Selection(position, endPoisition);
+                vscode.window.showTextDocument(editor.document, {
+                    viewColumn: editor.viewColumn,
+                    preserveFocus: false
+                });
+            }, 50);
 
-		});
-	}
+        });
+    }
 
-	onWebViewMessage(message: any) {
-		switch(message.command) {
-			case "send-text": this.onText(message)
-		}
-	}
+    onWebViewMessage(message: any) {
+        switch(message.command) {
+            case "send-text": this.onText(message)
+        }
+    }
 
     protected createPanelImpl(): Promise<vscode.WebviewPanel> {
-        return new Promise<vscode.WebviewPanel>((resolve, reject) => {
+        return new Promise<vscode.WebviewPanel>(async (resolve, reject) => {
+
+
+            if (vscode.window.activeTextEditor) {
+                await vscode.commands.executeCommand(
+                    'workbench.action.splitEditorDown'
+                );
+            }
             this.currentPanel = vscode.window.createWebviewPanel(
                 'werckmeister.PianoView',
                 'Werckmeister Piano Input',
-                vscode.ViewColumn.Beside,
+                vscode.ViewColumn.Active,
                 {
                     enableScripts: true,
                 }
             );
-			this.currentPanel.webview.onDidReceiveMessage(this.onWebViewMessage.bind(this), undefined, this.context.subscriptions);
+            await vscode.commands.executeCommand(
+                'workbench.action.closeOtherEditors'
+            );
+
+            this.currentPanel.webview.onDidReceiveMessage(this.onWebViewMessage.bind(this), undefined, this.context.subscriptions);
             let jsPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'dist', 'WebViewApp.dist.js'));
             let htmlPath = vscode.Uri.file(this.getExtensionPath('WebViewApp', 'pianoView.html'));
             
