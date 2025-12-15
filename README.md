@@ -13,16 +13,16 @@ This extension provides support for the [Werckmeister](https://werckme.github.io
 * Autocompletion
 
 
+### Piano Input
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/piano-input.gif">
+
 ### Werckmeister-VST Plugin integration
 Connect a Werckmeister-VST instance with VSCode
-<img src="https://raw.githubusercontent.com/werckme/werckmeister/manual-update/assets/vst2vscode.gif">
+<img src="https://raw.githubusercontent.com/werckme/werckmeister/main/assets/vst2vscode.gif">
+
 
 ### MIDI Inspector
 Analyse the compiled MIDI file of a sheet. 
-
-
-### Piano Input
-<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/piano-input.gif">
 
 ### Piano Roll View
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/werckmeister-inspector-piano-roll.gif">
