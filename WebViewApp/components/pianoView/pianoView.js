@@ -6,16 +6,19 @@ import { BaseComponent } from "../shared/base/base.component";
 // https://en.wikipedia.org/wiki/Musical_Symbols_(Unicode_block)
 const Sharp = "♯";
 const Flat = "♭";
-const DurationNoneOption = "none";
+const NoDurationOption = "none";
+const NoDotOption = "none";
 
 export class PianoView extends BaseComponent {
     constructor(props) {
         super(props);
         this.state = {
-            selectedDuration: DurationNoneOption,
-            selectedEnharmonicEq: Sharp
+            selectedDuration: NoDurationOption,
+            selectedEnharmonicEq: Sharp,
+            selectedDotOption: NoDotOption
         }
-        this.durations = [DurationNoneOption, "64", "32", "16", "8", "4", "2", "1"];
+        this.durations = [NoDurationOption, "128", "64", "32", "16", "8", "4", "2", "1"];
+        this.dotOptions = [NoDotOption, ".", "..", "...", "...."];
         this.keyboardRef = React.createRef();
     }
 
@@ -26,9 +29,10 @@ export class PianoView extends BaseComponent {
         }
     }
 
-
-    onKeyClick(note, octaveNr, acc) {
-        const d = this.state.selectedDuration;
+    renderNote(noteName, octaveNr, acc) {
+        let note = noteName;
+        const duration = this.state.selectedDuration;
+        const dot = this.state.selectedDotOption;
         if (acc === Flat) {
             note = this.getNextNoteName(note);
             note = note + "b";
@@ -37,11 +41,19 @@ export class PianoView extends BaseComponent {
             note = note + "#";
         }
         note = `${note}${this.getOctaveTokens(octaveNr)}`;
-        if (this.state.selectedDuration && d !== 'none') {
-            note = note + d;
+        if (duration && duration !== NoDurationOption) {
+            note = note + duration;
         }
+        if (dot && dot !== NoDotOption) {
+            note = note + dot;
+        }
+        return note;
+    }
+
+    onKeyClick(noteName, octaveNr, acc) {
+        const note = this.renderNote(noteName, octaveNr, acc)
         this.sendMessageToHost("send-text", {text: note + " "});
-        this.setState({selectedDuration: DurationNoneOption})
+        this.setState({selectedDuration: NoDurationOption})
     }
 
     getNextNoteName(note) {
@@ -95,12 +107,39 @@ export class PianoView extends BaseComponent {
                     <label key={duration}>
                         <input
                             type="radio"
-                            className={duration !== DurationNoneOption && this.state.selectedDuration === duration ? 'blink' : ''}
+                            className={duration !== NoDurationOption && this.state.selectedDuration === duration ? 'blink' : ''}
                             value={duration}
                             checked={this.state.selectedDuration === duration}
                             onChange={this.onDurationChange.bind(this)}
                         />
                         {duration}
+                    </label>
+                ))}
+            </div>
+        );
+    }
+
+    onDotOptionChange(event) {
+        this.setState({ selectedDotOption: event.target.value });
+    }
+
+    renderDotControls() {
+        const duration = this.state.selectedDuration;
+        if (duration === NoDurationOption) {
+            return (<div></div>);
+        }
+        return (
+            <div className="control dot">
+                {this.dotOptions.map(dotOption => (
+                    <label key={dotOption}>
+                        <input
+                            type="radio"
+                            value={dotOption}
+                            checked={this.state.selectedDotOption === dotOption}
+                            onChange={this.onDotOptionChange.bind(this)}
+                        />
+
+                        {duration + (dotOption !== NoDotOption ? dotOption : '')}
                     </label>
                 ))}
             </div>
@@ -119,7 +158,7 @@ export class PianoView extends BaseComponent {
                     />
                     <b>{Sharp}</b>
                 </label>
-                <label key="#">
+                <label key="b">
                     <input
                         type="radio"
                         value={Flat}
@@ -184,7 +223,7 @@ export class PianoView extends BaseComponent {
                     {octaves.map(octaveNr => this.renderOctave(octaveNr))}
                 </div>
                 <div className="controls">
-                    {this.renderDurationControls()}
+                    {this.renderDurationControls()} {this.renderDotControls()}
                     {this.renderEnharmonicEqControls()}
                 </div>
             </>
