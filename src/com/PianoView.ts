@@ -28,6 +28,17 @@ export class PianoView extends AWebView {
 		 const position = editor.selection.active;
 		 editor.edit(editBuilder => {
     		editBuilder.insert(position, textMessage.text);
+			setTimeout(()=>{
+				const endPoisition = new vscode.Position(position.line, position.character + textMessage.text.length)
+				const range = new vscode.Range(position, endPoisition);
+				editor.revealRange(range)
+				editor.selection = new vscode.Selection(position, endPoisition);
+				vscode.window.showTextDocument(editor.document, {
+					viewColumn: editor.viewColumn,
+					preserveFocus: false
+				});
+			}, 50);
+
 		});
 	}
 

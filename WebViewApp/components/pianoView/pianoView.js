@@ -6,17 +6,16 @@ import { BaseComponent } from "../shared/base/base.component";
 // https://en.wikipedia.org/wiki/Musical_Symbols_(Unicode_block)
 const Sharp = "♯";
 const Flat = "♭";
-
+const DurationNoneOption = "none";
 
 export class PianoView extends BaseComponent {
     constructor(props) {
         super(props);
-        const noneOption = "none";
         this.state = {
-            selectedDuration: noneOption,
+            selectedDuration: DurationNoneOption,
             selectedEnharmonicEq: Sharp
         }
-        this.durations = [noneOption, "64", "32", "16", "8", "4", "2", "1"];
+        this.durations = [DurationNoneOption, "64", "32", "16", "8", "4", "2", "1"];
         this.keyboardRef = React.createRef();
     }
 
@@ -42,6 +41,7 @@ export class PianoView extends BaseComponent {
             note = note + d;
         }
         this.sendMessageToHost("send-text", {text: note + " "});
+        this.setState({selectedDuration: DurationNoneOption})
     }
 
     getNextNoteName(note) {
@@ -75,7 +75,8 @@ export class PianoView extends BaseComponent {
     }
 
     renderKey(note, octaveNr, acc) {
-        return (<button title={note} onClick={this.onKeyClick.bind(this, note, octaveNr, acc)}>{this.renderKeyLabel(name, octaveNr, acc)}</button>)
+        const title = note + this.getOctaveTokens(octaveNr);
+        return (<button title={title} onClick={this.onKeyClick.bind(this, note, octaveNr, acc)}>{this.renderKeyLabel(note, octaveNr, acc)}</button>)
     }
 
     onDurationChange(event) {
@@ -94,6 +95,7 @@ export class PianoView extends BaseComponent {
                     <label key={duration}>
                         <input
                             type="radio"
+                            className={duration !== DurationNoneOption && this.state.selectedDuration === duration ? 'blink' : ''}
                             value={duration}
                             checked={this.state.selectedDuration === duration}
                             onChange={this.onDurationChange.bind(this)}
@@ -107,7 +109,7 @@ export class PianoView extends BaseComponent {
 
     renderEnharmonicEqControls() {
         return (
-            <div className="control duration">
+            <div className="control enharmonicEq">
                 <label key="#">
                     <input
                         type="radio"
@@ -136,7 +138,7 @@ export class PianoView extends BaseComponent {
                 <div className="key wk c">
                     {this.renderKey('c', octaveNr)}
                     <div className="key bk cs">
-                        {this.renderKey('c#', octaveNr, this.state.selectedEnharmonicEq)}
+                        {this.renderKey('c', octaveNr, this.state.selectedEnharmonicEq)}
                     </div>
                 </div>
                 <div className="key wk d">

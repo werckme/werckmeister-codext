@@ -254,7 +254,6 @@ export class InspectorView extends AWebView {
 	}
 
 	onWebViewMessage(message: any) {
-		console.log(message);
 		switch(message.command) {
 			case "player-stop": return this.onStopReceived();
 			case "player-play": return this.onPlayReceived(message.begin);
