@@ -88,7 +88,7 @@
             },
             {
                 "command": "extension.werckmeister.pianoview",
-                "title": "Werckmeister: Piano Input Helper",
+                "title": "Werckmeister: Piano Input",
                 "icon": {
                     "light": "./resources/werckmeister_light.svg",
                     "dark": "./resources/werckmeister_dark.svg"

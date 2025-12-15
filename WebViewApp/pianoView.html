@@ -19,6 +19,9 @@
           width: 30px;
           border: 2px black solid;
         }
+        .mus {
+          font-weight: bold;
+        }
         .key button {
           position: absolute;
           width: 100%;
@@ -51,7 +54,20 @@
           position: absolute;
           left: 22px;
           z-index: 1;
-        } 
+        }
+        .controls {
+          display: flex;
+          flex-direction: row;
+          align-content: center;
+          justify-content: flex-start;
+          align-items: center;
+          flex-wrap: wrap;
+        }
+        .controls > * + * {
+          margin-left: 1em;
+          padding-left: 0.5em;
+          border-left: 1px solid var(--vscode-foreground);;
+        }
         .control label + label{
           margin-left: 1em;
         }

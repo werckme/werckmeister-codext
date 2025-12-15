@@ -6,8 +6,16 @@ import { BaseComponent } from "../shared/base/base.component";
 // https://en.wikipedia.org/wiki/Musical_Symbols_(Unicode_block)
 const Sharp = "♯";
 const Flat = "♭";
+const Bar = "𝄀";
+const BarBeginRepeat = "𝄆";
+const BarEndRepeat = "𝄇";
 const NoDurationOption = "none";
 const NoDotOption = "none";
+
+
+function mus(symbol) {
+    return (<span className="mus">{symbol}</span>)
+}
 
 export class PianoView extends BaseComponent {
     constructor(props) {
@@ -50,10 +58,15 @@ export class PianoView extends BaseComponent {
         return note;
     }
 
+    sendToEditor(text) {
+        this.sendMessageToHost("send-text", {text});
+    }
+
     onKeyClick(noteName, octaveNr, acc) {
         const note = this.renderNote(noteName, octaveNr, acc)
-        this.sendMessageToHost("send-text", {text: note + " "});
+        this.sendToEditor(note + " ");
         this.setState({selectedDuration: NoDurationOption})
+
     }
 
     getNextNoteName(note) {
@@ -65,7 +78,7 @@ export class PianoView extends BaseComponent {
 
     renderKeyLabel(name, octave, acc) {
         if (acc) {
-            return (<span><b>{acc}</b></span>)
+            return (<>{mus(acc)}</>)
         }
         if (name !== 'c' || octave !== 0) {
             return <></>;
@@ -126,7 +139,7 @@ export class PianoView extends BaseComponent {
     renderDotControls() {
         const duration = this.state.selectedDuration;
         if (duration === NoDurationOption) {
-            return (<div></div>);
+            return (<></>);
         }
         return (
             <div className="control dot">
@@ -156,7 +169,7 @@ export class PianoView extends BaseComponent {
                         checked={this.state.selectedEnharmonicEq === Sharp}
                         onChange={this.onEnharmonicEqChange.bind(this)}
                     />
-                    <b>{Sharp}</b>
+                    {mus(Sharp)}
                 </label>
                 <label key="b">
                     <input
@@ -165,10 +178,26 @@ export class PianoView extends BaseComponent {
                         checked={this.state.selectedEnharmonicEq === Flat}
                         onChange={this.onEnharmonicEqChange.bind(this)}
                     />
-                    <b>{Flat}</b>
+                    {mus(Flat)}
                 </label>
             </div>
         );
+    }
+
+    addBar(barType) {
+        switch(barType) {
+            case Bar: return this.sendToEditor("| ");
+            case BarBeginRepeat: return this.sendToEditor("|: ");
+            case BarEndRepeat: return this.sendToEditor(":| ");
+        }
+    }
+
+    renderAddBarControls() {
+        return(<div className="control bar">
+            <button onClick={this.addBar.bind(this, Bar)}>{mus(Bar)}</button>
+            <button onClick={this.addBar.bind(this, BarBeginRepeat)}>{mus(BarBeginRepeat)}</button>
+            <button onClick={this.addBar.bind(this, BarEndRepeat)}>{mus(BarEndRepeat)}</button>
+        </div>);
     }
 
     renderOctave(octaveNr) {
@@ -225,6 +254,7 @@ export class PianoView extends BaseComponent {
                 <div className="controls">
                     {this.renderDurationControls()} {this.renderDotControls()}
                     {this.renderEnharmonicEqControls()}
+                    {this.renderAddBarControls()}
                 </div>
             </>
         );

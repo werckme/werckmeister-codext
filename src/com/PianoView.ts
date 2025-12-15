@@ -51,9 +51,9 @@ export class PianoView extends AWebView {
     protected createPanelImpl(): Promise<vscode.WebviewPanel> {
         return new Promise<vscode.WebviewPanel>((resolve, reject) => {
             this.currentPanel = vscode.window.createWebviewPanel(
-                'werckmeister.PianoView', // Identifies the type of the webview. Used internally
-                'Piano', // Title of the panel displayed to the user
-                vscode.ViewColumn.Beside, // Editor column to show the new webview panel in.
+                'werckmeister.PianoView',
+                'Werckmeister Piano Input',
+                vscode.ViewColumn.Beside,
                 {
                     enableScripts: true,
                 }
