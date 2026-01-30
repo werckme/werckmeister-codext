@@ -535,7 +535,13 @@ export class Player {
         if (config.begin > 0) {
             options.push(`--begin=${config.begin}`);
         }
-        return options;
+        const settings = vscode.workspace.getConfiguration('werckmeister');
+        const strArgs = settings.playerArguments as string;
+        if (!strArgs) {
+            return options;
+        }
+        const additionalArgs = strArgs.split(" ");
+        return options.concat(additionalArgs);
     }
 }
 

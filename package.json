@@ -5,7 +5,7 @@
     "description": "Werckmeister for VS Code",
     "icon": "resources/Logo.png",
     "repository": "https://github.com/werckme/werckmeister-codext",
-    "version": "1.1.10",
+    "version": "1.1.11",
     "engines": {
         "vscode": "^1.38.0"
     },
@@ -233,7 +233,12 @@
                     "type": "number",
                     "default": 7935,
                     "description": "VST UDP Port, must match with the port set in the Werckmeister-VST preferences."
-                }
+                },
+                "werckmeister.playerArguments": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Additional space separated player arguments"
+                }     
             }
         }
     },

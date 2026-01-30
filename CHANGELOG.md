@@ -1,3 +1,6 @@
+# Version 1.1.11
+* adding optional player arguments to extension settings
+
 # Version 1.1.0
 * adding piano input helper
 * improving search bar behaviour in MIDI Event List
