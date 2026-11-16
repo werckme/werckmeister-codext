@@ -1,6 +1,6 @@
 import React from "react";
 import * as _ from 'lodash';
-import { WmMidiFileDebugger } from '@werckmeister/midi-debugger';
+import { WmMidiFileDebugger } from 'werckmeister-midi-debugger';
 import { Base64Binary } from "../shared/Base64Binary";
 import { Button } from "antd";
 

@@ -1,0 +1,27 @@
+{
+    "name": "werckmeister-midi-debugger",
+    "version": "1.0.0",
+    "description": "MIDI view (piano roll / event list) used by the werckmeister vscode extension",
+    "license": "MIT",
+    "private": true,
+    "main": "out/src/index.js",
+    "types": "out/src/index.d.ts",
+    "scripts": {
+        "build": "tsc -p ./tsconfig.build.json",
+        "test": "tsc -p ./ && mocha \"out/test/**/*.test.js\""
+    },
+    "dependencies": {
+        "lodash": "^4.17.21",
+        "midievents": "^2.0.0",
+        "midifile": "^2.0.0"
+    },
+    "devDependencies": {
+        "@types/jsdom": "^21.1.7",
+        "@types/lodash": "^4.17.13",
+        "@types/mocha": "^10.0.10",
+        "@types/node": "^22.10.0",
+        "jsdom": "^25.0.1",
+        "mocha": "^12.0.3",
+        "typescript": "~5.6.3"
+    }
+}

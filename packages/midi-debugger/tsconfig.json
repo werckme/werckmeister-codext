@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es2019",
+        "lib": ["es2022", "dom", "dom.iterable"],
+        "outDir": "out",
+        "rootDir": ".",
+        "declaration": true,
+        "strict": true,
+        "esModuleInterop": true,
+        "types": ["node", "mocha"]
+    },
+    "include": ["src", "test"]
+}

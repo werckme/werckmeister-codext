@@ -261,9 +261,13 @@
         }
     },
     "scripts": {
-        "compile": "npm run build-parser && tsc -p ./ && npm run build-webviewapp",
+        "compile": "npm run build-packages && tsc -p ./ && npm run build-webviewapp",
+        "build-packages": "npm run build-parser && npm run build-midi-debugger",
         "build-parser": "npm --prefix packages/werckmeister-parser install && npm --prefix packages/werckmeister-parser run build",
+        "build-midi-debugger": "npm --prefix packages/midi-debugger install && npm --prefix packages/midi-debugger run build",
+        "test-packages": "npm run test-parser && npm run test-midi-debugger",
         "test-parser": "npm --prefix packages/werckmeister-parser test",
+        "test-midi-debugger": "npm --prefix packages/midi-debugger test",
         "watch": "tsc -watch -p ./",
         "pretest": "npm run compile",
         "test": "node ./out/test/runTest.js",
@@ -274,7 +278,7 @@
         "webpack-dev": "webpack --mode development --watch",
         "test-compile": "tsc -p ./",
         "publish": "vsce package && vsce publish",
-        "package": "npm run build-webviewapp && vsce package"
+        "package": "npm run build-midi-debugger && npm run build-webviewapp && vsce package"
     },
     "devDependencies": {
         "@babel/core": "^7.6.3",
@@ -297,9 +301,8 @@
         "webpack-cli": "^4.9.2"
     },
     "dependencies": {
-        "@types/lodash": "^4.14.144",
+        "@types/lodash": "4.14.144",
         "@werckmeister/language-features": "1.0.0-76",
-        "@werckmeister/midi-debugger": "1.0.0-40",
         "ace-builds": "^1.4.6",
         "antd": "^4.18.7",
         "lodash": "^4.17.21",
@@ -308,6 +311,7 @@
         "taskkill": "^3.0.0",
         "udp-free-port": "^1.0.0",
         "werckmeister-ace-build": "^1.4.6",
+        "werckmeister-midi-debugger": "file:packages/midi-debugger",
         "werckmeister-parser": "file:packages/werckmeister-parser"
     }
 }

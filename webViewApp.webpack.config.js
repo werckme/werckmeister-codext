@@ -7,6 +7,12 @@ module.exports = {
     path: path.resolve('./WebViewApp/', 'dist'),
     filename: 'WebViewApp.dist.js'
   },
+  resolve: {
+    alias: {
+      // packages/midi-debugger has its own node_modules, use only one lodash copy
+      lodash: path.resolve(__dirname, 'node_modules/lodash')
+    }
+  },
   module: {
     rules: [
       {
