@@ -9,3 +9,10 @@ out
 tsconfig.json
 webpack.config.js
 webViewApp.webpack.config.js
+packages
+tasks
+.nvmrc
+.meta
+*.tsbuildinfo
+tslint.json
+.github

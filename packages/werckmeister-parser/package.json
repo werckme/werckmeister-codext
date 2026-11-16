@@ -1,0 +1,18 @@
+{
+    "name": "werckmeister-parser",
+    "version": "0.1.0",
+    "description": "Lossless, error tolerant parser for Werckmeister sheet code (works on whole documents and on fragments)",
+    "license": "MIT",
+    "main": "out/src/index.js",
+    "types": "out/src/index.d.ts",
+    "scripts": {
+        "build": "tsc -p ./",
+        "test": "tsc -p ./ && mocha \"out/test/**/*.test.js\""
+    },
+    "devDependencies": {
+        "@types/mocha": "^10.0.6",
+        "@types/node": "^22.20.5",
+        "mocha": "^10.4.0",
+        "typescript": "~5.6.3"
+    }
+}
