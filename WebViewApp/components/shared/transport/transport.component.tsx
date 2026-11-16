@@ -1,4 +1,5 @@
 import React from "react";
+import * as _ from "lodash";
 import { playIcon } from "./play.icon";
 import { stopIcon } from "./stop.icon";
 import { BaseComponent } from "../base/base.component";
@@ -7,8 +8,28 @@ import { pauseIcon } from "./pause.icon";
 import { vstIcon } from "./vst.icon";
 import { SwitchComponent } from "../com/switch.component";
 import { followIcon } from "./follow.icon";
-export class TransportComponent extends BaseComponent {
-    constructor(props) {
+
+export interface TransportProps {
+    playerState: string;
+    /** the current position in quarters */
+    position: number;
+    /** the duration of the sheet in ticks */
+    sheetDuration: number;
+    ppq?: number;
+    followTransport?: boolean;
+    followTransportChange?: (value: boolean) => void;
+}
+
+interface TransportState {
+    position: number;
+    /** begin time in quarters, as entered in the input */
+    begin: string | number;
+}
+
+export class TransportComponent extends BaseComponent<TransportProps, TransportState> {
+    private updateBeginBounced: () => void;
+
+    constructor(props: TransportProps) {
         super(props);
         this.state = {
             position: 0,
@@ -33,7 +54,7 @@ export class TransportComponent extends BaseComponent {
         this.sendMessageToHost("player-update-range", { begin: this.state.begin });
     }
 
-    onBeginChanged(ev) {
+    onBeginChanged(ev: React.ChangeEvent<HTMLInputElement>) {
         const value = ev.target.value;
         this.setState({ begin: value })
         this.updateBeginBounced();
@@ -171,7 +192,7 @@ export class TransportComponent extends BaseComponent {
                         onChange={this.onBeginChanged.bind(this)}
                         disabled={this.props.playerState === PlayerState.Playing || this.isConnectedToVst()}
                         min="0" />
-                    <input title="End Time (qtrs)" className="range-to" type="number" value={this.props.sheetDuration.toFixed(0) / this.props.ppq || 1} disabled />
+                    <input title="End Time (qtrs)" className="range-to" type="number" value={Number(this.props.sheetDuration.toFixed(0)) / this.props.ppq! || 1} disabled />
                     <div id="status-bar">
                         <span className="transport-state" style={{ visibility: this.isConnectedToVst() ? "hidden" : "visible" }}>{this.props.playerState || 'Stopped'}</span>
                         <SwitchComponent icon={followIcon()} switchValue={followTransport} onChange={followTransportChange} title="Turn Follow Mode On/Off" id="followSwitch"></SwitchComponent>

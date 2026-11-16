@@ -1,5 +1,4 @@
 import React from "react";
-import * as _ from 'lodash';
 import { BaseComponent } from "../shared/base/base.component";
 
 
@@ -14,21 +13,30 @@ const NoDurationOption = "none";
 const NoDotOption = "none";
 
 
-function mus(symbol) {
+function mus(symbol: string) {
     return (<span className="mus">{symbol}</span>)
 }
 
-export class PianoView extends BaseComponent {
-    constructor(props) {
+interface PianoViewState {
+    selectedDuration: string;
+    /** Sharp or Flat: how the black keys are written */
+    selectedEnharmonicEq: string;
+    selectedDotOption: string;
+}
+
+/** a piano keyboard and some controls to write notes, bars and chords into the editor */
+export class PianoView extends BaseComponent<{}, PianoViewState> {
+    durations = [NoDurationOption, "128", "64", "32", "16", "8", "4", "2", "1"];
+    dotOptions = [NoDotOption, ".", "..", "...", "...."];
+    keyboardRef = React.createRef<HTMLDivElement>();
+
+    constructor(props: {}) {
         super(props);
         this.state = {
             selectedDuration: NoDurationOption,
             selectedEnharmonicEq: Sharp,
             selectedDotOption: NoDotOption
         }
-        this.durations = [NoDurationOption, "128", "64", "32", "16", "8", "4", "2", "1"];
-        this.dotOptions = [NoDotOption, ".", "..", "...", "...."];
-        this.keyboardRef = React.createRef();
     }
 
     componentDidMount() {
@@ -38,7 +46,7 @@ export class PianoView extends BaseComponent {
         }
     }
 
-    renderNote(noteName, octaveNr, acc) {
+    renderNote(noteName: string, octaveNr: number, acc?: string) {
         let note = noteName;
         const duration = this.state.selectedDuration;
         const dot = this.state.selectedDotOption;
@@ -59,7 +67,7 @@ export class PianoView extends BaseComponent {
         return note;
     }
 
-    sendToEditor(text) {
+    sendToEditor(text: string) {
         this.sendMessageToHost("send-text", {text});
     }
 
@@ -68,20 +76,20 @@ export class PianoView extends BaseComponent {
         this.setState({selectedDotOption: NoDotOption})
     }
 
-    onKeyClick(noteName, octaveNr, acc) {
+    onKeyClick(noteName: string, octaveNr: number, acc?: string) {
         const note = this.renderNote(noteName, octaveNr, acc)
         this.sendToEditor(note + " ");
         this.resetDurationSelection();
     }
 
-    getNextNoteName(note) {
+    getNextNoteName(note: string) {
         if (note === 'g') {
             return 'a';
         }
         return String.fromCharCode(note.charCodeAt(0) + 1);
     }
 
-    renderKeyLabel(name, octave, acc) {
+    renderKeyLabel(name: string, octave: number, acc?: string) {
         if (acc) {
             return (<>{mus(acc)}</>)
         }
@@ -91,11 +99,11 @@ export class PianoView extends BaseComponent {
         return (<span>{name}</span>)
     }
 
-    getOctaveTokens(octaveNr) {
+    getOctaveTokens(octaveNr: number) {
         if (octaveNr === 0) {
             return '';
         }
-        const tokens = []
+        const tokens: string[] = []
         const token = octaveNr > 0 ? '\'' : ',';
         let c = Math.abs(octaveNr);
         while(c-- > 0) {
@@ -104,16 +112,16 @@ export class PianoView extends BaseComponent {
         return tokens.join('')
     }
 
-    renderKey(note, octaveNr, acc) {
+    renderKey(note: string, octaveNr: number, acc?: string) {
         const title = note + this.getOctaveTokens(octaveNr);
         return (<button title={title} onClick={this.onKeyClick.bind(this, note, octaveNr, acc)}>{this.renderKeyLabel(note, octaveNr, acc)}</button>)
     }
 
-    onDurationChange(event) {
+    onDurationChange(event: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ selectedDuration: event.target.value });
     };
 
-    onEnharmonicEqChange(event) {
+    onEnharmonicEqChange(event: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ selectedEnharmonicEq: event.target.value });
     };
     
@@ -137,7 +145,7 @@ export class PianoView extends BaseComponent {
         );
     }
 
-    onDotOptionChange(event) {
+    onDotOptionChange(event: React.ChangeEvent<HTMLInputElement>) {
         this.setState({ selectedDotOption: event.target.value });
     }
 
@@ -189,7 +197,7 @@ export class PianoView extends BaseComponent {
         );
     }
 
-    addToken(tokenType) {
+    addToken(tokenType: string) {
         switch(tokenType) {
             case TokenBar: return this.sendToEditor("| ");
             case TokenBarBeginRepeat: return this.sendToEditor("|: ");
@@ -220,7 +228,7 @@ export class PianoView extends BaseComponent {
         </div>);
     }
 
-    renderOctave(octaveNr) {
+    renderOctave(octaveNr: number) {
         return(
             <div key={"octave-" + octaveNr} className={"octave octave-" + octaveNr}>
                 <div className="key wk c">

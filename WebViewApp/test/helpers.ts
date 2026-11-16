@@ -67,7 +67,7 @@ export function fixtureFiles(): string[] {
  */
 export function corpusFiles(): string[] {
     const dir = process.env.WERCKMEISTER_MIDI_CORPUS
-        || path.resolve(__dirname, "../../../../../werckmeister/rendertests");
+        || path.resolve(__dirname, "../../../../werckmeister/rendertests");
     if (!fs.existsSync(dir)) {
         return [];
     }
@@ -77,4 +77,12 @@ export function corpusFiles(): string[] {
 /** waits until the `setTimeout` callbacks of the filter checkboxes are executed */
 export function tick(): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, 0));
+}
+
+/** the messages the webview sent to the extension host (via acquireVsCodeApi().postMessage) */
+export const sentMessages: any[] = [];
+g.acquireVsCodeApi = () => ({ postMessage: (message: unknown) => sentMessages.push(message) });
+
+export function clearSentMessages(): void {
+    sentMessages.length = 0;
 }

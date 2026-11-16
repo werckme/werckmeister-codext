@@ -30,7 +30,7 @@ export const Base64Binary = {
 	_keyStr : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
 
 	/* will return a  Uint8Array type */
-	decodeArrayBuffer: function(input) {
+	decodeArrayBuffer: function(input: string): ArrayBuffer {
 		var bytes = Math.ceil( (3*input.length) / 4.0);
 		var ab = new ArrayBuffer(bytes);
 		this.decode(input, ab);
@@ -38,7 +38,7 @@ export const Base64Binary = {
 		return ab;
 	},
 
-	decode: function(input, arrayBuffer) {
+	decode: function(input: string, arrayBuffer?: ArrayBuffer): Uint8Array {
 		//get last chars to see if are valid
 		var lkey1 = this._keyStr.indexOf(input.charAt(input.length-1));		 
 		var lkey2 = this._keyStr.indexOf(input.charAt(input.length-1));		 
@@ -47,7 +47,7 @@ export const Base64Binary = {
 		if (lkey1 == 64) bytes--; //padding chars, so skip
 		if (lkey2 == 64) bytes--; //padding chars, so skip
 
-		var uarray;
+		var uarray: Uint8Array;
 		var chr1, chr2, chr3;
 		var enc1, enc2, enc3, enc4;
 		var i = 0;

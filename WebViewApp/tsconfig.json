@@ -3,12 +3,14 @@
         "module": "commonjs",
         "target": "es2019",
         "lib": ["es2022", "dom", "dom.iterable"],
+        "jsx": "react",
         "outDir": "out",
         "rootDir": ".",
-        "declaration": true,
         "strict": true,
         "esModuleInterop": true,
+        "skipLibCheck": true,
         "types": ["node", "mocha"]
     },
-    "include": ["src", "test"]
+    "include": ["main.tsx", "components", "midiDebugger", "test"],
+    "exclude": ["out", "dist"]
 }

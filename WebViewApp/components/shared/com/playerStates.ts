@@ -8,4 +8,6 @@ export const PlayerState = {
     Stopping: "Stopping",
     Pausing: "Pausing",
     Paused: "Paused"
-}
+} as const;
+
+export type PlayerStateName = typeof PlayerState[keyof typeof PlayerState];

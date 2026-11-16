@@ -4,7 +4,7 @@ import { MidiEvent } from "midievents";
 import MIDIFile from "midifile";
 import {
     eventDataToString, eventTypeToString, getTracks, midiNumberToNoteName, midiNumberToNoteNameHtml,
-} from "../src/midiHelper";
+} from "../midiDebugger/midiHelper";
 import { fixture } from "./helpers";
 
 function midi(subtype: number, param1?: number, param2?: number): MidiEvent {

@@ -10,7 +10,7 @@
 		"rootDir": "src",
 		"strict": true,   /* enable all strict type-checking options */
 		"skipLibCheck": true,
-		/* only these global types, node_modules/@types also contains the types of the packages' dev dependencies */
+		/* only the global types the extension needs (node_modules/@types also contains the types of the webview and its tests) */
 		"types": ["node", "mocha", "vscode"]
 		/* Additional Checks */
 		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
@@ -20,6 +20,7 @@
 	"exclude": [
 		"node_modules",
 		".vscode-test",
-		"packages"
+		"packages",
+		"WebViewApp"
 	]
 }

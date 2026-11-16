@@ -4,6 +4,7 @@ import { TransportViewComponent } from './components/transportView/transportView
 import { DebuggerComponent } from './components/debugger/debugger.component';
 import { PianoView } from './components/pianoView/pianoView';
 
+/** every webview html (transportView.html, pianoView.html, inspector.html) contains one of these elements */
 const PianoViewId = 'piano-view-main-component';
 const TransportViewId = 'transport-main-component';
 const DebuggerId = 'debugger-main-component';
@@ -18,8 +19,7 @@ if (pianoView) {
     ReactDOM.render(<PianoView />, pianoView);
 }
 
-
 const debugger_ = document.getElementById(DebuggerId);
 if (debugger_) {
-    ReactDOM.render(<DebuggerComponent></DebuggerComponent>, debugger_)
+    ReactDOM.render(<DebuggerComponent></DebuggerComponent>, debugger_);
 }

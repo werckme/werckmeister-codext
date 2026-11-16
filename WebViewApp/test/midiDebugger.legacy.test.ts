@@ -1,7 +1,7 @@
 import * as assert from "assert";
 import * as path from "path";
 import * as fs from "fs";
-import { WmMidiFileDebugger } from "../src";
+import { WmMidiFileDebugger } from "../midiDebugger";
 import {
     arrayBufferFor, corpusFiles, createLegacyWindow, fixtureFiles, modernWindow, resetModernDocument, tick,
 } from "./helpers";

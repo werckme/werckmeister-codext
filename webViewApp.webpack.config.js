@@ -1,25 +1,25 @@
 const path = require('path');
 
 module.exports = {
-  entry: './WebViewApp/main.js',
+  entry: './WebViewApp/main.tsx',
   mode: 'development',
   output: {
     path: path.resolve('./WebViewApp/', 'dist'),
     filename: 'WebViewApp.dist.js'
   },
   resolve: {
-    alias: {
-      // packages/midi-debugger has its own node_modules, use only one lodash copy
-      lodash: path.resolve(__dirname, 'node_modules/lodash')
-    }
+    extensions: ['.tsx', '.ts', '.js']
   },
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.tsx?$/,
         exclude: /node_modules/,
         use: {
-          loader: "babel-loader"
+          loader: 'ts-loader',
+          options: {
+            configFile: path.resolve(__dirname, 'WebViewApp/tsconfig.json')
+          }
         }
       }
     ]

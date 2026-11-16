@@ -16,3 +16,9 @@ tasks
 *.tsbuildinfo
 tslint.json
 .github
+WebViewApp/components
+WebViewApp/midiDebugger
+WebViewApp/test
+WebViewApp/out
+WebViewApp/main.tsx
+WebViewApp/tsconfig.json
