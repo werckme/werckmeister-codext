@@ -14,6 +14,9 @@ This extension provides support for the [Werckmeister](https://werckme.github.io
 
 
 ### Piano Input
+<img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/transpose-command.gif">
+
+### Piano Input
 <img src="https://raw.githubusercontent.com/werckme/werckmeister-codext/master/assets/features/piano-input.gif">
 
 ### Werckmeister-VST Plugin integration

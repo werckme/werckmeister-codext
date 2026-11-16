@@ -1,3 +1,6 @@
+# Version 1.1.20
+* transpose command
+
 # Version 1.1.11
 * adding optional player arguments to extension settings
 
