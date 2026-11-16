@@ -4,7 +4,7 @@ tsconfig.json
 dist
 *.vsix
 out
-
+.meta
 ### VisualStudioCode ###
 .vscode/*
 !.vscode/settings.json
@@ -113,3 +113,4 @@ typings/
 .dynamodb/
 
 # End of https://www.gitignore.io/api/node
+.vscode-test

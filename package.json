@@ -21,6 +21,8 @@
         "onCommand:extension.werckmeister.connectToVst",
         "onCommand:extension.werckmeister.closeVstConnection",
         "onCommand:extension.werckmeister.countQuarters",
+        "onCommand:extension.werckmeister.transposeOctaveUp",
+        "onCommand:extension.werckmeister.transposeOctaveDown",
         "onView:werckmeister-vstConnections",
         "onLanguage:werckmeister"
     ],
@@ -121,6 +123,14 @@
             {
                 "command": "extension.werckmeister.countQuarters",
                 "title": "Werckmeister: Count quarters of selection"
+            },
+            {
+                "command": "extension.werckmeister.transposeOctaveUp",
+                "title": "Werckmeister: Transpose selection one octave up"
+            },
+            {
+                "command": "extension.werckmeister.transposeOctaveDown",
+                "title": "Werckmeister: Transpose selection one octave down"
             }
         ],
         "menus": {
@@ -144,6 +154,14 @@
                 }
             ],
             "commandPalette": [
+                {
+                    "when": "editorLangId == werckmeister",
+                    "command": "extension.werckmeister.transposeOctaveUp"
+                },
+                {
+                    "when": "editorLangId == werckmeister",
+                    "command": "extension.werckmeister.transposeOctaveDown"
+                },
                 {
                     "when": "resourceExtname == .sheet",
                     "command": "extension.werckmeister.play"
@@ -238,19 +256,21 @@
                     "type": "string",
                     "default": "",
                     "description": "Additional space separated player arguments"
-                }     
+                }
             }
         }
     },
     "scripts": {
-        "compile": "tsc -p ./ && npm run build-webviewapp",
+        "compile": "npm run build-parser && tsc -p ./ && npm run build-webviewapp",
+        "build-parser": "npm --prefix packages/werckmeister-parser install && npm --prefix packages/werckmeister-parser run build",
+        "test-parser": "npm --prefix packages/werckmeister-parser test",
         "watch": "tsc -watch -p ./",
         "pretest": "npm run compile",
         "test": "node ./out/test/runTest.js",
         "build-webviewapp": "webpack --config webViewApp.webpack.config.js",
         "webview-dev": "webpack --config webViewApp.webpack.config.js --watch",
-        "vscode:prepublish": "webpack --mode production",
-        "webpack": "webpack --mode development",
+        "vscode:prepublish": "npm run build-parser && webpack --mode production",
+        "webpack": "npm run build-parser && webpack --mode development",
         "webpack-dev": "webpack --mode development --watch",
         "test-compile": "tsc -p ./",
         "publish": "vsce package && vsce publish",
@@ -287,6 +307,7 @@
         "react-dom": "^16.10.2",
         "taskkill": "^3.0.0",
         "udp-free-port": "^1.0.0",
-        "werckmeister-ace-build": "^1.4.6"
+        "werckmeister-ace-build": "^1.4.6",
+        "werckmeister-parser": "file:packages/werckmeister-parser"
     }
 }
