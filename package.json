@@ -263,7 +263,7 @@
     "scripts": {
         "compile": "npm run build-parser && tsc -p ./ && npm run build-webviewapp",
         "build-parser": "npm --prefix packages/werckmeister-parser install && npm --prefix packages/werckmeister-parser run build",
-        "test-parser": "npm --prefix packages/werckmeister-parser test",
+        "test-parser": "npm --prefix packages/werckmeister-parser install && npm --prefix packages/werckmeister-parser test",
         "test-webview": "tsc -p WebViewApp && mocha --exit \"WebViewApp/out/test/**/*.test.js\"",
         "watch": "tsc -watch -p ./",
         "pretest": "npm run compile",
@@ -300,7 +300,6 @@
     },
     "dependencies": {
         "@werckmeister/language-features": "1.0.0-76",
-        "ace-builds": "^1.4.6",
         "lodash": "^4.17.21",
         "midievents": "^2.0.0",
         "midifile": "^2.0.0",
@@ -308,7 +307,6 @@
         "react-dom": "^16.10.2",
         "taskkill": "^3.0.0",
         "udp-free-port": "^1.0.0",
-        "werckmeister-ace-build": "^1.4.6",
         "werckmeister-parser": "file:packages/werckmeister-parser"
     }
 }

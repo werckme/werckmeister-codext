@@ -26,6 +26,10 @@ jobs:
           VERSION: ${{ github.run_number }}
       - name: prepare
         run: npm ci
+      - name: test parser
+        run: npm run test-parser
+      - name: test webview
+        run: npm run test-webview
       - name: build
         run: npm run package
       - uses: actions/upload-artifact@v4
